@@ -33,8 +33,8 @@ AndroidPlayer is a high-performance Android screen mirroring application for Win
 
 ### Requirements
 
-- Windows 10 or later
-- .NET SDK (see `global.json`)
+- Windows 7 or later
+- .NET SDK 
 - JetBrains Rider (recommended) or Visual Studio
 - Android device with USB debugging enabled
 
@@ -103,6 +103,16 @@ Please keep code style consistent and test changes before submitting.
 - FFmpeg.AutoGen
 - ADB
 - .NET
+
+---
+
+
+💝 Support the Project
+If you find AndroidPlayer useful and would like to support its development, consider making a donation:
+
+https://img.shields.io/badge/Donate-PayPal-blue.svg
+
+Your support helps keep the project alive and encourages continued development! Every contribution, no matter how small, is greatly appreciated. ❤️
 
 ---
 
