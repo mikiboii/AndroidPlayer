@@ -1,96 +1,113 @@
-📱 AndroidPlayer
-Real-time Android screen mirroring with PC control, audio forwarding, and keyboard input support
+# AndroidPlayer
 
-https://img.shields.io/badge/license-MIT-blue.svg
-https://img.shields.io/badge/platform-Windows-blue
-https://img.shields.io/badge/IDE-Rider-ff69b4
+AndroidPlayer is a high-performance Android screen mirroring application for Windows built with WPF and DirectX. It provides low-latency video and audio streaming, keyboard and mouse control, and customizable key mapping for games and productivity.
 
-✨ Features
-📺 High-Performance Mirroring - Real-time screen casting with low latency rendering
+---
 
-🎮 PC Control - Full mouse and keyboard control over your Android device
+## Features
 
-🔊 Audio Forwarding - Stream device audio directly to your PC speakers
+- 🚀 Low-latency Android screen mirroring
+- 🎮 Custom key mapping for games
+- 🔊 Real-time Android audio forwarding
+- ⌨️ Type directly on your Android device using your PC keyboard
+- 🖱️ Mouse and keyboard control
+- ⚡ GPU-accelerated H.264 decoding using FFmpeg
+- 🖥️ DirectX rendering for smooth playback
+- 📱 Works with Android devices over ADB
 
-⌨️ Text Input - Type directly from your PC keyboard into Android apps
+---
 
-🎯 Key Mapping - Customizable key bindings for enhanced control (see image 2)
+## Screenshots
 
-⚡ Optimized Rendering - Smooth, high-quality display performance
+### Screen Mirroring
 
-https://Icons/Docs_image/image%25201.PNG
-![screenshot](Icons/Docs_image/image 1.PNG)
-Figure 1: Real-time Android screen mirroring on PC
+![Screen Mirroring](Icons/Docs_image/image1.PNG)
 
-https://Icons/Docs_image/image%25202.PNG
-Figure 2: Customizable key mapping interface
+### Key Mapping
 
-📥 Download
-For regular users: Download the latest pre-built release from the Releases page. No building required - just download, extract, and run!
+![Key Mapping](Icons/Docs_image/image2.PNG)
 
-🚀 Quick Start (For Developers)
-Prerequisites
-Windows OS (7, 8, 10, or 11)
+---
 
-Android device with USB debugging enabled
+## Building
 
-Rider IDE or Visual Studio
+### Requirements
 
-Installation & Setup
-Clone the repository
+- Windows 10 or later
+- .NET SDK (see `global.json`)
+- JetBrains Rider (recommended) or Visual Studio
+- Android device with USB debugging enabled
 
-bash
-git clone https://github.com/yourusername/AndroidPlayer.git
-cd AndroidPlayer
-Open in Rider
+### Build
 
-Launch Rider IDE
+Clone the repository:
 
-Open the solution file (AndroidPlayer.sln)
+```bash
+git clone https://github.com/mikiboii/AndroidPlayer.git
+```
 
-Build & Run
+Open the solution in **JetBrains Rider**:
 
-Click Build → Build Solution (or press Ctrl+Shift+B)
+```
+Androidplayer.sln
+```
 
-Click Run (or press Ctrl+F5)
+Then either:
 
-Enable Developer Mode for Testing
+- Build and Run
+- **or**
+- Publish the project from Rider
 
-⚠️ Important: For development and testing, ensure developer mode is enabled:
+No additional setup should be required if all project dependencies are present.
 
-csharp
-// In Androidplayer.Store.my_info
-private bool _developerMode = true;  // Set to true for testing
-Publishing
-Use Rider's Build → Publish feature
+---
 
-Or run a standard build configuration
+## Developer Mode
 
-Ensure _developerMode is set to false before publishing
+For easier testing while developing, enable Developer Mode inside the application.
 
-📋 System Requirements
-Component	Requirement
-OS	Windows 7, 8, 10, or 11
-Storage	200MB free space
-Android	7.0+ with USB debugging
-Note: For end users, no IDE or development tools are required - just download the pre-built release!
+Open:
 
-💝 Support the Project
-If you find AndroidPlayer useful and would like to support its development, consider making a donation:
+```text
+Androidplayer.Store.my_info
+```
 
-https://img.shields.io/badge/Donate-PayPal-blue.svg
+and set:
 
-Your support helps keep the project alive and encourages continued development! Every contribution, no matter how small, is greatly appreciated. ❤️
+```csharp
+private bool _developerMode = true;
+```
 
-📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+Developer Mode enables features that simplify testing during development.
 
-🙏 Acknowledgments
-Thanks to all contributors who help improve AndroidPlayer
+---
 
-Built with .NET and love for Android-PC integration
+## Contributing
 
-Star ⭐ this repository if you find it useful!
+Contributions are welcome!
 
-Report Bug · Request Feature
+1. Fork the repository.
+2. Create a new branch.
+3. Make your changes.
+4. Submit a Pull Request.
 
+Please keep code style consistent and test changes before submitting.
+
+---
+
+## Technologies
+
+- C#
+- WPF
+- DirectX 11
+- FFmpeg.AutoGen
+- ADB
+- .NET
+
+---
+
+## License
+
+This project is licensed under the Apache 2.0 License.
+
+See the `LICENSE` file for details.
