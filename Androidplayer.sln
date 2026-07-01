@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Androidplayer", "Androidplayer\Androidplayer.csproj", "{6AB060EE-9E82-4E2F-8C5C-82EAB92387D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Androidplayer", "Androidplayer.csproj", "{6AB060EE-9E82-4E2F-8C5C-82EAB92387D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
