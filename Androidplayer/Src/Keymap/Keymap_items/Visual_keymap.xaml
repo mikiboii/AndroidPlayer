@@ -1,0 +1,897 @@
+
+
+<UserControl x:Class="Androidplayer.Src.Keymap.Keymap_items.Visual_keymap"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
+             mc:Ignorable="d"
+             d:DesignHeight="180" d:DesignWidth="360"
+             Background="Transparent">
+
+    <Grid x:Name="RootGrid" IsHitTestVisible="True" Background="Transparent"
+          MouseLeftButtonDown="RootGrid_MouseLeftButtonDown"
+          MouseMove="RootGrid_MouseMove"
+          MouseLeftButtonUp="RootGrid_MouseLeftButtonUp">
+
+        <!-- Main content with Viewbox for auto-scaling -->
+        <Viewbox Stretch="Uniform" Margin="5" StretchDirection="Both">
+            <Grid  >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left Control (X) -->
+                <Border Grid.Column="0"
+                        CornerRadius="10"
+                        Background="#D8DBE4"
+                        BorderBrush="#DADFE6"
+                        BorderThickness="2.5"
+                        Margin="8"
+                        VerticalAlignment="Center"
+                        SnapsToDevicePixels="True">
+                    <Grid Width="38">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>   <!-- + -->
+                            <RowDefinition Height="Auto"/>   <!-- 25 -->
+                            <RowDefinition Height="Auto"/>   <!-- - -->
+                            <RowDefinition Height="Auto"/>   <!-- Y -->
+                        </Grid.RowDefinitions>
+
+                        
+                        
+                        
+                        <Border Grid.Row="0"
+        Margin="0,0,0,3"
+        Height="35"
+        Cursor="Hand"
+        CornerRadius="10,10,7,7"
+        BorderThickness="0,0,0,1"
+        RenderTransformOrigin="0.5,0.5">
+
+    <!-- Default brushes (important for animating colors) -->
+    <Border.Background>
+        <SolidColorBrush x:Name="bgBrush_left" Color="#F5F7FA"/>
+    </Border.Background>
+    <Border.BorderBrush>
+        <SolidColorBrush x:Name="borderBrush_left" Color="#E0E4EA"/>
+    </Border.BorderBrush>
+
+    <!-- Transform for scale animation -->
+    <Border.RenderTransform>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+    </Border.RenderTransform>
+
+    <!-- + symbol -->
+    <TextBlock x:Name="plusText_left"
+               Text="+"
+               Foreground="#1A73E8"
+               FontWeight="Bold"
+               FontSize="22"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               IsHitTestVisible="False"/>
+
+    <!-- ✅ Triggers go directly inside Border.Triggers -->
+    <Border.Triggers>
+
+        <!-- Hover -->
+        <EventTrigger RoutedEvent="MouseEnter">
+            <BeginStoryboard>
+                <Storyboard>
+                    <ColorAnimation Storyboard.TargetName="bgBrush_left"
+                                    Storyboard.TargetProperty="Color"
+                                    To="#1A73E8"
+                                    Duration="0:0:0.1"/>
+                    <ColorAnimation Storyboard.TargetName="borderBrush_left"
+                                    Storyboard.TargetProperty="Color"
+                                    To="#E0E4EA"
+                                    Duration="0:0:0.1"/>
+                    <ColorAnimation Storyboard.TargetName="plusText_left"
+                                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                    To="White"
+                                    Duration="0:0:0.1"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
+                                     To="1.05" Duration="0:0:0.08"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
+                                     To="1.05" Duration="0:0:0.08"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+
+        <!-- Leave -->
+        <EventTrigger RoutedEvent="MouseLeave">
+            <BeginStoryboard>
+                <Storyboard>
+                    <ColorAnimation Storyboard.TargetName="bgBrush_left"
+                                    Storyboard.TargetProperty="Color"
+                                    To="#F5F7FA"
+                                    Duration="0:0:0.1"/>
+                    <ColorAnimation Storyboard.TargetName="borderBrush_left"
+                                    Storyboard.TargetProperty="Color"
+                                    To="#E0E4EA"
+                                    Duration="0:0:0.1"/>
+                    <ColorAnimation Storyboard.TargetName="plusText_left"
+                                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                    To="#1A73E8"
+                                    Duration="0:0:0.1"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
+                                     To="1" Duration="0:0:0.08"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
+                                     To="1" Duration="0:0:0.08"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+
+    </Border.Triggers>
+</Border>
+
+                        
+                        
+                        <!-- + -->
+                        <!-- <Border Grid.Row="0" -->
+                        <!--         Margin="0,0,0,3" -->
+                        <!--         Height="35" -->
+                        <!--         Background="#F5F7FA" -->
+                        <!--         BorderBrush="#E0E4EA" -->
+                        <!--         BorderThickness="0,0,0,1" -->
+                        <!--         CornerRadius="10,10,7,7"> -->
+                        <!--     ~1~ <TextBlock Text="+"  @1@ -->
+                        <!--     ~1~            Foreground="#1A73E8" @1@ -->
+                        <!--     ~1~            FontWeight="Bold" @1@ -->
+                        <!--     ~1~            FontSize="22" @1@ -->
+                        <!--     ~1~            HorizontalAlignment="Center" @1@ -->
+                        <!--     ~1~            VerticalAlignment="Center"/> @1@ -->
+                        <!--     -->
+                        <!--      -->
+                        <!--     ~1~ + Button @1@ -->
+                        <!--     <Button Content="+" -->
+                        <!--             Foreground="#1A73E8" -->
+                        <!--             FontSize="22" -->
+                        <!--             FontWeight="Bold" -->
+                        <!--             VerticalAlignment="Center" -->
+                        <!--             HorizontalAlignment="Center" -->
+                        <!--             Background="Transparent" -->
+                        <!--             BorderThickness="0" -->
+                        <!--             Cursor="Hand"> -->
+                        <!--         <Button.Style> -->
+                        <!--             <Style TargetType="Button"> -->
+                        <!--                 <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/> -->
+                        <!--                 <Setter Property="RenderTransform"> -->
+                        <!--                     <Setter.Value> -->
+                        <!--                         <ScaleTransform ScaleX="1" ScaleY="1"/> -->
+                        <!--                     </Setter.Value> -->
+                        <!--                 </Setter> -->
+                        <!--                 <Style.Triggers> -->
+                        <!--                     <Trigger Property="IsMouseOver" Value="True"> -->
+                        <!--                         <Setter Property="Background" Value="#E8F0FE"/>  -->
+                        <!--                         <Setter Property="RenderTransform"> -->
+                        <!--                             <Setter.Value> -->
+                        <!--                                 <ScaleTransform ScaleX="1.1" ScaleY="1.1"/> -->
+                        <!--                             </Setter.Value> -->
+                        <!--                         </Setter> -->
+                        <!--                     </Trigger> -->
+                        <!--                 </Style.Triggers> -->
+                        <!--             </Style> -->
+                        <!--         </Button.Style> -->
+                        <!--     </Button> -->
+                        <!-- -->
+                        <!--      -->
+                        <!--      -->
+                        <!-- </Border> -->
+
+                        <!-- 25 -->
+                        <Border Grid.Row="1"
+                                Height="42"
+                                Background="#FFFFFF"
+                                BorderBrush="#E0E4EA"
+                                CornerRadius="8,8,0,0"
+                                BorderThickness="0,0,0,0">
+                            <TextBlock Text="25"
+                                       Foreground="#1A73E8"
+                                       FontWeight="Bold"
+                                       FontSize="20"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- − -->
+                        <!-- <Border Grid.Row="2" -->
+                        <!--         Height="42" -->
+                        <!--         Background="#F5F7FA" -->
+                        <!--         BorderBrush="#E0E4EA" -->
+                        <!--         Margin="0,0,0,2" -->
+                        <!--         CornerRadius="0,0,8,8" -->
+                        <!--         BorderThickness="0,0,0,1"> -->
+                        <!--     ~1~ <TextBlock Text="−" @1@ -->
+                        <!--     ~1~            Foreground="#1A73E8" @1@ -->
+                        <!--     ~1~            FontWeight="Bold" @1@ -->
+                        <!--     ~1~            FontSize="22" @1@ -->
+                        <!--     ~1~            HorizontalAlignment="Center" @1@ -->
+                        <!--     ~1~            VerticalAlignment="Center"/> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--      -->
+                        <!--      -->
+                        <!--      -->
+                        <!--     <Button Content="+" -->
+                        <!--             Foreground="#1A73E8" -->
+                        <!--             FontSize="22" -->
+                        <!--             FontWeight="Bold" -->
+                        <!--             VerticalAlignment="Center" -->
+                        <!--             HorizontalAlignment="Center" -->
+                        <!--             Background="Transparent" -->
+                        <!--             BorderThickness="0" -->
+                        <!--      -->
+                        <!--     > -->
+                        <!--      -->
+                        <!--     </Button> -->
+                        <!--      -->
+                        <!--      -->
+                        <!-- </Border> -->
+                        
+                        
+                        
+                        
+                        
+                        
+                        <Border Grid.Row="2"
+        Height="42"
+        Margin="0,0,0,2"
+        CornerRadius="0,0,8,8"
+        BorderThickness="0,0,0,1"
+        Cursor="Hand"
+        RenderTransformOrigin="0.5,0.5"
+        Background="#F5F7FA"
+        BorderBrush="#E0E4EA">
+
+    <!-- Transform for scale animation -->
+    <Border.RenderTransform>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+    </Border.RenderTransform>
+
+    <!-- − symbol -->
+    <TextBlock x:Name="minusText_left"
+               Text="−"
+               Foreground="#1A73E8"
+               FontWeight="Bold"
+               FontSize="22"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               IsHitTestVisible="False"/>
+
+    <!-- ✅ Hover animation triggers -->
+    <Border.Triggers>
+        <EventTrigger RoutedEvent="MouseEnter">
+            <BeginStoryboard>
+                <Storyboard>
+                    <!-- Animate background color -->
+                    <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                    To="#1A73E8"
+                                    Duration="0:0:0.1"/>
+                    <!-- Animate border color -->
+                    <ColorAnimation Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                    To="#1A73E8"
+                                    Duration="0:0:0.1"/>
+                    <!-- Animate minus text to white -->
+                    <ColorAnimation Storyboard.TargetName="minusText_left"
+                                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                    To="White"
+                                    Duration="0:0:0.1"/>
+                    <!-- Scale up -->
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
+                                     To="1.05" Duration="0:0:0.08"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
+                                     To="1.05" Duration="0:0:0.08"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+
+        <EventTrigger RoutedEvent="MouseLeave">
+            <BeginStoryboard>
+                <Storyboard>
+                    <!-- Back to default colors -->
+                    <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                    To="#F5F7FA"
+                                    Duration="0:0:0.1"/>
+                    <ColorAnimation Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                    To="#E0E4EA"
+                                    Duration="0:0:0.1"/>
+                    <!-- Animate minus text back to blue -->
+                    <ColorAnimation Storyboard.TargetName="minusText_left"
+                                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                    To="#1A73E8"
+                                    Duration="0:0:0.1"/>
+                    <!-- Scale down -->
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
+                                     To="1" Duration="0:0:0.08"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
+                                     To="1" Duration="0:0:0.08"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Border.Triggers>
+</Border>
+
+                        
+                        
+                        
+                        
+                        
+                        
+
+                        <!-- Y -->
+                        <Border Grid.Row="3"
+                                Height="32"
+                                Background="#F5F7FA"
+                                Margin="0,0,0,1"
+                                CornerRadius="9,9,10,10">
+                            <TextBlock Text="X"
+                                       Foreground="#000"
+                                       FontWeight="Bold"
+                                       FontSize="18"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Center Circular Control -->
+                <Grid x:Name="Circle_Grid"  Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      
+                      >
+                    
+                    
+                    <Grid Width="120" Height="120">
+                        
+                        
+                    <Ellipse Width="120" Height="120" Stroke="#1A73E8" StrokeThickness="6" Fill="Transparent"/>
+                    
+                    
+                    
+                    <Button Width="26" Height="26"
+            Background="#FFE4C4"
+            BorderBrush="#1A73E8"
+            BorderThickness="2"
+            Click="remove_btn_OnClick"
+            Padding="0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="0,6,6,0"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center">
+        <Button.Template>
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Border"
+                        Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}" 
+                        CornerRadius="13"
+                        RenderTransformOrigin="0.5,0.5">
+                    <Border.RenderTransform>
+                        <ScaleTransform x:Name="scaleTransform" ScaleX="1" ScaleY="1"/>
+                    </Border.RenderTransform>
+                    <TextBlock Text="X" 
+                               Foreground="Red" 
+                               TextAlignment="Center"
+                               FontSize="14"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Trigger.EnterActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                     Storyboard.TargetProperty="ScaleX"
+                                                     To="1.3" Duration="0:0:0.08"/>
+                                    <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                     Storyboard.TargetProperty="ScaleY"
+                                                     To="1.3" Duration="0:0:0.08"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </Trigger.EnterActions>
+                        <Trigger.ExitActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                     Storyboard.TargetProperty="ScaleX"
+                                                     To="1" Duration="0:0:0.08"/>
+                                    <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                     Storyboard.TargetProperty="ScaleY"
+                                                     To="1" Duration="0:0:0.08"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </Trigger.ExitActions>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Button.Template>
+    </Button>
+                    
+                        
+                    </Grid>
+                    
+                    <!-- Outer Blue Ring -->
+
+                    <!-- Inner Target Mark -->
+                    <!-- <Canvas Width="70" Height="70" IsHitTestVisible="False"> -->
+                    <!--     <Ellipse Canvas.Left="21" Canvas.Top="21" Width="28" Height="28" Stroke="#000" StrokeThickness="3" Fill="Transparent"/> -->
+                    <!--     <Rectangle Canvas.Left="34" Canvas.Top="8" Width="3" Height="10" Fill="#000"/> -->
+                    <!--     <Rectangle Canvas.Left="34" Canvas.Top="52" Width="3" Height="10" Fill="#000"/> -->
+                    <!--     <Rectangle Canvas.Left="8" Canvas.Top="34" Width="10" Height="3" Fill="#000"/> -->
+                    <!--     <Rectangle Canvas.Left="52" Canvas.Top="34" Width="10" Height="3" Fill="#000"/> -->
+                    <!--     <Ellipse Canvas.Left="33" Canvas.Top="33" Width="4" Height="4" Fill="#000"/> -->
+                    <!-- </Canvas> -->
+
+
+                    
+                    <Canvas Width="70" Height="70" IsHitTestVisible="False">
+                        <Ellipse Canvas.Left="21" Canvas.Top="21" Width="28" Height="28" Stroke="#000" StrokeThickness="3" Fill="Transparent"/>
+                        <Rectangle Canvas.Left="34" Canvas.Top="8" Width="3" Height="10" Fill="#000"/>
+                        <Rectangle Canvas.Left="34" Canvas.Top="52" Width="3" Height="10" Fill="#000"/>
+                        <Rectangle Canvas.Left="8" Canvas.Top="34" Width="10" Height="3" Fill="#000"/>
+                        <Rectangle Canvas.Left="52" Canvas.Top="34" Width="10" Height="3" Fill="#000"/>
+                        <Ellipse Canvas.Left="33" Canvas.Top="33" Width="4" Height="4" Fill="#000"/>
+                    </Canvas>
+
+                    
+                    
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <!-- Display text -->
+                        <TextBlock x:Name="DisplayKey"
+                                   Text="y"
+                                   Foreground="white"
+                                   FontSize="42"
+                                   
+                                   FontWeight="Bold"
+                                  TextAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Visibility="Visible"
+                                   TextWrapping="NoWrap" />
+
+                        <!-- Editing input -->
+                        <TextBox x:Name="InputField"
+                                 Text=""
+                                 FontSize="42"
+                                 FontWeight="Bold"
+                                 
+                                 Foreground="white"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Visibility="Collapsed"
+                                 VerticalContentAlignment="Center"
+                                 HorizontalContentAlignment="Center"/>
+                    </Grid>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                     
+
+            
+                    
+                    
+                    
+                </Grid>
+
+                <!-- Right Control (Y) -->
+                <Border Grid.Column="2"
+                        CornerRadius="10"
+                        Background="#D8DBE4"
+                        BorderBrush="#DADFE6"
+                        BorderThickness="2.5"
+                        Margin="8"
+                        VerticalAlignment="Center"
+                        SnapsToDevicePixels="True">
+                    <Grid Width="38">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>   <!-- + -->
+                            <RowDefinition Height="Auto"/>   <!-- 25 -->
+                            <RowDefinition Height="Auto"/>   <!-- - -->
+                            <RowDefinition Height="Auto"/>   <!-- Y -->
+                        </Grid.RowDefinitions>
+
+                      
+
+
+
+                        
+<!--                        <Border Grid.Row="0" -->
+<!--                                 -->
+<!--                                 -->
+<!--         Margin="0,0,0,3" -->
+<!--         Height="35" -->
+<!--         Cursor="Hand" -->
+<!--         CornerRadius="10,10,7,7" -->
+<!--         BorderThickness="0,0,0,1" -->
+<!--         RenderTransformOrigin="0.5,0.5"> -->
+<!-- -->
+<!--     ~1~ Default brushes (important for animating colors) @1@ -->
+<!--     <Border.Background> -->
+<!--         <SolidColorBrush x:Name="bgBrush" Color="#F5F7FA"/> -->
+<!--     </Border.Background> -->
+<!--     <Border.BorderBrush> -->
+<!--         <SolidColorBrush x:Name="borderBrush" Color="#E0E4EA"/> -->
+<!--     </Border.BorderBrush> -->
+<!-- -->
+<!--     ~1~ Transform for scale animation @1@ -->
+<!--     <Border.RenderTransform> -->
+<!--         <ScaleTransform ScaleX="1" ScaleY="1"/> -->
+<!--     </Border.RenderTransform> -->
+<!-- -->
+<!--     ~1~ ✅ Triggers go directly inside Border.Triggers @1@ -->
+<!--     <Border.Triggers> -->
+<!--         <EventTrigger RoutedEvent="MouseEnter"> -->
+<!--             <BeginStoryboard> -->
+<!--                 <Storyboard> -->
+<!--                     <ColorAnimation Storyboard.TargetName="bgBrush" -->
+<!--                                     Storyboard.TargetProperty="Color" -->
+<!--                                     To="#1A73E8" -->
+<!--                                     Duration="0:0:0.1"/> -->
+<!--                     <ColorAnimation Storyboard.TargetName="borderBrush" -->
+<!--                                     Storyboard.TargetProperty="Color" -->
+<!--                                     To="#E0E4EA" -->
+<!--                                     Duration="0:0:0.1"/> -->
+<!--                     <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" -->
+<!--                                      To="1.05" Duration="0:0:0.08"/> -->
+<!--                     <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" -->
+<!--                                      To="1.05" Duration="0:0:0.08"/> -->
+<!--                 </Storyboard> -->
+<!--             </BeginStoryboard> -->
+<!--         </EventTrigger> -->
+<!-- -->
+<!--         <EventTrigger RoutedEvent="MouseLeave"> -->
+<!--             <BeginStoryboard> -->
+<!--                 <Storyboard> -->
+<!--                     <ColorAnimation Storyboard.TargetName="bgBrush" -->
+<!--                                     Storyboard.TargetProperty="Color" -->
+<!--                                     To="#F5F7FA" -->
+<!--                                     Duration="0:0:0.1"/> -->
+<!--                     <ColorAnimation Storyboard.TargetName="borderBrush" -->
+<!--                                     Storyboard.TargetProperty="Color" -->
+<!--                                     To="#E0E4EA" -->
+<!--                                     Duration="0:0:0.1"/> -->
+<!--                     <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" -->
+<!--                                      To="1" Duration="0:0:0.08"/> -->
+<!--                     <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" -->
+<!--                                      To="1" Duration="0:0:0.08"/> -->
+<!--                 </Storyboard> -->
+<!--             </BeginStoryboard> -->
+<!--         </EventTrigger> -->
+<!--     </Border.Triggers> -->
+<!-- -->
+<!--     ~1~ + symbol @1@ -->
+<!--     <TextBlock Text="+" -->
+<!--                Foreground="#1A73E8" -->
+<!--                FontWeight="Bold" -->
+<!--                FontSize="22" -->
+<!--      -->
+<!--                HorizontalAlignment="Center" -->
+<!--                VerticalAlignment="Center" -->
+<!--                IsHitTestVisible="False"/> -->
+<!-- </Border> -->
+
+
+                        
+
+                        <Border Grid.Row="0"
+        Margin="0,0,0,3"
+        Height="35"
+        Cursor="Hand"
+        CornerRadius="10,10,7,7"
+        BorderThickness="0,0,0,1"
+        RenderTransformOrigin="0.5,0.5">
+
+    <!-- Default brushes (important for animating colors) -->
+    <Border.Background>
+        <SolidColorBrush x:Name="bgBrush_right" Color="#F5F7FA"/>
+    </Border.Background>
+    <Border.BorderBrush>
+        <SolidColorBrush x:Name="borderBrush_right" Color="#E0E4EA"/>
+    </Border.BorderBrush>
+
+    <!-- Transform for scale animation -->
+    <Border.RenderTransform>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+    </Border.RenderTransform>
+
+    <!-- + symbol -->
+    <TextBlock x:Name="plusText_right"
+               Text="+"
+               Foreground="#1A73E8"
+               FontWeight="Bold"
+               FontSize="22"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               IsHitTestVisible="False"/>
+
+    <!-- ✅ Triggers go directly inside Border.Triggers -->
+    <Border.Triggers>
+
+        <!-- Hover -->
+        <EventTrigger RoutedEvent="MouseEnter">
+            <BeginStoryboard>
+                <Storyboard>
+                    <ColorAnimation Storyboard.TargetName="bgBrush_right"
+                                    Storyboard.TargetProperty="Color"
+                                    To="#1A73E8"
+                                    Duration="0:0:0.1"/>
+                    <ColorAnimation Storyboard.TargetName="borderBrush_right"
+                                    Storyboard.TargetProperty="Color"
+                                    To="#E0E4EA"
+                                    Duration="0:0:0.1"/>
+                    <ColorAnimation Storyboard.TargetName="plusText_right"
+                                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                    To="White"
+                                    Duration="0:0:0.1"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
+                                     To="1.05" Duration="0:0:0.08"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
+                                     To="1.05" Duration="0:0:0.08"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+
+        <!-- Leave -->
+        <EventTrigger RoutedEvent="MouseLeave">
+            <BeginStoryboard>
+                <Storyboard>
+                    <ColorAnimation Storyboard.TargetName="bgBrush_right"
+                                    Storyboard.TargetProperty="Color"
+                                    To="#F5F7FA"
+                                    Duration="0:0:0.1"/>
+                    <ColorAnimation Storyboard.TargetName="borderBrush_right"
+                                    Storyboard.TargetProperty="Color"
+                                    To="#E0E4EA"
+                                    Duration="0:0:0.1"/>
+                    <ColorAnimation Storyboard.TargetName="plusText_right"
+                                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                    To="#1A73E8"
+                                    Duration="0:0:0.1"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
+                                     To="1" Duration="0:0:0.08"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
+                                     To="1" Duration="0:0:0.08"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+
+    </Border.Triggers>
+</Border>
+
+
+
+
+
+                        <!-- 25 -->
+                        <Border Grid.Row="1"
+                                Height="42"
+                                Background="#FFFFFF"
+                                BorderBrush="#E0E4EA"
+                                CornerRadius="8,8,0,0"
+                                BorderThickness="0,0,0,0">
+                            <TextBlock Text="25"
+                                       Foreground="#1A73E8"
+                                       FontWeight="Bold"
+                                       FontSize="20"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- − -->
+<!--                        <Border Grid.Row="2" -->
+<!--         Height="42" -->
+<!--         Margin="0,0,0,2" -->
+<!--         CornerRadius="0,0,8,8" -->
+<!--         BorderThickness="0,0,0,1" -->
+<!--         Cursor="Hand" -->
+<!--         RenderTransformOrigin="0.5,0.5" -->
+<!--         Background="#F5F7FA" -->
+<!--         BorderBrush="#E0E4EA"> -->
+<!-- -->
+<!--     ~1~ Transform for scale animation @1@ -->
+<!--     <Border.RenderTransform> -->
+<!--         <ScaleTransform ScaleX="1" ScaleY="1"/> -->
+<!--     </Border.RenderTransform> -->
+<!-- -->
+<!--     ~1~ ✅ Hover animation triggers @1@ -->
+<!--     <Border.Triggers> -->
+<!--         <EventTrigger RoutedEvent="MouseEnter"> -->
+<!--             <BeginStoryboard> -->
+<!--                 <Storyboard> -->
+<!--                     ~1~ Animate background color @1@ -->
+<!--                     <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" -->
+<!--                                     To="#1A73E8" -->
+<!--                                     Duration="0:0:0.1"/> -->
+<!--                     ~1~ Animate border color @1@ -->
+<!--                     <ColorAnimation Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)" -->
+<!--                                     To="#1A73E8" -->
+<!--                                     Duration="0:0:0.1"/> -->
+<!--                     ~1~ Scale up @1@ -->
+<!--                     <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" -->
+<!--                                      To="1.05" Duration="0:0:0.08"/> -->
+<!--                     <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" -->
+<!--                                      To="1.05" Duration="0:0:0.08"/> -->
+<!--                 </Storyboard> -->
+<!--             </BeginStoryboard> -->
+<!--         </EventTrigger> -->
+<!-- -->
+<!--         <EventTrigger RoutedEvent="MouseLeave"> -->
+<!--             <BeginStoryboard> -->
+<!--                 <Storyboard> -->
+<!--                     ~1~ Back to default @1@ -->
+<!--                     <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" -->
+<!--                                     To="#F5F7FA" -->
+<!--                                     Duration="0:0:0.1"/> -->
+<!--                     <ColorAnimation Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)" -->
+<!--                                     To="#E0E4EA" -->
+<!--                                     Duration="0:0:0.1"/> -->
+<!--                     ~1~ Scale down @1@ -->
+<!--                     <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" -->
+<!--                                      To="1" Duration="0:0:0.08"/> -->
+<!--                     <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" -->
+<!--                                      To="1" Duration="0:0:0.08"/> -->
+<!--                 </Storyboard> -->
+<!--             </BeginStoryboard> -->
+<!--         </EventTrigger> -->
+<!--     </Border.Triggers> -->
+<!-- -->
+<!--     ~1~ − symbol @1@ -->
+<!--     <TextBlock Text="−" -->
+<!--                Foreground="#1A73E8" -->
+<!--                FontWeight="Bold" -->
+<!--                FontSize="22" -->
+<!--                HorizontalAlignment="Center" -->
+<!--                VerticalAlignment="Center" -->
+<!--                IsHitTestVisible="False"/> -->
+<!-- </Border> -->
+
+<Border Grid.Row="2"
+        Height="42"
+        Margin="0,0,0,2"
+        CornerRadius="0,0,8,8"
+        BorderThickness="0,0,0,1"
+        Cursor="Hand"
+        RenderTransformOrigin="0.5,0.5"
+        Background="#F5F7FA"
+        BorderBrush="#E0E4EA">
+
+    <!-- Transform for scale animation -->
+    <Border.RenderTransform>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+    </Border.RenderTransform>
+
+    <!-- − symbol -->
+    <TextBlock x:Name="minusText"
+               Text="−"
+               Foreground="#1A73E8"
+               FontWeight="Bold"
+               FontSize="22"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               IsHitTestVisible="False"/>
+
+    <!-- ✅ Hover animation triggers -->
+    <Border.Triggers>
+        <EventTrigger RoutedEvent="MouseEnter">
+            <BeginStoryboard>
+                <Storyboard>
+                    <!-- Animate background color -->
+                    <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                    To="#1A73E8"
+                                    Duration="0:0:0.1"/>
+                    <!-- Animate border color -->
+                    <ColorAnimation Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                    To="#1A73E8"
+                                    Duration="0:0:0.1"/>
+                    <!-- Animate minus text to white -->
+                    <ColorAnimation Storyboard.TargetName="minusText"
+                                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                    To="White"
+                                    Duration="0:0:0.1"/>
+                    <!-- Scale up -->
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
+                                     To="1.05" Duration="0:0:0.08"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
+                                     To="1.05" Duration="0:0:0.08"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+
+        <EventTrigger RoutedEvent="MouseLeave">
+            <BeginStoryboard>
+                <Storyboard>
+                    <!-- Back to default colors -->
+                    <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                    To="#F5F7FA"
+                                    Duration="0:0:0.1"/>
+                    <ColorAnimation Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                    To="#E0E4EA"
+                                    Duration="0:0:0.1"/>
+                    <!-- Animate minus text back to blue -->
+                    <ColorAnimation Storyboard.TargetName="minusText"
+                                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                    To="#1A73E8"
+                                    Duration="0:0:0.1"/>
+                    <!-- Scale down -->
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
+                                     To="1" Duration="0:0:0.08"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
+                                     To="1" Duration="0:0:0.08"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Border.Triggers>
+</Border>
+
+
+
+
+
+
+                        <!-- Y -->
+                        <Border Grid.Row="3"
+                                Height="32"
+                                Background="#F5F7FA"
+                                Margin="0,0,0,1"
+                                CornerRadius="9,9,10,10">
+                            <TextBlock Text="Y"
+                                       Foreground="#000"
+                                       FontWeight="Bold"
+                                       FontSize="18"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Viewbox>
+
+        <!-- Square dashed border outline -->
+        <Rectangle x:Name="DashedBorder"
+                   Stroke="#1A73E8"
+                   StrokeThickness="2"
+                   StrokeDashArray="4,2"
+                   RadiusX="8" RadiusY="8"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch"/>
+
+        <!-- Resize Thumbs -->
+        <primitives:Thumb x:Name="TopLeftThumb" Width="10" Height="10" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE">
+            <primitives:Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </primitives:Thumb.Template>
+        </primitives:Thumb>
+
+        <primitives:Thumb x:Name="TopRightThumb" Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW">
+            <primitives:Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </primitives:Thumb.Template>
+        </primitives:Thumb>
+
+        <primitives:Thumb x:Name="BottomLeftThumb" Width="10" Height="10" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW">
+            <primitives:Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </primitives:Thumb.Template>
+        </primitives:Thumb>
+
+        <primitives:Thumb x:Name="BottomRightThumb" Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE">
+            <primitives:Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </primitives:Thumb.Template>
+        </primitives:Thumb>
+
+        <!-- Close Button -->
+       
+    </Grid>
+</UserControl>

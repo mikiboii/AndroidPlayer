@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Publish Androidplayer to folder" type="DotNetFolderPublish" factoryName="Publish to folder">
+    <riderPublish configuration="Release" include_all_content_for_self_extract="true" include_native_libs_for_self_extract="true" platform="Any CPU" produce_single_file="true" self_contained="true" target_folder="$PROJECT_DIR$/Androidplayer" target_framework="net6.0-windows" uuid_high="7687751141899259439" uuid_low="-8332641265902188584">
+      <runtimes>
+        <item value="win-x86" />
+      </runtimes>
+    </riderPublish>
+    <method v="2" />
+  </configuration>
+</component>

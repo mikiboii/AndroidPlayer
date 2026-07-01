@@ -1,0 +1,192 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+<!--        <TargetFramework>net8.0-windows</TargetFramework>-->
+        <TargetFramework>net6.0-windows</TargetFramework>
+
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseWPF>true</UseWPF>
+        
+<!--        <UseWindowsForms>true</UseWindowsForms>-->
+        
+        <ApplicationIcon>Icons\android.ico</ApplicationIcon>
+        <LangVersion>default</LangVersion>
+       
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <Prefer32bit>false</Prefer32bit>
+      <PlatformTarget>x86</PlatformTarget>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <Prefer32bit>false</Prefer32bit>
+      <PlatformTarget>x86</PlatformTarget>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="7.1.2" />
+      <PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
+      <PackageReference Include="LiteDB" Version="6.0.0-prerelease.65" />
+      <PackageReference Include="OpenCvSharp4.Extensions" Version="4.11.0.20250507" />
+      <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
+      <PackageReference Include="SharpAdbClient" Version="2.3.23" />
+      <PackageReference Include="SharpDX" Version="4.2.0" />
+      <PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
+      <PackageReference Include="SharpDX.Direct2D1" Version="4.2.0" />
+      <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
+      <PackageReference Include="SharpDX.Direct3D9" Version="4.2.0" />
+      <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
+      <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
+      <PackageReference Include="SharpDX.XAudio2" Version="4.2.0" />
+      <PackageReference Include="SharpVectors" Version="1.8.5" />
+      <PackageReference Include="SharpVectors.Wpf" Version="1.8.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Icons\sidebar1\home.png" />
+      <Resource Include="Icons\sidebar1\home.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
+      <None Remove="Icons\sidebar1\keyboard.png" />
+      <Resource Include="Icons\sidebar1\keyboard.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
+      <None Remove="Icons\sidebar1\screenshot.png" />
+      <Resource Include="Icons\sidebar1\screenshot.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Resource>
+      <None Remove="Icons\sidebar1\settings.png" />
+      <Resource Include="Icons\sidebar1\settings.png" />
+      <None Remove="Icons\sidebar1\rotate.png" />
+      <Resource Include="Icons\sidebar1\rotate.png" />
+      <None Remove="Icons\sidebar1\record.png" />
+      <Resource Include="Icons\sidebar1\record.png" />
+      <None Remove="Icons\sidebar1\menu.png" />
+      <Resource Include="Icons\sidebar1\menu.png" />
+      <None Remove="Icons\sidebar1\back.png" />
+      <Resource Include="Icons\sidebar1\back.png" />
+      <None Remove="Icons\android.png" />
+      <Resource Include="Icons\android.png" />
+      <None Remove="Icons\sidebar2\screenshot.png" />
+      <Resource Include="Icons\sidebar2\screenshot.png" />
+      <None Remove="Icons\sidebar2\settings.png" />
+      <Resource Include="Icons\sidebar2\settings.png" />
+      <None Remove="Icons\sidebar2\rotate.png" />
+      <Resource Include="Icons\sidebar2\rotate.png" />
+      <None Remove="Icons\sidebar2\record.png" />
+      <Resource Include="Icons\sidebar2\record.png" />
+      <None Remove="Icons\sidebar2\menu.png" />
+      <Resource Include="Icons\sidebar2\menu.png" />
+      <None Remove="Icons\sidebar2\keyboard.png" />
+      <Resource Include="Icons\sidebar2\keyboard.png" />
+      <None Remove="Icons\sidebar2\home.png" />
+      <Resource Include="Icons\sidebar2\home.png" />
+      <None Remove="Icons\sidebar2\back.png" />
+      <Resource Include="Icons\sidebar2\back.png" />
+      <None Remove="Src\Keymap\K_icons\add-_1_.png" />
+      <Resource Include="Icons\splash.png" />
+      <Resource Include="Src\Keymap\K_icons\add-_1_.png" />
+      <None Remove="Src\Keymap\K_icons\arrow-left.png" />
+      <Resource Include="Src\Keymap\K_icons\arrow-left.png" />
+      <None Remove="Src\Keymap\K_icons\arrow-right.png" />
+      <Resource Include="Src\Keymap\K_icons\arrow-right.png" />
+      <None Remove="Src\Keymap\K_icons\bullet.png" />
+      <Resource Include="Src\Keymap\K_icons\bullet.png" />
+      <None Remove="Src\Keymap\K_icons\cross.png" />
+      <Resource Include="Src\Keymap\K_icons\cross.png" />
+      <None Remove="Src\Keymap\K_icons\delete.png" />
+      <Resource Include="Src\Keymap\K_icons\delete.png" />
+      <None Remove="Src\Keymap\K_icons\eye.png" />
+      <Resource Include="Src\Keymap\K_icons\eye.png" />
+      <None Remove="Src\Keymap\K_icons\grenade.png" />
+      <Resource Include="Src\Keymap\K_icons\grenade.png" />
+      <None Remove="Src\Keymap\K_icons\mouse_down.png" />
+      <Resource Include="Src\Keymap\K_icons\mouse_down.png" />
+      <None Remove="Src\Keymap\K_icons\mouse_right.png" />
+      <Resource Include="Src\Keymap\K_icons\mouse_right.png" />
+      <None Remove="Src\Keymap\K_icons\mouse_up.png" />
+      <Resource Include="Src\Keymap\K_icons\mouse_up.png" />
+      <None Remove="Src\Keymap\K_icons\right-click.png" />
+      <Resource Include="Src\Keymap\K_icons\right-click.png" />
+      <None Remove="Src\Keymap\K_icons\save.png" />
+      <Resource Include="Src\Keymap\K_icons\save.png" />
+      <None Remove="Src\Keymap\K_icons\visibility.png" />
+      <Resource Include="Src\Keymap\K_icons\visibility.png" />
+      <None Remove="Src\Keymap\K_icons\writing.png" />
+      <Resource Include="Src\Keymap\K_icons\writing.png" />
+      <None Remove="Src\Keymap\K_icons\direction.png" />
+      <Resource Include="Src\Keymap\K_icons\direction.png" />
+      <None Remove="Src\Keymap\K_icons\grenade_2.png" />
+      <Resource Include="Src\Keymap\K_icons\grenade_2.png" />
+      <None Remove="Src\Keymap\K_icons\view.png" />
+      <Resource Include="Src\Keymap\K_icons\view.png" />
+      <None Remove="Src\Keymap\K_icons\bullet_1.png" />
+      <Resource Include="Src\Keymap\K_icons\bullet_1.png" />
+      <None Remove="Src\Keymap\K_icons\bullet_2.png" />
+      <Resource Include="Src\Keymap\K_icons\bullet_2.png" />
+      <None Remove="Src\Keymap\K_icons\bullet_3.png" />
+      <Resource Include="Src\Keymap\K_icons\bullet_3.png" />
+      <None Remove="Src\Keymap\K_icons\target.png" />
+      <Resource Include="Src\Keymap\K_icons\target.png" />
+      <None Remove="Icons\warning.png" />
+      <Resource Include="Icons\warning.png" />
+      <None Remove="Icons\close.png" />
+      <Resource Include="Icons\close.png" />
+      <None Remove="Icons\keyboard_test.png" />
+      <Resource Include="Icons\keyboard_test.png" />
+      <None Remove="Icons\1_controller.png" />
+      <Resource Include="Icons\Controller.png" />
+      <None Remove="Icons\Keyboard.png" />
+      <Resource Include="Icons\Keyboard.png" />
+      <None Remove="Icons\Controller_2.png" />
+      <Resource Include="Icons\Controller_2.png" />
+      <None Remove="Icons\Keyboard_2.png" />
+      <Resource Include="Icons\Keyboard_2.png" />
+      <None Remove="Icons\checkmark.png" />
+      <Resource Include="Icons\checkmark.png" />
+      <None Remove="Icons\cursor\sword.png" />
+      <Resource Include="Icons\cursor\sword.png" />
+      <None Remove="Icons\cursor\sword.cur" />
+      <Resource Include="Icons\cursor\sword.cur" />
+      <Resource Include="Icons\cursor\sword_3.cur" />
+      <None Remove="Icons\cursor\sword_4.cur" />
+      <Resource Include="Icons\cursor\sword_4.cur" />
+      <None Remove="Icons\cursor\sized_sword.cur" />
+      <Resource Include="Icons\cursor\sized_sword.cur" />
+      <None Remove="Icons\cursor\Cookie..cur" />
+      <Resource Include="Icons\cursor\Cookie.cur" />
+      <None Remove="Icons\cursor\cookie_2.cur" />
+      <Resource Include="Icons\cursor\cookie_2.cur" />
+      <None Remove="Icons\cursor\cursor_new.cur" />
+      <Resource Include="Icons\cursor\cursor_new.cur" />
+      <None Remove="Icons\cursor\black_sword.cur" />
+      <Resource Include="Icons\cursor\black_sword.cur" />
+    
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Src\Keymap\K_icons\" />
+      <Folder Include="user\" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,115 @@
+<UserControl x:Class="Androidplayer.Src.Keymap.List_item"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Androidplayer.Src.Keymap"
+             mc:Ignorable="d"
+             Width="250"
+             Height="50"
+             HorizontalAlignment="Left"
+             Padding="0,0,0,0"
+             Margin="0,0,0,5"
+             d:DesignHeight="50" d:DesignWidth="250"
+             x:Name="Root">
+    
+    <UserControl.Resources>
+        <Style x:Key="IconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Border x:Name="MainBorder" BorderBrush="#E0E0E0"  BorderThickness="1" 
+                Width="238"
+                Height="50"
+                HorizontalAlignment="Left"
+                CornerRadius="9"
+                Padding="7" Margin="0,0,0,0" Background="White">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Display Mode (Normal State) -->
+                <TextBlock x:Name="DisplayTextBlock" 
+                          Grid.Column="0"
+                          Text="{Binding ItemName, ElementName=Root}" 
+                          TextTrimming="WordEllipsis"  
+                          VerticalAlignment="Center" 
+                          FontSize="14" 
+                          Foreground="#333"/>
+                
+                <!-- Edit Mode (Editing State) -->
+                
+                <!-- Text="{Binding ItemName, ElementName=Root, Mode=TwoWay}"  -->
+                
+                <!-- KeyDown="EditTextBox_KeyDown" -->
+                
+                <TextBox x:Name="EditTextBox" 
+                        Grid.Column="0"
+                        
+                        MaxLength="15"
+                        Text="{Binding ItemName, ElementName=Root, Mode=TwoWay}"
+                      
+                        KeyDown="EditTextBox_KeyDown"
+                       
+                        LostKeyboardFocus="EditTextBox_OnLostKeyboardFocus"
+                        
+                        Focusable="True"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        
+                        FontSize="14"
+                        Foreground="#333"
+                        Padding="2,0,2,0"
+                        BorderThickness="1"
+                        BorderBrush="#1A73E8"
+                        Visibility="Collapsed"
+                        />
+                
+                <!-- Button Panel  -->
+                <StackPanel Grid.Column="1" 
+                           Orientation="Horizontal" 
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center">
+                    
+                    <!-- Normal Buttons -->
+                    <StackPanel x:Name="NormalButtonsPanel" 
+                               Orientation="Horizontal">
+                        <Button x:Name="EditButton"
+                                Style="{StaticResource IconButtonStyle}"
+                                Foreground="#333" 
+                                ToolTip="Edit"
+                                Click="EditButton_Click">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="14"/>
+                        </Button>
+                        <Button x:Name="DeleteButton"
+                                Style="{StaticResource IconButtonStyle}"
+                                Foreground="#333" 
+                                ToolTip="Delete"
+                                Click="DeleteButton_Click">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="14"/>
+                        </Button>
+                    </StackPanel>
+                    
+                    <!-- Save Button (Edit Mode) -->
+                    <Button x:Name="SaveButton"
+                            Style="{StaticResource IconButtonStyle}"
+                            Foreground="#4CAF50" 
+                            ToolTip="Save"
+                            Visibility="Collapsed"
+                            Click="SaveButton_Click">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="14" FontWeight="Bold"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

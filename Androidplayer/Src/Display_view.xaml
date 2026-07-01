@@ -1,0 +1,252 @@
+<UserControl x:Class="Androidplayer.Src.Display_view"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Androidplayer.Src"
+             xmlns:keymap="clr-namespace:Androidplayer.Src.Keymap"
+             xmlns:Keymap_items="clr-namespace:Androidplayer.Src.Keymap.Keymap_items"
+             xmlns:store="clr-namespace:Androidplayer.Src.Keymap.K_store"
+
+             
+             xmlns:wpf1="clr-namespace:FlyleafLib_01.Controls.WPF"
+             
+             
+         
+             
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"  Background="Black"
+             BorderBrush="Gray"
+             BorderThickness="0.7,0,0.7,0.7"
+             >
+    
+    <!-- 
+        xmlns:flconv="clr-namespace:FlyleafLib.Controls.WPF;assembly=FlyleafLib"
+             xmlns:fl="clr-namespace:FlyleafLib.Controls.WPF;assembly=FlyleafLib"
+     -->
+    
+    <Grid Background="Black"  Margin="4">
+        
+        
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- <fl:VideoView x:Name="flview" Width="" Height="520" > -->
+        <!-- -->
+        <!--     <Viewbox> -->
+        <!--     <TextBlock Grid.Column="1" Margin="10" TextAlignment="Right" Text="wwww" FontSize="22" Foreground="Red"/> -->
+        <!-- -->
+        <!--     </Viewbox> -->
+        <!-- -->
+        <!-- -->
+        <!-- </fl:VideoView> -->
+        
+        
+        <!-- <fl:VideoView  x:Name="MainImage" Margin="0,30,0,0" -->
+        <!-- -->
+        <!--                HorizontalAlignment="Center" -->
+        <!--                VerticalAlignment="Center" -->
+        <!--                    -->
+        <!--                    -->
+        <!--                    -->
+        <!--                > -->
+        
+        
+        
+        <!-- <fl:FlyleafHost -->
+        <!--     x:Name="MainImage" Margin="0,30,0,0" -->
+        <!-- -->
+        <!--      -->
+        <!--     HorizontalAlignment="Center" -->
+        <!--     VerticalAlignment="Center" -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!--     AttachedDragMove="Both" KeyBindings="Both" -->
+        <!-- -->
+        <!-- > -->
+   
+            
+            
+            
+        <wpf1:FlyleafHost x:Name="MainImage" Margin="0,0,0,0"
+        
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+        
+        
+                          
+                          Width="1280" Height="720"
+                          
+        
+                          AttachedDragMove="Both" KeyBindings="Both">
+        
+        
+            
+            
+       
+        
+        <Canvas x:Name="ImageContainer" 
+                
+                Background="Transparent"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                
+                AllowDrop="True"
+                Focusable="True"
+                
+                
+                
+        >
+            
+            
+            
+            
+            
+            
+            <!-- Main image -->
+            <!-- <Image x:Name="MainImage" -->
+            <!-- -->
+            <!--        Stretch="Uniform" -->
+            <!-- -->
+            <!--       HorizontalAlignment="Center" -->
+            <!--        VerticalAlignment="Center" -->
+            <!-- -->
+            <!--        -->
+            <!--         -->
+            <!-- Focusable="True" -->
+            <!-- MouseUp="MainImage_OnMouseUp" -->
+            <!-- MouseDown="MainImage_OnMouseDown" -->
+            <!-- MouseMove="MainImage_OnMouseMove" -->
+            <!-- -->
+            <!-- MouseWheel="MainImage_OnMouseWheel" -->
+            <!--        /> -->
+            <!-- -->
+       
+          
+
+            
+            
+            <Border x:Name="ToastMessage"
+                    IsHitTestVisible="False"
+                    Background="#DD333333"
+                    CornerRadius="8"
+                    Padding="10,8"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Margin="0,20,0,0"
+                    Opacity="0"
+                    MaxWidth="400">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/> <!-- Icon -->
+                        <ColumnDefinition Width="*" />   <!-- Text -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Icon -->
+                    <Image x:Name="Toasticon" Source="../../Icons/warning.png" 
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           Width="30" Height="30"
+                           VerticalAlignment="Top"
+                           Margin="0,0,8,0"/>
+
+                    <!-- Text -->
+                    <TextBlock x:Name="ToastText"
+                               Grid.Column="1"
+                               Text="Saved successfully!"
+                               Foreground="White"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Top"/>
+                </Grid>
+            </Border>
+
+            
+            
+            
+           
+
+            <!-- -->
+            <!-- Width="{Binding ActualWidth, ElementName=MainImage}" -->
+            <!-- Height="{Binding ActualHeight, ElementName=MainImage}" -->
+            
+                    <!-- Width="{Binding ActualWidth, ElementName=ImageContainer}" -->
+                    <!-- Height="{Binding ActualHeight, ElementName=ImageContainer}" -->
+            <Border x:Name="ModeOverlay"
+                    Canvas.ZIndex="999"
+                    Background="Transparent"
+                    CornerRadius="12"
+                    BorderBrush="#40FFFFFF"
+                    BorderThickness="1"
+                    Opacity="0"
+                    IsHitTestVisible="False"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Visibility="Visible">
+
+                <Grid   >
+                    <Image x:Name="ModeOverlayImage"
+                           Stretch="Uniform"
+                           Margin="20"
+                           
+                           
+                           Source="../../Icons/Keyboard.png"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality">
+
+                        <Image.RenderTransform>
+                            <ScaleTransform x:Name="OverlayScale" ScaleX="0.2" ScaleY="0.2"/>
+                        </Image.RenderTransform>
+                        <Image.RenderTransformOrigin>0.5,0.5</Image.RenderTransformOrigin>
+
+                    </Image>
+                </Grid>
+            </Border>
+
+            
+            
+            
+          
+            <!-- <Keymap_items:Direction_keymap -->
+            <!-- -->
+            <!--     Width="100" Height="100" -->
+            <!-- -->
+            <!-- ></Keymap_items:Direction_keymap> -->
+            
+            
+            
+            <!-- <Keymap_items:Visual_keymap  Width="100" Height="100" ></Keymap_items:Visual_keymap> -->
+            
+            
+            <!-- <Keymap_items:Image_key Width="100" Height="100" ></Keymap_items:Image_key> -->
+            
+            <!-- <Keymap_items:Image_nokey Width="100" Height="100"  ></Keymap_items:Image_nokey> -->
+            
+            </Canvas>
+        
+        
+        <!-- </fl:VideoView> -->
+
+        
+        <!-- </fl:FlyleafHost> -->
+        </wpf1:FlyleafHost>
+            
+        
+        <!-- <keymap:keymap_menu Grid.Row="0"  HorizontalAlignment="Left" -->
+        <!--                      -->
+        <!--                     Visibility="{Binding Source={x:Static store:k_info.Instance}, -->
+        <!--                                          Path=KeymapMode, -->
+        <!--                                          Converter={StaticResource BoolToVis}}" -->
+        <!--                     ></keymap:keymap_menu> -->
+        
+       
+        
+        <!-- <keymap:del_demo Grid.Row="0"  HorizontalAlignment="Left" ></keymap:del_demo> -->
+  
+        
+    </Grid>
+</UserControl>

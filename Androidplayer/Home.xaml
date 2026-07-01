@@ -1,0 +1,133 @@
+<Window x:Class="Androidplayer.Home"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        
+        xmlns:local="clr-namespace:Androidplayer"
+        xmlns:src="clr-namespace:Androidplayer.Src"
+        
+        xmlns:pages="clr-namespace:Androidplayer.Src.Pages"
+        
+        xmlns:keymap="clr-namespace:Androidplayer.Src.Keymap"
+
+        mc:Ignorable="d"
+        Title="Android Player" 
+        
+        
+        MinHeight="200"  MinWidth="322"
+        
+        Icon="Icons/android.png"
+        
+ 
+        AllowsTransparency="False"
+        
+        
+        PreviewMouseDown="Home_OnPreviewMouseDown"
+        
+        
+        Focusable="True" FocusManager.IsFocusScope="True"
+        IsEnabled="True"
+        
+        
+        KeyDown="Home_OnKeyDown"
+        KeyUp="Home_OnKeyUp"
+        
+       
+        
+        Loaded="Home_OnLoaded"
+        
+        
+        WindowStartupLocation="CenterScreen"
+        Background="Black"
+        
+        WindowStyle="None"
+        
+       
+        >
+    
+    
+    <!-- Height="550" Width="1100" -->
+  
+    <!--PreviewMouseDown="Home_OnPreviewMouseDown" -->
+    
+    
+    <!-- KeyDown="Home_OnKeyDown" -->
+    <!-- KeyUp="Home_OnKeyUp" -->
+    <!-- Loaded="Home_OnLoaded" -->
+    
+    
+    
+    <!-- #BF000000 -->
+    
+    <!-- -->
+    <!-- <WindowChrome.WindowChrome> -->
+    <!--     <WindowChrome x:Name="chrome" CornerRadius="0" GlassFrameThickness="10" CaptionHeight="0"   ></WindowChrome> -->
+    <!-- </WindowChrome.WindowChrome> -->
+
+    
+    
+    <!-- <WindowChrome.WindowChrome> -->
+    <!--     <WindowChrome CornerRadius="0" GlassFrameThickness="0" CaptionHeight="0"   ></WindowChrome> -->
+    <!-- </WindowChrome.WindowChrome> -->
+
+    
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            CaptionHeight="0"
+            ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
+    
+    
+
+    
+    <Grid Margin="0" 
+          Background="Black"
+          Focusable="True" FocusManager.IsFocusScope="True"
+          IsEnabled="True"
+          Visibility="Visible"
+          >
+    
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+    
+        <pages:TitleBar x:Name="CustomTitleBar"
+            Grid.Row="0"
+            Title="Android Player"
+            ParentWindow="{Binding RelativeSource={RelativeSource AncestorType=Window}}"></pages:TitleBar>
+    
+        <!-- <src:Video_player Grid.Row="1" ></src:Video_player> -->
+        
+        
+        <!-- <src:Display_view  x:Name="displayView" Visibility="Hidden" Grid.Row="1"  ></src:Display_view> -->
+        <src:Display_view  x:Name="displayView" Visibility="Hidden" Grid.Row="1"  ></src:Display_view>
+        
+        
+        <pages:Loading_page x:Name="loadingpage"  Grid.Row="1"  ></pages:Loading_page>
+        
+        
+        
+        
+        <!-- <keymap:del_demo Grid.Row="1"></keymap:del_demo> -->
+        
+    
+        
+        <!-- <Border Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Red" Width="100" Height="100"> -->
+        <!-- -->
+        <!--     <Button Name="Button"></Button> -->
+        <!-- </Border> -->
+        
+        
+        
+        
+        <!-- <src:del_test Grid.Row="1" ></src:del_test> -->
+        
+      
+    
+    </Grid>
+</Window>

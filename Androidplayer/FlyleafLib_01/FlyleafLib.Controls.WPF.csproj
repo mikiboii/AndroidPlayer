@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0-windows;net10.0-windows</TargetFrameworks>
+	<UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <Version>1.6.4</Version>
+    <Authors>SuRGeoNix</Authors>
+    <Copyright>SuRGeoNix © 2026</Copyright>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/SuRGeoNix/Flyleaf</PackageProjectUrl>
+    <PackageIcon>Flyleaf.png</PackageIcon>
+    <PackageIconUrl />
+    <PackageTags>flyleaf flyleaflib flyleafme video audio wpf media player element control</PackageTags>
+    <Description>FlyleafME: A WPF Media Element Control (based on FlyleafLib)</Description>
+    <PackageReleaseNotes>
+		Updates FlyleafLib
+	</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows|AnyCPU'">
+    <WarningLevel>6</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows|AnyCPU'">
+    <WarningLevel>6</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dragablz" Version="0.0.3.234" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.3.1-ci1146" />
+    <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FlyleafLib\FlyleafLib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Images\Flyleaf.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

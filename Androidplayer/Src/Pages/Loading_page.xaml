@@ -1,0 +1,143 @@
+
+<UserControl x:Class="Androidplayer.Src.Pages.Loading_page"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             Width="370" Height="450"
+             Background="Transparent">
+
+    <UserControl.Resources>
+        <!-- Toggle button style with hover and underline -->
+        <Style x:Key="ToggleButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}">
+                            <TextBlock Text="{TemplateBinding Content}" 
+                                       Foreground="{TemplateBinding Foreground}" 
+                                       TextDecorations="{TemplateBinding Tag}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#1a7c80"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="White" CornerRadius="10" Padding="10" Margin="0">
+        <StackPanel>
+      
+
+            <StackPanel Orientation="Horizontal" Margin="5,0,0,20">
+                <TextBlock 
+                    x:Name="UsbText"
+                    Text="USB"
+                    FontWeight="Bold"
+                    FontSize="14"
+                    Foreground="Black"
+                    VerticalAlignment="Center"
+                    Cursor="Hand"
+                    MouseLeftButtonUp="UsbText_OnClick" />
+
+                <TextBlock 
+                    x:Name="WirelessText"
+                    Text="Wireless"
+                    FontWeight="Bold"
+                    FontSize="14"
+                    Foreground="Black"
+                    VerticalAlignment="Center"
+                    Margin="5,0,0,0"
+                    Cursor="Hand"
+                    MouseLeftButtonUp="WirelessText_OnClick" />
+            </StackPanel>
+
+            
+            <!-- Android Icon -->
+            <Image Source="../../Icons/android.png" RenderOptions.BitmapScalingMode="HighQuality" Width="100" Height="100" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+            <!-- Status Label -->
+            <TextBlock x:Name="StatusLabel" Text="No device found. please reconnect your device" 
+                       FontWeight="Bold" FontSize="14" 
+                       HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,25"/>
+
+            <!-- Instructions -->
+            <!-- <ScrollViewer Height="200" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10"> -->
+            <!--     <StackPanel> -->
+            <!--         <TextBlock Text="Enabling USB-Debugging" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/> -->
+            <!--         <TextBlock TextWrapping="Wrap" FontSize="16" Margin="0,0,0,4"> -->
+            <!--             To communicate with an Android device over the Android Debug Bridge (adb), enable USB debugging on the device. -->
+            <!--         </TextBlock> -->
+            <!--         <TextBlock TextWrapping="Wrap" FontSize="16" Margin="0,0,0,4">1. On the Android device, open the settings.</TextBlock> -->
+            <!--         <TextBlock TextWrapping="Wrap" FontSize="16" Margin="0,0,0,4">2. Tap <Run FontWeight="Bold">Developer Settings.</Run> The developer settings are hidden by default.</TextBlock> -->
+            <!--         <TextBlock TextWrapping="Wrap" FontSize="16" Margin="0,0,0,4">a. Scroll down and tap <Run FontWeight="Bold">About phone</Run> or <Run FontWeight="Bold">About Pad</Run>.</TextBlock> -->
+            <!--         <TextBlock TextWrapping="Wrap" FontSize="16" Margin="0,0,0,4">b. Scroll down again and tap <Run FontWeight="Bold">Build Number</Run> seven times.</TextBlock> -->
+            <!--         <TextBlock TextWrapping="Wrap" FontSize="16" Margin="0,0,0,4">3. In <Run FontWeight="Bold">Developer settings</Run>, check <Run FontWeight="Bold">USB-Debugging</Run>.</TextBlock> -->
+            <!--         <TextBlock TextWrapping="Wrap" FontSize="16" Margin="0,0,0,4">4. Set the USB mode to <Run FontWeight="Bold">Media device (MTP)</Run>.</TextBlock> -->
+            <!--     </StackPanel> -->
+            <!-- </ScrollViewer> -->
+
+            <ScrollViewer x:Name="guide_view" Height="200" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10" >
+                <StackPanel>
+                    <TextBlock Text="Enabling USB-Debugging" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/>
+
+                    <TextBlock TextWrapping="Wrap" FontSize="16" Margin="0,0,0,8">
+                        To communicate with an Android device over the Android Debug Bridge (adb), enable USB debugging on the device.
+                    </TextBlock>
+
+                    <!-- Step 1 -->
+                    <TextBlock Text="1. On the Android device, open the settings." 
+                               TextWrapping="Wrap" FontSize="16" Margin="20,0,0,4"/>
+
+                    <!-- Step 2 -->
+                    <TextBlock Text="2. Tap Developer Settings. The developer settings are hidden by default."
+                               TextWrapping="Wrap" FontSize="16" Margin="20,0,0,4"/>
+
+                    <!-- Sub-steps a, b -->
+                    <TextBlock Text="a. Scroll down and tap About phone or About Pad."
+                               TextWrapping="Wrap" FontSize="16" Margin="40,0,0,4"/>
+
+                    <TextBlock Text="b. Scroll down again and tap Build Number seven times."
+                               TextWrapping="Wrap" FontSize="16" Margin="40,0,0,4"/>
+
+                    <!-- Step 3 -->
+                    <TextBlock Text="3. In Developer settings, check USB-Debugging."
+                               TextWrapping="Wrap" FontSize="16" Margin="20,0,0,4"/>
+
+                    <!-- Step 4 -->
+                    <TextBlock Text="4. Set the USB mode to Media device (MTP)."
+                               TextWrapping="Wrap" FontSize="16" Margin="20,0,0,4"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            
+            <!-- Circular Progress Bar -->
+            <Grid x:Name="progress_view"  HorizontalAlignment="Center" Width="200" Height="200" Visibility="Visible">
+                <Ellipse Stroke="#E6E6E6" StrokeThickness="12"/>
+                <Path x:Name="ProgressArc" Stroke="#EB34D2" StrokeThickness="12" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock x:Name="ProgressPercent" Text="0%" FontSize="24" FontWeight="Bold" Foreground="#EB34D2" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="ProgressStatus" Text="Initializing system..." FontSize="10" Foreground="#646464" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+            
+            
+            
+         
+            
+            
+            
+        </StackPanel>
+    </Border>
+</UserControl>

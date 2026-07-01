@@ -1,0 +1,260 @@
+<UserControl x:Class="Androidplayer.Src.Keymap.Keymap_items.Image_key"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Androidplayer.Src.Keymap.Keymap_items"
+             xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
+             mc:Ignorable="d"
+             d:DesignHeight="120" d:DesignWidth="120">
+    <Grid x:Name="RootGrid" IsHitTestVisible="True" Background="Transparent"
+          
+          MouseLeftButtonDown="RootGrid_MouseLeftButtonDown"
+          MouseMove="RootGrid_MouseMove"
+          
+          MouseLeftButtonUp="RootGrid_MouseLeftButtonUp"
+    >
+
+        <!-- Viewbox wraps the circular layout so it scales with the Grid -->
+        <Viewbox Stretch="Fill" Margin="5">
+    <!-- Give this Grid a base Width/Height -->
+    <!-- #635a4b -->
+    <Grid  >
+        <!-- Circular main border -->
+        <Ellipse Stroke="#1A73E8"
+                 StrokeThickness="2"
+                 Fill="#635a4b" 
+                 Width="95" Height="95"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center" />
+
+        <Grid Width="100" Height="100"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+    
+    <!-- Centered image -->
+    <Image 
+        x:Name="ImageDisplay"
+        Source="../K_icons/grenade_2.png"
+           Width="70"
+           Height="70"
+           HorizontalAlignment="Center"
+           VerticalAlignment="Center"/>
+    
+    
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <!-- Display text -->
+        <TextBlock x:Name="DisplayKey"
+                   Text="ctrl + alt"
+                   Foreground="white"
+                   FontSize="42"
+                                   
+                   FontWeight="Bold"
+                   TextAlignment="Center"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Visibility="Visible"
+                   TextWrapping="NoWrap" />
+
+        <!-- Editing input -->
+        <TextBox x:Name="InputField"
+                 Text=""
+                 FontSize="42"
+                 FontWeight="Bold"
+                                 
+                 TextChanged="InputField_TextChanged"
+                 Foreground="white"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 Visibility="Collapsed"
+                 VerticalContentAlignment="Center"
+                 HorizontalContentAlignment="Center"/>
+    </Grid>
+
+
+    <!-- Button stays absolutely positioned -->
+    <Button Width="20" Height="20"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="0,6,6,0"
+            Background="#FFE4C4"
+            BorderBrush="#1A73E8"
+            Click="remove_btn_OnClick"
+            BorderThickness="2"
+            Padding="0"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center">
+        <Button.Template>
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="Border"
+                        Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}" 
+                        CornerRadius="10"
+                        RenderTransformOrigin="0.5,0.5">
+                    <Border.RenderTransform>
+                        <ScaleTransform x:Name="scaleTransform" ScaleX="1" ScaleY="1"/>
+                    </Border.RenderTransform>
+
+                    <TextBlock Text="X" 
+                               Foreground="Red" 
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Trigger.EnterActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                     Storyboard.TargetProperty="ScaleX"
+                                                     To="1.3" Duration="0:0:0.08"/>
+                                    <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                     Storyboard.TargetProperty="ScaleY"
+                                                     To="1.3" Duration="0:0:0.08"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </Trigger.EnterActions>
+                        <Trigger.ExitActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                     Storyboard.TargetProperty="ScaleX"
+                                                     To="1" Duration="0:0:0.08"/>
+                                    <DoubleAnimation Storyboard.TargetName="scaleTransform"
+                                                     Storyboard.TargetProperty="ScaleY"
+                                                     To="1" Duration="0:0:0.08"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </Trigger.ExitActions>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Button.Template>
+    </Button>
+
+</Grid>
+
+        
+        <!-- WASD keys placed around the circle -->
+<!--         <Canvas Width="100" Height="100" -->
+<!--                 HorizontalAlignment="Center" -->
+<!--                 VerticalAlignment="Center"> -->
+<!-- -->
+<!--             ~1~ W (Top) @1@ -->
+<!--            -->
+<!--              -->
+<!--             <Image Source="../K_icons/grenade_2.png" VerticalAlignment="Center" HorizontalAlignment="Center" Width="70" Height="70" ></Image> -->
+<!--             -->
+<!--              -->
+<!--              -->
+<!--              -->
+<!--             <Button Width="20" Height="20" -->
+<!--         Canvas.Left="72" Canvas.Top="10" -->
+<!--         Background="#FFE4C4" -->
+<!--         BorderBrush="#1A73E8" -->
+<!--         Click="remove_btn_OnClick" -->
+<!--         BorderThickness="2" -->
+<!--         Padding="0" -->
+<!--         HorizontalContentAlignment="Center" -->
+<!--         VerticalContentAlignment="Center"> -->
+<!--     <Button.Template> -->
+<!--         <ControlTemplate TargetType="Button"> -->
+<!--             <Border x:Name="Border" -->
+<!--                     Background="{TemplateBinding Background}"  -->
+<!--                     BorderBrush="{TemplateBinding BorderBrush}"  -->
+<!--                     BorderThickness="{TemplateBinding BorderThickness}"  -->
+<!--                     CornerRadius="10" -->
+<!--                     RenderTransformOrigin="0.5,0.5"> -->
+<!--                  -->
+<!--                 <Border.RenderTransform> -->
+<!--                     <ScaleTransform x:Name="scaleTransform" ScaleX="1" ScaleY="1"/> -->
+<!--                 </Border.RenderTransform> -->
+<!-- -->
+<!--                 <TextBlock Text="X"  -->
+<!--                            Foreground="Red"  -->
+<!--                            TextAlignment="Center" -->
+<!--                            HorizontalAlignment="Center" -->
+<!--                            VerticalAlignment="Center"/> -->
+<!--             </Border> -->
+<!--              -->
+<!--             <ControlTemplate.Triggers> -->
+<!--                 <Trigger Property="IsMouseOver" Value="True"> -->
+<!--                     <Trigger.EnterActions> -->
+<!--                         <BeginStoryboard> -->
+<!--                             <Storyboard> -->
+<!--                                 ~1~ Faster hover pop @1@ -->
+<!--                                 <DoubleAnimation Storyboard.TargetName="scaleTransform" -->
+<!--                                                  Storyboard.TargetProperty="ScaleX" -->
+<!--                                                  To="1.3" Duration="0:0:0.08"/> -->
+<!--                                 <DoubleAnimation Storyboard.TargetName="scaleTransform" -->
+<!--                                                  Storyboard.TargetProperty="ScaleY" -->
+<!--                                                  To="1.3" Duration="0:0:0.08"/> -->
+<!--                             </Storyboard> -->
+<!--                         </BeginStoryboard> -->
+<!--                     </Trigger.EnterActions> -->
+<!--                     <Trigger.ExitActions> -->
+<!--                         <BeginStoryboard> -->
+<!--                             <Storyboard> -->
+<!--                                 ~1~ Faster return to normal @1@ -->
+<!--                                 <DoubleAnimation Storyboard.TargetName="scaleTransform" -->
+<!--                                                  Storyboard.TargetProperty="ScaleX" -->
+<!--                                                  To="1" Duration="0:0:0.08"/> -->
+<!--                                 <DoubleAnimation Storyboard.TargetName="scaleTransform" -->
+<!--                                                  Storyboard.TargetProperty="ScaleY" -->
+<!--                                                  To="1" Duration="0:0:0.08"/> -->
+<!--                             </Storyboard> -->
+<!--                         </BeginStoryboard> -->
+<!--                     </Trigger.ExitActions> -->
+<!--                 </Trigger> -->
+<!--             </ControlTemplate.Triggers> -->
+<!--         </ControlTemplate> -->
+<!--     </Button.Template> -->
+<!-- </Button> -->
+<!-- -->
+<!--              -->
+<!--              -->
+<!-- -->
+<!--              -->
+<!--         </Canvas> -->
+    </Grid>
+</Viewbox>
+
+
+        <!-- Square dashed border outline -->
+        <Rectangle x:Name="DashedBorder"
+                   Stroke="#1A73E8"
+                   StrokeThickness="2"
+                   StrokeDashArray="4,2"
+                   RadiusX="8" RadiusY="8"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch"/>
+
+        <!-- Resize Thumbs -->
+        <primitives:Thumb x:Name="TopLeftThumb" Width="10" Height="10" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE">
+            <primitives:Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </primitives:Thumb.Template>
+        </primitives:Thumb>
+
+        <primitives:Thumb x:Name="TopRightThumb" Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW">
+            <primitives:Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </primitives:Thumb.Template>
+        </primitives:Thumb>
+
+        <primitives:Thumb x:Name="BottomLeftThumb" Width="10" Height="10" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW">
+            <primitives:Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </primitives:Thumb.Template>
+        </primitives:Thumb>
+
+        <primitives:Thumb x:Name="BottomRightThumb" Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE">
+            <primitives:Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </primitives:Thumb.Template>
+        </primitives:Thumb>
+
+    </Grid>
+</UserControl>

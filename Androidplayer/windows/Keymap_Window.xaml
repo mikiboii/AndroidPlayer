@@ -1,0 +1,40 @@
+<Window x:Class="Androidplayer.windows.Keymap_Window"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Androidplayer.windows"
+        
+        xmlns:keymap="clr-namespace:Androidplayer.Src.Keymap"
+        xmlns:Keymap_items="clr-namespace:Androidplayer.Src.Keymap.Keymap_items"
+        xmlns:store="clr-namespace:Androidplayer.Src.Keymap.K_store"
+        
+        mc:Ignorable="d"
+        Title="Keymap_Window" Height="450" Width="314"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        
+        
+        >
+    
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            CaptionHeight="0"
+            ResizeBorderThickness="0" />
+    </WindowChrome.WindowChrome>
+    
+    
+    
+    <Grid>
+        <keymap:keymap_menu Grid.Row="0"  HorizontalAlignment="Left"
+                            
+                            Visibility="{Binding Source={x:Static store:k_info.Instance},
+                                                 Path=KeymapMode,
+                                                 Converter={StaticResource BoolToVis}}"
+        ></keymap:keymap_menu>
+    </Grid>
+</Window>
