@@ -31,17 +31,17 @@ public partial class App : System.Windows.Application
       
        
         
-        // var splash = new Splash_screen();
-        // splash.Show();
-        // // Optionally do some heavy initialization here
-        // await Task.Run(() =>
-        // {
-        //     // Simulate work like loading data, initializing services, etc.
-        //     System.Threading.Thread.Sleep(3000);
-        // });
-        //
-        // // 3️⃣ Close splash and show main window
-        // splash.Close();
+        var splash = new Splash_screen();
+        splash.Show();
+        // Optionally do some heavy initialization here
+        await Task.Run(() =>
+        {
+            // Simulate work like loading data, initializing services, etc.
+            System.Threading.Thread.Sleep(3000);
+        });
+        
+        // 3️⃣ Close splash and show main window
+        splash.Close();
         
         
         
