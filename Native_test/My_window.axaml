@@ -1,0 +1,78 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Androidplayer.Native_test.My_window"
+        xmlns:pages="using:Androidplayer.Pages"
+        xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
+        xmlns:local="using:Androidplayer"
+      
+        
+        Background="Black"
+        Title="My_window">
+      <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+             <!-- <pages:TitleBar Grid.Row="0"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar> -->
+             
+             <Grid  Margin="10">
+             
+                  <local:FlyleafHost  x:Name="AndroidVideo"  d:DesignWidth="500" d:DesignHeight="500"  >
+                 
+                      <Grid>
+                 
+                 
+                 
+                 <Button Content="click"  Width="50" Height="30" Background="Aqua"  ></Button>
+                      </Grid>
+                 
+                 
+                 
+                 
+                 
+                  </local:FlyleafHost>
+                 
+                 
+                 
+                 
+                 <!-- <local:FlyleafHost -->
+                 <!--     x:Name="AndroidVideo" -->
+                 <!--     Width="400" -->
+                 <!--     Height="300" -->
+                 <!--     HorizontalAlignment="Left" -->
+                 <!--     VerticalAlignment="Top"/> -->
+                 <!-- -->
+                 <!-- <Grid -->
+                 <!--     Width="400" -->
+                 <!--     Height="300" -->
+                 <!--     HorizontalAlignment="Left" -->
+                 <!--     VerticalAlignment="Top" -->
+                 <!--     IsHitTestVisible="False"> -->
+                 <!-- -->
+                 <!--     <Button -->
+                 <!--         Content="CLICK" -->
+                 <!--         Width="100" -->
+                 <!--         Height="50" -->
+                 <!--         HorizontalAlignment="Left" -->
+                 <!--         VerticalAlignment="Top"/> -->
+                 <!-- -->
+                 <!-- </Grid> -->
+                 
+                 
+                 
+                 
+                 <!-- <vlc:VideoView x:Name="VideoView"  > -->
+                 <!--          <Grid> -->
+                 <!-- -->
+                 <!-- -->
+                 <!-- -->
+                 <!--     <Button Content="click"  Width="50" Height="30" Background="Aqua"  ></Button> -->
+                 <!--     <Button >PLAY</Button> -->
+                 <!--          </Grid> -->
+                 <!-- </vlc:VideoView> -->
+                 
+             </Grid>
+             
+           
+    </Grid>
+</Window>

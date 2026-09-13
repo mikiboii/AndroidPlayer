@@ -1,0 +1,105 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="30"
+             x:Class="Androidplayer.Pages.TitleBar"
+             x:CompileBindings="False"
+             Background="#2D2D30">
+    
+    <Border Background="#2D2D30" Height="30">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- App Icon and Title -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                <!-- <Image Source="avares://Androidplayer/Icons/android.png" -->
+                <!--        Height="25" -->
+                <!--        Margin="0,0,10,0" -->
+                <!--        RenderOptions.BitmapInterpolationMode="HighQuality"/> -->
+                
+                <Image
+                  
+                    Source="/Icons/android.png"
+                       Height="25"
+                       Margin="0,0,10,0"
+                       RenderOptions.BitmapInterpolationMode="HighQuality"/>
+                
+                <TextBlock Name="app_name" 
+                           Text="{Binding Title}" 
+                           Foreground="White" 
+                           FontSize="12" 
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+            
+            <!-- Drag Region -->
+            <Border Grid.Column="1" 
+                    Background="Transparent" 
+                    PointerPressed="DragRegion_OnPointerPressed"/>
+            
+            <!-- Window Controls -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <!-- Minimize Button -->
+                <Button x:Name="MinimizeBtn" 
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Content="─" 
+                        Width="46" Height="30" 
+                        Background="Transparent" 
+                        Foreground="White" 
+                        BorderThickness="0"
+                        Click="MinimizeBtn_OnClick" 
+                        FontSize="12" 
+                        FontWeight="Bold">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#3E3E42"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                
+                <!-- Maximize/Restore Button -->
+                <Button x:Name="MaximizeBtn" 
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Content="☐" 
+                        Width="46" Height="30" 
+                        Background="Transparent" 
+                        Foreground="White" 
+                        BorderThickness="0"
+                        Click="MaximizeBtn_OnClick" 
+                        FontSize="12">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#3E3E42"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+
+                <!-- Close Button -->
+                <Button x:Name="CloseBtn" 
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Content="✕" 
+                        Width="46" Height="30"
+                        Background="Transparent" 
+                        Foreground="White" 
+                        BorderThickness="0"
+                        Click="CloseBtn_OnClick" 
+                        FontSize="14" 
+                        FontWeight="Bold">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#E81123"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

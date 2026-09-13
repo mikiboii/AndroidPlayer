@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="App.axaml" value="Androidplayer.csproj" />
+        <entry key="MainWindow.axaml" value="Androidplayer.csproj" />
+        <entry key="Native_test/My_window.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Pages/TitleBar.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/UserControl1.axaml" value="Androidplayer.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

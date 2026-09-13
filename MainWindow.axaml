@@ -1,0 +1,125 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:pages="using:Androidplayer.Pages"
+        
+        xmlns:local="using:Androidplayer"
+        
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Androidplayer.MainWindow"
+        
+        
+        
+        
+        
+        
+        CanResize="True"
+
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        
+        Background="Black"
+        Title="Androidplayer">
+    
+        
+         <Grid RowDefinitions="40,*" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+             <pages:TitleBar Grid.Row="0"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar>
+             
+             <Grid Grid.Row="1" Margin="4">
+             
+                  <local:FlyleafHost  x:Name="AndroidVideo" d:DesignWidth="500" d:DesignHeight="500"  >
+                      
+                      <Grid>
+                 
+                 
+                 
+                 <Button Content="click"  Width="50" Height="30" Background="Aqua" Click="Button_OnClick" ></Button>
+                      </Grid>
+                 
+                 
+                 
+    <!--               -->
+    <!--              <Grid> -->
+    <!--     ~1~ Semi-transparent dark overlay to see controls better @1@ -->
+    <!--     <Border Background="#80000000" /> -->
+    <!--      -->
+    <!--     ~1~ Control panel at bottom @1@ -->
+    <!--     <StackPanel  -->
+    <!--         VerticalAlignment="Bottom"  -->
+    <!--         HorizontalAlignment="Center"  -->
+    <!--         Margin="0,0,0,20" -->
+    <!--         Spacing="10" -->
+    <!--         Background="#44000000" -->
+    <!--         > -->
+    <!--          -->
+    <!--         ~1~ Play/Pause Button @1@ -->
+    <!--         <Button Content="▶ Play" Width="80" Height="40" Background="Green"  -->
+    <!--                  /> -->
+    <!--          -->
+    <!--         ~1~ Volume Slider @1@ -->
+    <!--         <StackPanel Orientation="Horizontal" Spacing="10"> -->
+    <!--             <TextBlock Text="🔊" Foreground="White" VerticalAlignment="Center" FontSize="16"/> -->
+    <!--             <Slider Width="120" Minimum="0" Maximum="100" Value="50"  -->
+    <!--                     Background="Gray" Foreground="White"/> -->
+    <!--             <TextBlock Text="50%" Foreground="White" VerticalAlignment="Center" FontSize="12"/> -->
+    <!--         </StackPanel> -->
+    <!--          -->
+    <!--         ~1~ Progress Bar @1@ -->
+    <!--         <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,0"> -->
+    <!--             <TextBlock Text="00:00" Foreground="White" VerticalAlignment="Center" FontSize="12"/> -->
+    <!--             <Slider Width="200" Minimum="0" Maximum="100" Value="0"  -->
+    <!--                     Background="Gray" Foreground="Red"/> -->
+    <!--             <TextBlock Text="10:00" Foreground="White" VerticalAlignment="Center" FontSize="12"/> -->
+    <!--         </StackPanel> -->
+    <!--          -->
+    <!--         ~1~ Quality selection @1@ -->
+    <!--         <ComboBox Width="100" Height="30" Background="#333" Foreground="White"> -->
+    <!--             <ComboBoxItem>Auto</ComboBoxItem> -->
+    <!--             <ComboBoxItem>1080p</ComboBoxItem> -->
+    <!--             <ComboBoxItem>720p</ComboBoxItem> -->
+    <!--             <ComboBoxItem>480p</ComboBoxItem> -->
+    <!--         </ComboBox> -->
+    <!--          -->
+    <!--         ~1~ Close button @1@ -->
+    <!--         <Button Content="✕" Width="40" Height="40" Background="DarkRed"  -->
+    <!--                 Foreground="White"  -->
+    <!--                 HorizontalAlignment="Right"/> -->
+    <!--     </StackPanel> -->
+    <!--      -->
+    <!--     ~1~ Title at top @1@ -->
+    <!--     <Border Background="#44000000" Padding="10,5" VerticalAlignment="Top"  -->
+    <!--             HorizontalAlignment="Center" Margin="0,10,0,0" CornerRadius="5"> -->
+    <!--         <TextBlock Text="🎬 Video Player Test" Foreground="White" FontSize="18"  -->
+    <!--                    FontWeight="Bold"/> -->
+    <!--     </Border> -->
+    <!--      -->
+    <!--     ~1~ Center loading indicator @1@ -->
+    <!--     <Grid VerticalAlignment="Center" HorizontalAlignment="Center"> -->
+    <!--         <Ellipse Width="50" Height="50" Stroke="White" StrokeThickness="3"  -->
+    <!--                  IsVisible="False"> -->
+    <!--             <Ellipse.Styles> -->
+    <!--                 <Style Selector="Ellipse"> -->
+    <!--                     <Setter Property="RenderTransform"> -->
+    <!--                         <Setter.Value> -->
+    <!--                             <RotateTransform Angle="0"/> -->
+    <!--                         </Setter.Value> -->
+    <!--                     </Setter> -->
+    <!--                 </Style> -->
+    <!--             </Ellipse.Styles> -->
+    <!--         </Ellipse> -->
+    <!--         <TextBlock Text="⏳" FontSize="30" Foreground="White"/> -->
+    <!--     </Grid> -->
+    <!-- </Grid> -->
+    <!--               -->
+                 
+                  </local:FlyleafHost>
+             
+                 
+                 
+             </Grid>
+             
+           
+    </Grid>
+</Window>

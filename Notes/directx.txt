@@ -1,0 +1,4 @@
+﻿Summary Table
+Approach	Package(s)	Description
+Veldrid	Veldrid	Single API, multiple backends
+DirectX via DXVK	Silk.NET.Direct3D11 + Silk.NET.DXVK.Native	DirectX bindings + Vulkan translation layer
