@@ -1,0 +1,64 @@
+﻿<Window x:Class="Androidplayer.Home"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Androidplayer"
+        
+        xmlns:pages1="clr-namespace:Androidplayer.Pages"
+        xmlns:src="clr-namespace:Androidplayer.Src"
+        xmlns:pages="clr-namespace:Androidplayer.Src.Pages"
+        x:CompileBindings="True"
+        x:DataType="local:Home"
+
+        Title="Android Player"
+        MinHeight="200" MinWidth="322"
+        Width="1100" Height="550"
+
+        Icon="/Icons/android.png"
+
+        Background="Black"
+        
+        CanResize="True"
+
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+
+        WindowStartupLocation="CenterScreen"
+
+        Focusable="True"
+        IsEnabled="True"
+
+        KeyDown="Home_OnKeyDown"
+        KeyUp="Home_OnKeyUp"
+        Loaded="Home_OnLoaded"
+        PointerPressed="Home_OnPreviewMouseDown"
+        
+        
+        
+        >
+
+    <Grid Margin="0"
+          Background="Black"
+          Focusable="True"
+          IsEnabled="True"
+          IsVisible="True">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <pages1:TitleBar x:Name="CustomTitleBar"
+                        Grid.Row="0"
+                        Title="Android Player"
+                        ParentWindow="{Binding $parent[Window]}"/>
+
+        <src:Display_view x:Name="displayView"
+                          IsVisible="False"
+                          Grid.Row="1"/>
+        
+        <pages:Loading_page x:Name="loadingpage"
+                            
+                            Grid.Row="1"/>
+
+    </Grid>
+</Window>

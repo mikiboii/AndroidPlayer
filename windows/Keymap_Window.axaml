@@ -1,0 +1,30 @@
+﻿<Window x:Class="Androidplayer.windows.Keymap_Window"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Androidplayer.windows"
+
+        xmlns:keymap="clr-namespace:Androidplayer.Src.Keymap"
+        xmlns:Keymap_items="clr-namespace:Androidplayer.Src.Keymap.Keymap_items"
+        xmlns:store="clr-namespace:Androidplayer.Src.Keymap.K_store"
+
+        mc:Ignorable="d"
+        Title="Keymap_Window"
+        Height="450" Width="314"
+        SystemDecorations="None"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        ShowInTaskbar="False"
+
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
+
+    <Grid>
+        <keymap:keymap_menu
+            Grid.Row="0"
+            HorizontalAlignment="Left"
+            IsVisible="{Binding Source={x:Static store:k_info.Instance}, Path=KeymapMode}"/>
+    </Grid>
+</Window>

@@ -1,0 +1,114 @@
+﻿<UserControl x:Class="Androidplayer.Src.Display_view"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Androidplayer.Src"
+             xmlns:keymap="clr-namespace:Androidplayer.Src.Keymap"
+             xmlns:Keymap_items="clr-namespace:Androidplayer.Src.Keymap.Keymap_items"
+             xmlns:store="clr-namespace:Androidplayer.Src.Keymap.K_store"
+             
+             
+             
+             xmlns:androidplayer="clr-namespace:Androidplayer"
+
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             Background="Black"
+             BorderBrush="Gray"
+             BorderThickness="0.7,0,0.7,0.7">
+
+  <Grid Background="Black" Margin="4">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <!-- Custom Flyleaf replacement: embeds a native HWND for DirectX -->
+    
+    
+    <androidplayer:FlyleafHost x:Name="MainImage"
+                       Margin="0"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                      
+                       >
+
+      <Canvas x:Name="ImageContainer"
+              Background="Transparent"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              DragDrop.AllowDrop="True"
+              Focusable="True">
+
+        <!-- Toast notification -->
+        <Border x:Name="ToastMessage"
+                IsHitTestVisible="False"
+                Background="#DD333333"
+                CornerRadius="8"
+                Padding="10,8"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Margin="0,20,0,0"
+                Opacity="0"
+                MaxWidth="400">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Image x:Name="Toasticon"
+                   Source="/Icons/warning.png"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Width="30" Height="30"
+                   VerticalAlignment="Top"
+                   Margin="0,0,8,0"/>
+
+            <TextBlock x:Name="ToastText"
+                       Grid.Column="1"
+                       Text="Saved successfully!"
+                       Foreground="White"
+                       FontWeight="SemiBold"
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Top"/>
+          </Grid>
+        </Border>
+
+        <!-- Mode overlay (keyboard / controller icon animation) -->
+        <Border x:Name="ModeOverlay"
+                
+                
+                Background="Transparent"
+                CornerRadius="12"
+                BorderBrush="#40FFFFFF"
+                BorderThickness="1"
+                Opacity="0"
+                IsHitTestVisible="False"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                IsVisible="True">
+          <Grid>
+            <Image x:Name="ModeOverlayImage"
+                   Stretch="Uniform"
+                   Margin="20"
+                   Source="/Icons/Keyboard.png"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   RenderTransformOrigin="0.5,0.5">
+              <!-- <Image.RenderTransform> -->
+              <!--   <ScaleTransform x:Name="OverlayScale" ScaleX="0.2" ScaleY="0.2"/> -->
+              <!-- </Image.RenderTransform> -->
+              
+              <Image.RenderTransform>
+                <ScaleTransform ScaleX="0.2"
+                                ScaleY="0.2"/>
+              </Image.RenderTransform>
+            </Image>
+          </Grid>
+        </Border>
+
+      </Canvas>
+    </androidplayer:FlyleafHost>
+  </Grid>
+</UserControl>

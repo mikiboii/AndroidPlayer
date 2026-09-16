@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="Androidplayer.Src.Keymap.Keymap_items.Image_nokey_normal"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Androidplayer.Src.Keymap.Keymap_items"
+             mc:Ignorable="d"
+             IsHitTestVisible="False"
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <Grid x:Name="RootGrid" IsHitTestVisible="True" Background="Transparent">
+
+        <Viewbox Stretch="Fill" Margin="5">
+            <Grid>
+
+                <!-- Circular main border -->
+                <Ellipse Stroke="#6B7583"
+                         Fill="#AC3C4146"
+                         StrokeThickness="2"
+                         Width="95" Height="95"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"/>
+
+                <Grid Width="100" Height="100"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center">
+
+                    <!-- Centered image -->
+                    <Image x:Name="ImageDisplay"
+                           Source="/Src/Keymap/K_icons/grenade_2.png"
+                           RenderOptions.BitmapInterpolationMode="HighQuality"
+                           Width="70"
+                           Height="70"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+
+                </Grid>
+            </Grid>
+        </Viewbox>
+
+        <!-- Square dashed border outline (commented out in original) -->
+
+    </Grid>
+</UserControl>

@@ -1,0 +1,152 @@
+﻿<UserControl x:Class="Androidplayer.Src.Keymap.Elements_view"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Androidplayer.Src.Keymap"
+             mc:Ignorable="d"
+             d:DesignHeight="350" d:DesignWidth="290"
+             BorderThickness="1">
+
+  <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <ScrollViewer x:Name="MainScrollViewer"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  Background="Transparent">
+
+      <UniformGrid Columns="3" HorizontalAlignment="Center" VerticalAlignment="Top">
+
+        <Button FontSize="14" Margin="6" Padding="12,10"
+                BorderBrush="#D0D0D0" BorderThickness="1"
+                Background="White" Foreground="#555" Cursor="Hand"
+                PointerMoved="Button_MouseMove"
+                Tag="Direction">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Src/Keymap/K_icons/direction.png" Height="25"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Margin="0,0,0,4"/>
+            <TextBlock Text="Direction" FontSize="12" Foreground="Black"/>
+          </StackPanel>
+        </Button>
+
+        <Button Margin="6" FontSize="14" Padding="12,10"
+                BorderBrush="#D0D0D0" BorderThickness="1"
+                Background="White" Foreground="#555" Cursor="Hand"
+                PointerMoved="Button_MouseMove"
+                Tag="Grenade">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Src/Keymap/K_icons/grenade_2.png" Height="23"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Margin="0,0,0,4"/>
+            <TextBlock Text="Grenade" FontSize="12" Foreground="Black"/>
+          </StackPanel>
+        </Button>
+
+        <Button Margin="3" FontSize="14" Padding="12,10"
+                BorderBrush="#D0D0D0" BorderThickness="1"
+                Background="White" Foreground="#555" Cursor="Hand"
+                PointerMoved="Button_MouseMove"
+                Tag="Visual">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Src/Keymap/K_icons/target.png" Height="25"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Margin="0,0,0,4"/>
+            <TextBlock Text="Visual" FontSize="12" Foreground="Black"/>
+          </StackPanel>
+        </Button>
+
+        <Button Margin="3" FontSize="14" Padding="12,10"
+                BorderBrush="#D0D0D0" BorderThickness="1"
+                Background="White" Foreground="#555" Cursor="Hand"
+                PointerMoved="Button_MouseMove"
+                Tag="Fire">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Src/Keymap/K_icons/bullet_2.png" Height="25"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Margin="0,0,0,4"/>
+            <TextBlock Text="Fire" TextAlignment="Center" FontSize="12" Foreground="Black"/>
+          </StackPanel>
+        </Button>
+
+        <Button Margin="3" FontSize="14" Padding="12,10"
+                BorderBrush="#D0D0D0" BorderThickness="1"
+                Background="White" Foreground="#555" Cursor="Hand"
+                PointerMoved="Button_MouseMove"
+                Tag="Mouse up">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Src/Keymap/K_icons/mouse_up.png" Height="25"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Margin="0,0,0,4"/>
+            <TextBlock Text="Mouse up" FontSize="12" Foreground="Black"/>
+          </StackPanel>
+        </Button>
+
+        <Button Margin="3" FontSize="14" Padding="12,10"
+                BorderBrush="#D0D0D0" BorderThickness="1"
+                Background="White" Foreground="#555" Cursor="Hand"
+                PointerMoved="Button_MouseMove"
+                Tag="Mouse down">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Src/Keymap/K_icons/mouse_down.png" Height="25"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Margin="0,0,0,4"/>
+            <TextBlock Text="Mouse down" FontSize="12" Foreground="Black"/>
+          </StackPanel>
+        </Button>
+
+        <Button Margin="3" FontSize="14" Padding="12,10"
+                BorderBrush="#D0D0D0" BorderThickness="1"
+                Background="White" Foreground="#555" Cursor="Hand"
+                PointerMoved="Button_MouseMove"
+                Tag="Peak left">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Src/Keymap/K_icons/arrow-left.png" Height="25"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Margin="0,0,0,4"/>
+            <TextBlock Text="Peak left" FontSize="12" Foreground="Black"/>
+          </StackPanel>
+        </Button>
+
+        <Button Margin="3" FontSize="14" Padding="12,10"
+                BorderBrush="#D0D0D0" BorderThickness="1"
+                Background="White" Foreground="#555" Cursor="Hand"
+                PointerMoved="Button_MouseMove"
+                Tag="Peak right">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Src/Keymap/K_icons/arrow-right.png" Height="25"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Margin="0,0,0,4"/>
+            <TextBlock Text="Peak right" FontSize="12" Foreground="Black"/>
+          </StackPanel>
+        </Button>
+
+        <Button Margin="3" FontSize="14" Padding="12,10"
+                BorderBrush="#D0D0D0" BorderThickness="1"
+                Background="White" Foreground="#555" Cursor="Hand"
+                PointerMoved="Button_MouseMove"
+                Tag="Mouse right">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Src/Keymap/K_icons/mouse_right.png" Height="25"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Margin="0,0,0,4"/>
+            <TextBlock Text="Mouse right" FontSize="12" Foreground="Black"/>
+          </StackPanel>
+        </Button>
+
+        <Button Margin="3" FontSize="14" Padding="12,10"
+                BorderBrush="#D0D0D0" BorderThickness="1"
+                Background="White" Foreground="#555" Cursor="Hand"
+                PointerMoved="Button_MouseMove"
+                Tag="Grenade vision">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Image Source="/Src/Keymap/K_icons/eye.png" Height="25"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Margin="0,0,0,4"/>
+            <TextBlock Text="Grenade &#10; vision" FontSize="12" Foreground="Black"/>
+          </StackPanel>
+        </Button>
+
+      </UniformGrid>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

@@ -1,3 +1,5 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/WebPathMapping/IgnoredPaths/=SRC_005CK_005FICONS/@EntryIndexedValue">Src\K_icons</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/MappedPaths/=SRC_005CPAGES_005CICONS/@EntryIndexedValue"></s:String>
+	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=SRC_005CK_005FICONS/@EntryIndexedValue">Src\K_icons</s:String>
 	<s:String x:Key="/Default/CodeInspection/WebPathMapping/PathsInCorrectCasing/=SRC_005CPAGES_005CICONS/@EntryIndexedValue">Src\Pages\Icons</s:String></wpf:ResourceDictionary>

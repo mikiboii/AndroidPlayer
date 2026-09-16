@@ -1,0 +1,143 @@
+﻿<Window x:Class="Androidplayer.SidebarWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sidebar"
+        Height="400"
+        Width="35"
+        SystemDecorations="None"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        ShowInTaskbar="False">
+
+  <Border Background="#f0f0f0"
+          BorderBrush="#cccccc"
+          BorderThickness="1"
+          CornerRadius="6"
+          PointerPressed="OnSidebarButtonClick"
+          Margin="0">
+
+    <StackPanel Margin="5">
+      <StackPanel.Styles>
+        <!-- Base icon style -->
+        <Style Selector="Image.sidebarIcon">
+          <Setter Property="Margin" Value="0,8"/>
+          <Setter Property="Height" Value="25"/>
+          
+        </Style>
+
+        <!-- Screenshot -->
+        <Style Selector="Image.screenshot">
+          <Setter Property="Source" Value="/Icons/sidebar1/screenshot.png"/>
+        </Style>
+        <Style Selector="Image.screenshot:pointerover">
+          <Setter Property="Source" Value="/Icons/sidebar2/screenshot.png"/>
+        </Style>
+
+        <!-- Record -->
+        <Style Selector="Image.record">
+          <Setter Property="Source" Value="/Icons/sidebar1/record.png"/>
+        </Style>
+        <Style Selector="Image.record:pointerover">
+          <Setter Property="Source" Value="/Icons/sidebar2/record.png"/>
+        </Style>
+
+        <!-- Keyboard -->
+        <Style Selector="Image.keyboard">
+          <Setter Property="Source" Value="/Icons/sidebar1/keyboard.png"/>
+        </Style>
+        <Style Selector="Image.keyboard:pointerover">
+          <Setter Property="Source" Value="/Icons/sidebar2/keyboard.png"/>
+        </Style>
+
+        <!-- Settings -->
+        <Style Selector="Image.settings">
+          <Setter Property="Source" Value="/Icons/sidebar1/settings.png"/>
+        </Style>
+        <Style Selector="Image.settings:pointerover">
+          <Setter Property="Source" Value="/Icons/sidebar2/settings.png"/>
+        </Style>
+
+        <!-- Rotate -->
+        <Style Selector="Image.rotate">
+          <Setter Property="Source" Value="/Icons/sidebar1/rotate.png"/>
+        </Style>
+        <Style Selector="Image.rotate:pointerover">
+          <Setter Property="Source" Value="/Icons/sidebar2/rotate.png"/>
+        </Style>
+
+        <!-- Back -->
+        <Style Selector="Image.back">
+          <Setter Property="Source" Value="/Icons/sidebar1/back.png"/>
+        </Style>
+        <Style Selector="Image.back:pointerover">
+          <Setter Property="Source" Value="/Icons/sidebar2/back.png"/>
+        </Style>
+
+        <!-- Home -->
+        <Style Selector="Image.home">
+          <Setter Property="Source" Value="/Icons/sidebar1/home.png"/>
+        </Style>
+        <Style Selector="Image.home:pointerover">
+          <Setter Property="Source" Value="/Icons/sidebar2/home.png"/>
+        </Style>
+
+        <!-- Menu -->
+        <Style Selector="Image.menu">
+          <Setter Property="Source" Value="/Icons/sidebar1/menu.png"/>
+        </Style>
+        <Style Selector="Image.menu:pointerover">
+          <Setter Property="Source" Value="/Icons/sidebar2/menu.png"/>
+        </Style>
+      </StackPanel.Styles>
+
+      <Border CornerRadius="50" Height="35">
+        <Image Source="/Icons/android.png" Height="25"
+               RenderOptions.BitmapInterpolationMode="HighQuality"/>
+      </Border>
+
+      <Border Height="5"/>
+
+      <Image Classes="sidebarIcon screenshot"
+             Tag="Screenshot"
+             ToolTip.Tip="Screenshot"
+             PointerPressed="OnSidebarButtonClick"/>
+
+      <Image Classes="sidebarIcon record"
+             Tag="Record"
+             ToolTip.Tip="Record"
+             PointerPressed="OnSidebarButtonClick"/>
+
+      <Image Classes="sidebarIcon keyboard"
+             Tag="Keymap"
+             ToolTip.Tip="Keymap menu"
+             PointerPressed="OnSidebarButtonClick"/>
+
+      <Image Classes="sidebarIcon settings"
+             Tag="Settings"
+             ToolTip.Tip="Settings page"
+             PointerPressed="OnSidebarButtonClick"/>
+
+      <Image Classes="sidebarIcon rotate"
+             Tag="Rotate"
+             ToolTip.Tip="Rotate device"
+             PointerPressed="OnSidebarButtonClick"/>
+
+      <Border Height="15"/>
+
+      <Image Classes="sidebarIcon back"
+             Tag="Back"
+             ToolTip.Tip="Back"
+             PointerPressed="OnSidebarButtonClick"/>
+
+      <Image Classes="sidebarIcon home"
+             Tag="Home"
+             ToolTip.Tip="Home"
+             PointerPressed="OnSidebarButtonClick"/>
+
+      <Image Classes="sidebarIcon menu"
+             Tag="Recent_apps"
+             ToolTip.Tip="Recent apps"
+             PointerPressed="OnSidebarButtonClick"/>
+    </StackPanel>
+  </Border>
+</Window>

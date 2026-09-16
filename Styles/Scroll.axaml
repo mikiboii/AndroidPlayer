@@ -1,0 +1,94 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Thumb visual -->
+  <Style Selector="ScrollBar /template/ Thumb#PART_Thumb">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Thumb">
+        <Border Name="PART_ThumbBorder"
+                Background="#FF4A90E2"
+                CornerRadius="3"
+                Opacity="0.2">
+          <Border.Transitions>
+            <Transitions>
+              <DoubleTransition Property="Opacity" Duration="0:0:0.3"/>
+            </Transitions>
+          </Border.Transitions>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="ScrollBar /template/ Thumb#PART_Thumb:pointerover /template/ Border#PART_ThumbBorder">
+    <Setter Property="Opacity" Value="1.0"/>
+  </Style>
+
+  <!-- Vertical scrollbar -->
+  <Style Selector="ScrollBar:vertical">
+    <Setter Property="Width" Value="14"/>
+    <Setter Property="MinWidth" Value="14"/>
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="SmallChange" Value="0.1"/>
+    <Setter Property="LargeChange" Value="0.5"/>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ScrollBar">
+        <Grid Background="Transparent">
+          <Track Name="PART_Track"
+                 IsDirectionReversed="True"
+                 Width="6"
+                 HorizontalAlignment="Center"
+                 Margin="0,4">
+            <Track.DecreaseButton>
+              <RepeatButton Name="PART_DecreaseButton"
+                            Opacity="0"
+                            Focusable="False"
+                            IsTabStop="False"/>
+            </Track.DecreaseButton>
+            <Track.IncreaseButton>
+              <RepeatButton Name="PART_IncreaseButton"
+                            Opacity="0"
+                            Focusable="False"
+                            IsTabStop="False"/>
+            </Track.IncreaseButton>
+            <Thumb Name="PART_Thumb"/>
+          </Track>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <!-- Horizontal scrollbar -->
+  <Style Selector="ScrollBar:horizontal">
+    <Setter Property="Height" Value="14"/>
+    <Setter Property="MinHeight" Value="14"/>
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="SmallChange" Value="0.1"/>
+    <Setter Property="LargeChange" Value="0.5"/>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ScrollBar">
+        <Grid Background="Transparent">
+          <Track Name="PART_Track"
+                 IsDirectionReversed="False"
+                 Height="6"
+                 VerticalAlignment="Center"
+                 Margin="4,0">
+            <Track.DecreaseButton>
+              <RepeatButton Name="PART_DecreaseButton"
+                            Opacity="0"
+                            Focusable="False"
+                            IsTabStop="False"/>
+            </Track.DecreaseButton>
+            <Track.IncreaseButton>
+              <RepeatButton Name="PART_IncreaseButton"
+                            Opacity="0"
+                            Focusable="False"
+                            IsTabStop="False"/>
+            </Track.IncreaseButton>
+            <Thumb Name="PART_Thumb"/>
+          </Track>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+</Styles>

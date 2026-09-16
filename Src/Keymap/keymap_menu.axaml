@@ -1,0 +1,192 @@
+﻿<UserControl x:Class="Androidplayer.Src.Keymap.keymap_menu"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Androidplayer.Src.Keymap"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="290"
+             Width="314">
+
+  <Grid Background="White">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="Auto"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- Main content -->
+    <Grid x:Name="ContentGrid" Margin="15">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <!-- Title -->
+      <TextBlock Grid.Row="0"
+                 Text="Keymap Setting"
+                 FontSize="24"
+                 FontWeight="Bold"
+                 Foreground="#222"
+                 Margin="0,0,0,16"/>
+
+      <!-- Main content stack -->
+      <StackPanel Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top">
+
+        <!-- Add Key Type Section -->
+        <Border BorderBrush="#E0E0E0"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="1"
+                Margin="0,0,0,15">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Add Key Type"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       Foreground="#333"
+                       Margin="0,0,0,12"/>
+
+            <local:Elements_view Grid.Row="1" Height="150"/>
+          </Grid>
+        </Border>
+
+        <!-- Selected Key Section -->
+        <Border BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="6" Padding="10">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title with Add Button -->
+            <DockPanel Grid.Row="0" Margin="0,0,0,12">
+              <TextBlock Text="Selected Key: F+2"
+                         FontWeight="Bold"
+                         FontSize="16"
+                         Foreground="#1A73E8"
+                         DockPanel.Dock="Left"
+                         VerticalAlignment="Center"/>
+
+              <Button DockPanel.Dock="Right"
+                      x:Name="add_new_keymap"
+                      Width="25" Height="25"
+                      Background="#1A73E8"
+                      Foreground="White"
+                      BorderThickness="0"
+                      Cursor="Hand"
+                      ToolTip.Tip="Add new keymap"
+                      Click="Add_new_keymap_OnClick">
+                <!-- Replaced Segoe MDL2 icon with a plain "+" for cross-platform -->
+                <TextBlock Text="+"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"/>
+                <Button.Template>
+                  <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                      <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                  </ControlTemplate>
+                </Button.Template>
+              </Button>
+            </DockPanel>
+
+            <!-- Current Keymaps label -->
+            <TextBlock Grid.Row="1"
+                       Text="Current Keymaps"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Margin="0,0,0,12"
+                       Foreground="#333"/>
+
+            <Border Grid.Row="2" Background="White" CornerRadius="4" Height="300">
+              <ScrollViewer VerticalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Name="keymap_list_view" Orientation="Vertical"/>
+              </ScrollViewer>
+            </Border>
+          </Grid>
+        </Border>
+      </StackPanel>
+
+      <!-- Save / Close Buttons -->
+      <StackPanel Grid.Row="2"
+                  Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  Margin="0,20,0,0">
+        <Button x:Name="Save_keyamp"
+                Content="Save"
+                Click="Save_keyamp_OnClick"
+                Background="#1A73E8"
+                Foreground="White"
+                FontSize="14"
+                FontWeight="SemiBold"
+                Padding="24,8"
+                BorderThickness="0"
+                Margin="0,0,12,0"
+                Cursor="Hand"
+                MinWidth="80"
+                Height="32">
+          <Button.Template>
+            <ControlTemplate TargetType="Button">
+              <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </ControlTemplate>
+          </Button.Template>
+        </Button>
+
+        <Button x:Name="Close_keymap"
+                Content="Close"
+                Click="Close_keymap_OnClick"
+                Background="#d12142"
+                Foreground="White"
+                FontSize="14"
+                FontWeight="SemiBold"
+                Padding="24,8"
+                BorderThickness="0"
+                Cursor="Hand"
+                MinWidth="80"
+                Height="32">
+          <Button.Template>
+            <ControlTemplate TargetType="Button">
+              <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </ControlTemplate>
+          </Button.Template>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <!-- Collapse/Expand Button -->
+    <Button Grid.Column="1"
+            x:Name="ToggleButton"
+            Height="30"
+            Width="24"
+            Background="Transparent"
+            BorderThickness="0"
+            Cursor="Hand"
+
+            ToolTip.Tip="Collapse / Expand"
+            Click="ToggleButton_OnClick">
+      <Image x:Name="ToggleIcon"
+             Source="/Src/Keymap/K_icons/arrow-left.png"
+             Height="25"
+             RenderOptions.BitmapInterpolationMode="HighQuality"
+             VerticalAlignment="Center"
+             Margin="0,0,0,0"/>
+    </Button>
+  </Grid>
+  
+  <!-- Src\Keymap\K_icons\ -->
+  <!-- Source="K_icons/arrow-left.png" -->
+</UserControl>

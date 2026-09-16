@@ -6,6 +6,8 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+      <LangVersion>12.0</LangVersion>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
       
 <!--      <PublishAot>true</PublishAot>-->
@@ -34,13 +36,23 @@
       <PackageReference Include="LibVLCSharp.Avalonia" Version="3.9.6" />
       <PackageReference Include="LiteDB" Version="6.0.0-prerelease.65" />
       <PackageReference Include="SharpAdbClient" Version="2.3.23" />
+      <PackageReference Include="SharpDX" Version="4.2.0" />
+      <PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
+      <PackageReference Include="SharpDX.Direct2D1" Version="4.2.0" />
+      <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
+      <PackageReference Include="SharpDX.Direct3D9" Version="4.2.0" />
+      <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
+      <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
+      <PackageReference Include="SharpDX.XAudio2" Version="4.2.0" />
       <PackageReference Include="Silk.NET" Version="2.23.0" />
       <PackageReference Include="Silk.NET.Direct3D11" Version="2.23.0" />
       <PackageReference Include="Silk.NET.DXVK.Native" Version="2.23.0" />
+      <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
   </ItemGroup>
 
     <ItemGroup>
         <AvaloniaResource Include="Icons\**" />
+        <AvaloniaResource Include="Src\Keymap\K_icons\**" />
         <AvaloniaResource Include="android.png" Condition="Exists('android.png')" />
     </ItemGroup>
 </Project>

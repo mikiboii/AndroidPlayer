@@ -1,4 +1,5 @@
 using System;
+using Androidplayer.Src.Keymap.K_store;
 // using Androidplayer.Src.Keymap.K_store;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -10,7 +11,7 @@ namespace Androidplayer.Store
         private static readonly Lazy<my_info> _instance = new Lazy<my_info>(() => new my_info());
         public static my_info Instance => _instance.Value;
 
-        private bool _developerMode = false;
+        private bool _developerMode = true;
         
         
         
@@ -33,14 +34,14 @@ namespace Androidplayer.Store
         private String _appname;
         
 
-        // private LiteDbEditor data_editor;
-        //
-        //
-        // public LiteDbEditor Dataeditor
-        // {
-        //     get => data_editor;
-        //     set => SetProperty(ref data_editor, value);
-        // }
+        private LiteDbEditor data_editor;
+        
+        
+        public LiteDbEditor Dataeditor
+        {
+            get => data_editor;
+            set => SetProperty(ref data_editor, value);
+        }
 
         public String Appname
         {

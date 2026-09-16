@@ -1,0 +1,171 @@
+﻿<UserControl x:Class="Androidplayer.Src.Keymap.Keymap_items.Image_key"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Androidplayer.Src.Keymap.Keymap_items"
+             xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="120" d:DesignWidth="120">
+
+  <UserControl.Styles>
+    <!-- Remove button styles (shared with Direction_keymap) -->
+    <Style Selector="Button.removeBtn">
+      <Setter Property="Width" Value="20"/>
+      <Setter Property="Height" Value="20"/>
+      <Setter Property="Background" Value="#FFE4C4"/>
+      <Setter Property="BorderBrush" Value="#1A73E8"/>
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="RenderTransform" Value="scale(1.0)"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.08"/>
+        </Transitions>
+      </Setter>
+    </Style>
+
+    <Style Selector="Button.removeBtn:pointerover">
+      <Setter Property="RenderTransform" Value="scale(1.3)"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid x:Name="RootGrid" IsHitTestVisible="True" Background="Transparent"
+        PointerPressed="RootGrid_MouseLeftButtonDown"
+        PointerMoved="RootGrid_MouseMove"
+        PointerReleased="RootGrid_MouseLeftButtonUp">
+
+    <Viewbox Stretch="Fill" Margin="5">
+      <Grid>
+        <!-- Circular main border -->
+        <Ellipse Stroke="#1A73E8"
+                 StrokeThickness="2"
+                 Fill="#635a4b"
+                 Width="95" Height="95"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"/>
+
+        <Grid Width="100" Height="100"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center">
+
+          <!-- Centered image -->
+          <Image x:Name="ImageDisplay"
+                 Source="/Src/Keymap/K_icons/grenade_2.png"
+                 Width="70"
+                 Height="70"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"/>
+
+          <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <!-- Display text -->
+            <TextBlock x:Name="DisplayKey"
+                       Text="ctrl + alt"
+                       Foreground="White"
+                       FontSize="42"
+                       FontWeight="Bold"
+                       TextAlignment="Center"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       IsVisible="True"
+                       TextWrapping="NoWrap"/>
+
+            <!-- Editing input -->
+            <TextBox x:Name="InputField"
+                     Text=""
+                     FontSize="42"
+                     FontWeight="Bold"
+                     TextChanged="InputField_TextChanged"
+                     Foreground="White"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     IsVisible="False"
+                     VerticalContentAlignment="Center"
+                     HorizontalContentAlignment="Center"/>
+          </Grid>
+
+          <!-- Remove button -->
+          <Button Classes="removeBtn"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Margin="0,6,6,0"
+                  Click="remove_btn_OnClick">
+            <Button.Template>
+              <ControlTemplate TargetType="Button">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="10"
+                        RenderTransformOrigin="0.5,0.5">
+                  <TextBlock Text="X"
+                             Foreground="Red"
+                             TextAlignment="Center"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"/>
+                </Border>
+              </ControlTemplate>
+            </Button.Template>
+          </Button>
+
+        </Grid>
+      </Grid>
+    </Viewbox>
+
+    <!-- Dashed outline -->
+    <Rectangle x:Name="DashedBorder"
+               Stroke="#1A73E8"
+               StrokeThickness="2"
+               StrokeDashArray="4,2"
+               RadiusX="8" RadiusY="8"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch"/>
+
+    <!-- Resize thumbs -->
+    <primitives:Thumb x:Name="TopLeftThumb" Width="10" Height="10"
+                      HorizontalAlignment="Left" VerticalAlignment="Top"
+                      Cursor="SizeNorthwestSoutheast"
+                      DragDelta="ResizeThumb_DragDelta">
+      <primitives:Thumb.Template>
+        <ControlTemplate TargetType="Thumb">
+          <Rectangle Fill="#1A73E8"/>
+        </ControlTemplate>
+      </primitives:Thumb.Template>
+    </primitives:Thumb>
+
+    <primitives:Thumb x:Name="TopRightThumb" Width="10" Height="10"
+                      HorizontalAlignment="Right" VerticalAlignment="Top"
+                      Cursor="SizeNortheastSouthwest"
+                      DragDelta="ResizeThumb_DragDelta">
+      <primitives:Thumb.Template>
+        <ControlTemplate TargetType="Thumb">
+          <Rectangle Fill="#1A73E8"/>
+        </ControlTemplate>
+      </primitives:Thumb.Template>
+    </primitives:Thumb>
+
+    <primitives:Thumb x:Name="BottomLeftThumb" Width="10" Height="10"
+                      HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                      Cursor="SizeNortheastSouthwest"
+                      DragDelta="ResizeThumb_DragDelta">
+      <primitives:Thumb.Template>
+        <ControlTemplate TargetType="Thumb">
+          <Rectangle Fill="#1A73E8"/>
+        </ControlTemplate>
+      </primitives:Thumb.Template>
+    </primitives:Thumb>
+
+    <primitives:Thumb x:Name="BottomRightThumb" Width="10" Height="10"
+                      HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                      Cursor="SizeNorthwestSoutheast"
+                      DragDelta="ResizeThumb_DragDelta">
+      <primitives:Thumb.Template>
+        <ControlTemplate TargetType="Thumb">
+          <Rectangle Fill="#1A73E8"/>
+        </ControlTemplate>
+      </primitives:Thumb.Template>
+    </primitives:Thumb>
+
+  </Grid>
+</UserControl>

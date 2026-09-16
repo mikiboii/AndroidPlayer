@@ -9,7 +9,7 @@ using Avalonia.Threading;
 namespace Androidplayer;
 
 
-public class FlyleafHost : Control
+public class FlyleafHost : Control ,IDisposable
 {
     
     public event EventHandler? HandleCreated;
@@ -19,6 +19,8 @@ public class FlyleafHost : Control
 
     private bool _updating;
     private bool _started;
+
+    public bool isSurfaceCreated = true;
 
     
     public static readonly StyledProperty<Control?> ContentProperty =
@@ -130,7 +132,7 @@ public class FlyleafHost : Control
 
         _overlayWindow = new VideoOverlayWindow();
 
-        _overlayWindow.Background = new SolidColorBrush(Colors.Red); 
+        // _overlayWindow.Background = new SolidColorBrush(Colors.Red); 
         // IMPORTANT:
         //
         // Overlay is owned by the SURFACE.
@@ -527,6 +529,12 @@ public class FlyleafHost : Control
 
             
         }
+    }
+
+
+    public void Dispose()
+    {
+        
     }
 
     // ============================================================

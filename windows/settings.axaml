@@ -1,0 +1,143 @@
+﻿<Window x:Class="Androidplayer.windows.settings"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Androidplayer.windows"
+        xmlns:settings_view="clr-namespace:Androidplayer.windows.settings_view"
+        xmlns:windows="clr-namespace:Androidplayer.windows"
+
+        x:DataType="windows:UISettings"
+
+        mc:Ignorable="d"
+        Title="Settings"
+        Height="600" Width="820"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Background="#F6F7F9"
+        Icon="/Icons/android.png"
+
+        SystemDecorations="None"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
+
+  <Grid Margin="0">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="228"/>
+      <ColumnDefinition Width="12"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- Left Navigation Panel -->
+    <Border Grid.Column="0"
+            Background="White"
+            CornerRadius="8"
+            Padding="12"
+            Margin="12,12,0,0">
+      <StackPanel>
+        <TextBlock Text="Settings"
+                   FontWeight="Bold"
+                   FontSize="18"
+                   Margin="6,4,0,18"/>
+        <ListBox x:Name="SettingsListBox"
+                 BorderThickness="0"
+                 Background="Transparent"
+                 SelectionMode="Single"
+                 SelectedIndex="0"
+                 FontSize="14"
+                 Foreground="#2D2D2D">
+          <ListBoxItem Padding="10">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+              <TextBlock Text="📺" Margin="0,0,10,0"/>
+              <TextBlock Text="Screen Settings"/>
+            </StackPanel>
+          </ListBoxItem>
+
+          <ListBoxItem Padding="10">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+              <TextBlock Text="🪟" Margin="0,0,10,0"/>
+              <TextBlock Text="Window settings"/>
+            </StackPanel>
+          </ListBoxItem>
+
+          <ListBoxItem Padding="10" Background="#F2F6FF" FontWeight="SemiBold">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+              <TextBlock Text="🖱️" Margin="0,0,10,0"/>
+              <TextBlock Text="Mouse Setting"/>
+            </StackPanel>
+          </ListBoxItem>
+
+          <ListBoxItem Padding="10">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+              <TextBlock Text="⌨️" Margin="0,0,10,0"/>
+              <TextBlock Text="Shortcut key"/>
+            </StackPanel>
+          </ListBoxItem>
+        </ListBox>
+      </StackPanel>
+    </Border>
+
+    <!-- Separator -->
+    <Border Grid.Column="1" Width="1" Background="#E6E9EE" Margin="0,10"/>
+
+    <!-- Main content area -->
+    <Grid Grid.Column="2" Margin="0,0,0,0">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="72"/>
+      </Grid.RowDefinitions>
+
+      <!-- Top bar with close button -->
+      <Grid Grid.Row="0" Margin="0,0,0,8" Height="50" HorizontalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0"
+                Background="Transparent"
+                PointerPressed="TopBar_MouseLeftButtonDown">
+          <Image Source="/Icons/close.png"
+                 Margin="0,12,12,0"
+                 RenderOptions.BitmapInterpolationMode="HighQuality"
+                 Width="22" Height="22"
+                 HorizontalAlignment="Right"
+                 VerticalAlignment="Top"
+                 Cursor="Hand"
+                 PointerReleased="CloseButton_Click"
+                 IsHitTestVisible="True"/>
+        </Border>
+      </Grid>
+
+      <!-- Main content area -->
+      <ContentControl x:Name="SettingsContent" Grid.Row="1" Margin="0,0,0,12"/>
+
+      <!-- Footer with Cancel + Save aligned to the right -->
+      <Border Grid.Row="2" Background="Transparent">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+
+          <StackPanel Grid.Column="1"
+                      Orientation="Horizontal"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      Margin="0,0,6,0">
+            <Button Content="Cancel"
+                    Classes="RoundedButton"
+                    Width="100" Height="34" Margin="0,0,10,0"
+                    Click="CloseButton_Click"/>
+            <Button Content="Save Changes"
+                    Classes="RoundedPrimaryButton"
+                    Width="130" Height="34"
+                    Click="save_btn_click"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>

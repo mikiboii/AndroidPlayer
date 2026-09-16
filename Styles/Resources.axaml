@@ -1,0 +1,93 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- ============================================================ -->
+  <!-- Brushes — accessible via DynamicResource / StaticResource    -->
+  <!-- ============================================================ -->
+  <Styles.Resources>
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#26292D"/>
+    <SolidColorBrush x:Key="PrimaryBrush_thin" Color="#65676B"/>
+    <SolidColorBrush x:Key="bluured" Color="#9398A3"/>
+    <SolidColorBrush x:Key="warning" Color="#FF9B7D"/>
+    <SolidColorBrush x:Key="btn" Color="#1A2B4C"/>
+    <SolidColorBrush x:Key="WordBlueBrush" Color="#FF4A90E2"/>
+  </Styles.Resources>
+
+  <!-- ============================================================ -->
+  <!-- RoundedButtonStyle                                           -->
+  <!-- Use: <Button Classes="RoundedButton" ... />                  -->
+  <!-- ============================================================ -->
+  <Style Selector="Button.RoundedButton">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderBrush" Value="#D0D7E6"/>
+    <Setter Property="Foreground" Value="#333333"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Button">
+        <Border Name="PART_Border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="6">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Margin="{TemplateBinding Padding}"/>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <!-- Hover state — sets the inner Border's Background -->
+  <Style Selector="Button.RoundedButton:pointerover /template/ Border#PART_Border">
+    <Setter Property="Background" Value="#FF9B7D"/>
+  </Style>
+
+  <!-- Pressed state -->
+  <Style Selector="Button.RoundedButton:pressed /template/ Border#PART_Border">
+    <Setter Property="Background" Value="#E0E0E0"/>
+  </Style>
+
+  <!-- ============================================================ -->
+  <!-- RoundedPrimaryButtonStyle                                    -->
+  <!-- Use: <Button Classes="RoundedPrimaryButton" ... />           -->
+  <!-- ============================================================ -->
+  <Style Selector="Button.RoundedPrimaryButton">
+    <Setter Property="Background" Value="#1A2B4C"/>
+    <Setter Property="BorderBrush" Value="#1A2B4C"/>
+    <Setter Property="Foreground" Value="White"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Button">
+        <Border Name="PART_Border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="6">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Margin="{TemplateBinding Padding}"/>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="Button.RoundedPrimaryButton:pointerover /template/ Border#PART_Border">
+    <Setter Property="Background" Value="#0A1A3F"/>
+  </Style>
+
+  <Style Selector="Button.RoundedPrimaryButton:pressed /template/ Border#PART_Border">
+    <Setter Property="Background" Value="#05122B"/>
+  </Style>
+
+</Styles>

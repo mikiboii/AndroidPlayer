@@ -1,0 +1,97 @@
+﻿<UserControl x:Class="Androidplayer.Src.Keymap.Keymap_items.KeymapElementNew"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Androidplayer.Src.Keymap.Keymap_items"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Width="60" Height="30">
+
+  <UserControl.Styles>
+    <!-- Close button — same style as removeBtn elsewhere, but 15x15 -->
+    <Style Selector="Button.closeBtn">
+      <Setter Property="Width" Value="15"/>
+      <Setter Property="Height" Value="15"/>
+      <Setter Property="Background" Value="#FFE4C4"/>
+      <Setter Property="BorderBrush" Value="#1A73E8"/>
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="RenderTransform" Value="scale(1.0)"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.08"/>
+        </Transitions>
+      </Setter>
+    </Style>
+
+    <Style Selector="Button.closeBtn:pointerover">
+      <Setter Property="RenderTransform" Value="scale(1.3)"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid x:Name="RootGrid"
+        Background="Transparent"
+        Margin="0"
+        IsHitTestVisible="True">
+
+    <Border x:Name="MainBorder"
+            BorderBrush="#65b7ff"
+            Background="#635a4b"
+            BorderThickness="2"
+            HorizontalAlignment="Stretch"
+            IsHitTestVisible="True"
+            CornerRadius="13">
+
+      <Grid Margin="4">
+        <!-- Display label (when not editing) -->
+        <TextBlock x:Name="DisplayKey"
+                   Text=""
+                   Foreground="White"
+                   FontSize="12"
+                   SizeChanged="DisplayKey_SizeChanged"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   IsVisible="True"
+                   TextWrapping="NoWrap"/>
+
+        <!-- Editing text box -->
+        <TextBox x:Name="InputField"
+                 Text=""
+                 FontSize="14"
+                 TextChanged="InputField_TextChanged"
+                 Foreground="White"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 IsVisible="False"
+                 VerticalContentAlignment="Center"
+                 HorizontalContentAlignment="Center"/>
+
+        <!-- Close button top-right -->
+        <Button x:Name="CloseButton"
+                Classes="closeBtn"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,-8,-8,0">
+          <Button.Template>
+            <ControlTemplate TargetType="Button">
+              <Border Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}"
+                      CornerRadius="10"
+                      RenderTransformOrigin="0.5,0.5">
+                <TextBlock Text="X"
+                           Foreground="Red"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+              </Border>
+            </ControlTemplate>
+          </Button.Template>
+        </Button>
+
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>
