@@ -11,6 +11,8 @@
 //         InitializeComponent();
 //     }
 // }
+
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -23,7 +25,7 @@ public partial class TitleBar : UserControl
 {
 
     public string mikiboii = "yoyo";
-    
+    private EventHandler<AvaloniaPropertyChangedEventArgs>? _windowPropertyChangedHandler;
     
     public TitleBar()
     {
@@ -35,7 +37,7 @@ public partial class TitleBar : UserControl
 
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
-        Title = "new mm";
+        
     }
 
     // Avalonia Property for Title (supports binding)
@@ -102,32 +104,74 @@ public partial class TitleBar : UserControl
     private void CloseBtn_OnClick(object? sender, RoutedEventArgs e)
     {
         ParentWindow?.Close();
+        
+        Home.Instance?.Close();
     }
 
+    // protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    // {
+    //     base.OnAttachedToVisualTree(e);
+    //     
+    //     // Find parent window if not set via binding
+    //     if (ParentWindow == null)
+    //     {
+    //         ParentWindow = this.FindAncestorOfType<Window>();
+    //     }
+    //     
+    //     // Update maximize button when window state changes
+    //     if (ParentWindow != null)
+    //     {
+    //         ParentWindow.PropertyChanged += (s, args) =>
+    //         {
+    //             if (args.Property == Window.WindowStateProperty)
+    //             {
+    //                 UpdateMaximizeButtonContent();
+    //             }
+    //         };
+    //         UpdateMaximizeButtonContent();
+    //     }
+    // }
+
+    
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        
-        // Find parent window if not set via binding
+
         if (ParentWindow == null)
-        {
             ParentWindow = this.FindAncestorOfType<Window>();
-        }
-        
-        // Update maximize button when window state changes
+
         if (ParentWindow != null)
         {
-            ParentWindow.PropertyChanged += (s, args) =>
+            _windowPropertyChangedHandler = (s, args) =>
             {
                 if (args.Property == Window.WindowStateProperty)
-                {
                     UpdateMaximizeButtonContent();
-                }
             };
+            ParentWindow.PropertyChanged += _windowPropertyChangedHandler;
+
             UpdateMaximizeButtonContent();
         }
     }
 
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        // Detach the window handler
+        if (ParentWindow != null && _windowPropertyChangedHandler != null)
+        {
+            ParentWindow.PropertyChanged -= _windowPropertyChangedHandler;
+        }
+        _windowPropertyChangedHandler = null;
+
+        // Detach own events
+        Loaded -= OnLoaded;
+
+        // Drop the window ref so it isn't rooted
+        ParentWindow = null;
+
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    
     private void UpdateMaximizeButtonContent()
     {
         if (ParentWindow != null)

@@ -124,8 +124,8 @@ namespace Androidplayer.Src.Pages
             {
                 if (Home.Instance != null)
                 {
-                    Home.Instance.loadingpage.IsVisible = true;
-                    Home.Instance.displayView.IsVisible = false;
+                    // Home.Instance.loadingpage.IsVisible = true;
+                    // Home.Instance.displayView.IsVisible = false;
                 }
 
                 progress_view.IsVisible = false;

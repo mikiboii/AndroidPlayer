@@ -58,8 +58,12 @@ public partial class Direction_keymap : UserControl, IKeymapElement
             OriginalX = left + (this.Bounds.Width / 2.0);
             OriginalY = top + (this.Bounds.Height / 2.0);
 
-            string jsonString = JsonSerializer.Serialize(GetJsonData(),
-                new JsonSerializerOptions { WriteIndented = true });
+            // string jsonString = JsonSerializer.Serialize(GetJsonData(),
+            //     new JsonSerializerOptions { WriteIndented = true });
+            
+            string jsonString = JsonSerializer.Serialize(
+                GetJsonData(),
+                KeymapJsonContext.Default.KeymapElement);
         }
     }
 
@@ -229,7 +233,57 @@ public partial class Direction_keymap : UserControl, IKeymapElement
         Canvas.SetTop(this, newTop);
     }
 
-    public object GetJsonData()
+    // public object GetJsonData()
+    // {
+    //     double parentW = OriginalParentWidth;
+    //     double parentH = OriginalParentHeight;
+    //
+    //     if (this.Parent is Canvas c)
+    //     {
+    //         parentW = c.Bounds.Width;
+    //         parentH = c.Bounds.Height;
+    //     }
+    //
+    //     double x = Canvas.GetLeft(this);
+    //     double y = Canvas.GetTop(this);
+    //
+    //     if (double.IsNaN(x)) x = 0;
+    //     if (double.IsNaN(y)) y = 0;
+    //
+    //     List<string> keys = new();
+    //     if (!string.IsNullOrEmpty(KeyName))
+    //         keys = KeyName.Split('+', StringSplitOptions.RemoveEmptyEntries)
+    //             .Select(k => k.Trim())
+    //             .ToList();
+    //
+    //     int deviceW = (int)(My_Store.Instance?.DeviceWidth ?? 0);
+    //     int deviceH = (int)(My_Store.Instance?.DeviceHeight ?? 0);
+    //
+    //     double scaledX = x / parentW * deviceW;
+    //     double scaledY = y / parentH * deviceH;
+    //
+    //     double scaled_width = this.Bounds.Width / parentW * deviceW;
+    //     double scaled_height = this.Bounds.Height / parentH * deviceH;
+    //
+    //     return new Dictionary<string, object>
+    //     {
+    //         ["type"] = Name,
+    //         ["keys"] = new List<string> { "W", "A", "S", "D" },
+    //         ["x"] = scaledX,
+    //         ["y"] = scaledY,
+    //         ["width"] = this.Bounds.Width,
+    //         ["height"] = this.Bounds.Height,
+    //         ["parent_width"] = deviceW,
+    //         ["parent_height"] = deviceH,
+    //         ["scaled_width"] = scaled_width,
+    //         ["scaled_height"] = scaled_height,
+    //         ["Img path"] = null!,
+    //         ["App name"] = my_info.Instance?.Appname!
+    //     };
+    // }
+
+    
+    public object  GetJsonData()
     {
         double parentW = OriginalParentWidth;
         double parentH = OriginalParentHeight;
@@ -242,7 +296,6 @@ public partial class Direction_keymap : UserControl, IKeymapElement
 
         double x = Canvas.GetLeft(this);
         double y = Canvas.GetTop(this);
-
         if (double.IsNaN(x)) x = 0;
         if (double.IsNaN(y)) y = 0;
 
@@ -255,29 +308,28 @@ public partial class Direction_keymap : UserControl, IKeymapElement
         int deviceW = (int)(My_Store.Instance?.DeviceWidth ?? 0);
         int deviceH = (int)(My_Store.Instance?.DeviceHeight ?? 0);
 
-        double scaledX = x / parentW * deviceW;
-        double scaledY = y / parentH * deviceH;
+        double scaledX = parentW > 0 ? x / parentW * deviceW : 0;
+        double scaledY = parentH > 0 ? y / parentH * deviceH : 0;
+        double scaledW = parentW > 0 ? this.Bounds.Width  / parentW * deviceW : 0;
+        double scaledH = parentH > 0 ? this.Bounds.Height / parentH * deviceH : 0;
 
-        double scaled_width = this.Bounds.Width / parentW * deviceW;
-        double scaled_height = this.Bounds.Height / parentH * deviceH;
-
-        return new Dictionary<string, object>
+        return new KeymapElement
         {
-            ["type"] = Name,
-            ["keys"] = new List<string> { "W", "A", "S", "D" },
-            ["x"] = scaledX,
-            ["y"] = scaledY,
-            ["width"] = this.Bounds.Width,
-            ["height"] = this.Bounds.Height,
-            ["parent_width"] = deviceW,
-            ["parent_height"] = deviceH,
-            ["scaled_width"] = scaled_width,
-            ["scaled_height"] = scaled_height,
-            ["Img path"] = null!,
-            ["App name"] = my_info.Instance?.Appname!
+            Type         = Name,
+            Keys         = new List<string> { "W", "A", "S", "D" },
+            X            = scaledX,
+            Y            = scaledY,
+            Width        = this.Bounds.Width,
+            Height       = this.Bounds.Height,
+            ParentWidth  = deviceW,
+            ParentHeight = deviceH,
+            ScaledWidth  = scaledW,
+            ScaledHeight = scaledH,
+            ImagePath    = null,
+            AppName      = my_info.Instance?.Appname
         };
     }
-
+    
     public void SetJsonData(KeymapElement data)
     {
         try

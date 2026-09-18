@@ -91,7 +91,11 @@ namespace Androidplayer.Src.Keymap
                     {
                         if (property.Value.ValueKind == JsonValueKind.Array)
                         {
-                            var parsedList = JsonSerializer.Deserialize<List<KeymapElement>>(property.Value.GetRawText(), options);
+                            // var parsedList = JsonSerializer.Deserialize<List<KeymapElement>>(property.Value.GetRawText(), options);
+                            var parsedList = JsonSerializer.Deserialize(
+                                property.Value.GetRawText(),
+                                KeymapJsonContext.Default.ListKeymapElement);
+                            
                             if (parsedList != null)
                                 _elements.AddRange(parsedList);
                         }
@@ -99,7 +103,10 @@ namespace Androidplayer.Src.Keymap
                 }
                 else
                 {
-                    var parsedList = JsonSerializer.Deserialize<List<KeymapElement>>(jsonData, options);
+                    // var parsedList = JsonSerializer.Deserialize<List<KeymapElement>>(jsonData, options);
+                    var parsedList = JsonSerializer.Deserialize(
+                        jsonData,
+                        KeymapJsonContext.Default.ListKeymapElement);
                     if (parsedList != null)
                         _elements = parsedList;
                 }

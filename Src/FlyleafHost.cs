@@ -9,7 +9,7 @@ using Avalonia.Threading;
 namespace Androidplayer;
 
 
-public class FlyleafHost : Control ,IDisposable
+public class FlyleafHost : Control
 {
     
     public event EventHandler? HandleCreated;
@@ -19,8 +19,6 @@ public class FlyleafHost : Control ,IDisposable
 
     private bool _updating;
     private bool _started;
-
-    public bool isSurfaceCreated = true;
 
     
     public static readonly StyledProperty<Control?> ContentProperty =
@@ -458,6 +456,7 @@ public class FlyleafHost : Control ,IDisposable
         public VideoSurfaceWindow()
         {
             Background = Brushes.Black;
+            // Background = Brushes.Transparent; 
 
             SystemDecorations =
                 SystemDecorations.None;
@@ -476,11 +475,11 @@ public class FlyleafHost : Control ,IDisposable
             
             ExtendClientAreaChromeHints =
                 Avalonia.Platform.ExtendClientAreaChromeHints.NoChrome;
-
-            Content = new Border
-            {
-                Background = Brushes.Black
-            };
+            //
+            // Content = new Border
+            // {
+            //     Background = Brushes.Black
+            // };
         }
 
         public IntPtr Handle
@@ -531,14 +530,14 @@ public class FlyleafHost : Control ,IDisposable
         }
     }
 
+    // ============================================================
+    // EXAMPLE OVERLAY CONTENT
+    // ============================================================
 
     public void Dispose()
     {
         
+        
     }
-
-    // ============================================================
-    // EXAMPLE OVERLAY CONTENT
-    // ============================================================
 
 }

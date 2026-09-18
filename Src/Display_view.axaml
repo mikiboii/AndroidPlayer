@@ -18,18 +18,20 @@
              BorderBrush="Gray"
              BorderThickness="0.7,0,0.7,0.7">
 
-  <Grid Background="Black" Margin="4">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="*"/>
-    </Grid.RowDefinitions>
+  <Grid x:Name="MainImages_parent" Background="Black" RowDefinitions="Auto, *, Auto" Margin="4" >
+    
 
     <!-- Custom Flyleaf replacement: embeds a native HWND for DirectX -->
     
+    <!-- HorizontalAlignment="Center" -->
+    <!-- VerticalAlignment="Center" -->
     
-    <androidplayer:FlyleafHost x:Name="MainImage"
-                       Margin="0"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
+    
+    <androidplayer:Native_view x:Name="MainImage"
+                     
+                       
+                       Grid.Row="1"
+                       
                       
                        >
 
@@ -109,6 +111,6 @@
         </Border>
 
       </Canvas>
-    </androidplayer:FlyleafHost>
+    </androidplayer:Native_view>
   </Grid>
 </UserControl>

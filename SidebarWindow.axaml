@@ -22,6 +22,7 @@
         <Style Selector="Image.sidebarIcon">
           <Setter Property="Margin" Value="0,8"/>
           <Setter Property="Height" Value="25"/>
+    
           
         </Style>
 
@@ -92,7 +93,10 @@
 
       <Border CornerRadius="50" Height="35">
         <Image Source="/Icons/android.png" Height="25"
-               RenderOptions.BitmapInterpolationMode="HighQuality"/>
+               RenderOptions.BitmapInterpolationMode="HighQuality"
+               UseLayoutRounding="True"
+               
+               />
       </Border>
 
       <Border Height="5"/>
@@ -100,26 +104,36 @@
       <Image Classes="sidebarIcon screenshot"
              Tag="Screenshot"
              ToolTip.Tip="Screenshot"
+             RenderOptions.BitmapInterpolationMode="HighQuality"
+             UseLayoutRounding="True"
              PointerPressed="OnSidebarButtonClick"/>
 
       <Image Classes="sidebarIcon record"
              Tag="Record"
              ToolTip.Tip="Record"
+             RenderOptions.BitmapInterpolationMode="HighQuality"
+             UseLayoutRounding="True"
              PointerPressed="OnSidebarButtonClick"/>
 
       <Image Classes="sidebarIcon keyboard"
              Tag="Keymap"
              ToolTip.Tip="Keymap menu"
+             RenderOptions.BitmapInterpolationMode="HighQuality"
+             UseLayoutRounding="True"
              PointerPressed="OnSidebarButtonClick"/>
 
       <Image Classes="sidebarIcon settings"
              Tag="Settings"
              ToolTip.Tip="Settings page"
+             RenderOptions.BitmapInterpolationMode="HighQuality"
+             UseLayoutRounding="True"
              PointerPressed="OnSidebarButtonClick"/>
 
       <Image Classes="sidebarIcon rotate"
              Tag="Rotate"
              ToolTip.Tip="Rotate device"
+             RenderOptions.BitmapInterpolationMode="HighQuality"
+             UseLayoutRounding="True"
              PointerPressed="OnSidebarButtonClick"/>
 
       <Border Height="15"/>
@@ -127,16 +141,22 @@
       <Image Classes="sidebarIcon back"
              Tag="Back"
              ToolTip.Tip="Back"
+             RenderOptions.BitmapInterpolationMode="HighQuality"
+             UseLayoutRounding="True"
              PointerPressed="OnSidebarButtonClick"/>
 
       <Image Classes="sidebarIcon home"
              Tag="Home"
              ToolTip.Tip="Home"
+             RenderOptions.BitmapInterpolationMode="HighQuality"
+             UseLayoutRounding="True"
              PointerPressed="OnSidebarButtonClick"/>
 
       <Image Classes="sidebarIcon menu"
              Tag="Recent_apps"
              ToolTip.Tip="Recent apps"
+             RenderOptions.BitmapInterpolationMode="HighQuality"
+             UseLayoutRounding="True"
              PointerPressed="OnSidebarButtonClick"/>
     </StackPanel>
   </Border>

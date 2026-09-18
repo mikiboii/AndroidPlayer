@@ -125,7 +125,7 @@
     <!-- Resize thumbs -->
     <primitives:Thumb x:Name="TopLeftThumb" Width="10" Height="10"
                       HorizontalAlignment="Left" VerticalAlignment="Top"
-                      Cursor="SizeNorthwestSoutheast"
+                      Cursor="TopLeftCorner"
                       DragDelta="ResizeThumb_DragDelta">
       <primitives:Thumb.Template>
         <ControlTemplate TargetType="Thumb">
@@ -136,7 +136,7 @@
 
     <primitives:Thumb x:Name="TopRightThumb" Width="10" Height="10"
                       HorizontalAlignment="Right" VerticalAlignment="Top"
-                      Cursor="SizeNortheastSouthwest"
+                      Cursor="TopRightCorner"
                       DragDelta="ResizeThumb_DragDelta">
       <primitives:Thumb.Template>
         <ControlTemplate TargetType="Thumb">
@@ -147,7 +147,7 @@
 
     <primitives:Thumb x:Name="BottomLeftThumb" Width="10" Height="10"
                       HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                      Cursor="SizeNortheastSouthwest"
+                      Cursor="TopRightCorner"
                       DragDelta="ResizeThumb_DragDelta">
       <primitives:Thumb.Template>
         <ControlTemplate TargetType="Thumb">
@@ -158,7 +158,7 @@
 
     <primitives:Thumb x:Name="BottomRightThumb" Width="10" Height="10"
                       HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                      Cursor="SizeNorthwestSoutheast"
+                      Cursor="TopLeftCorner"
                       DragDelta="ResizeThumb_DragDelta">
       <primitives:Thumb.Template>
         <ControlTemplate TargetType="Thumb">

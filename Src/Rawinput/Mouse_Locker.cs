@@ -7,7 +7,7 @@ using Avalonia.Input;
 using Avalonia.VisualTree;
 using Androidplayer.Store;
 
-using my_flyleaf = Androidplayer.FlyleafHost;
+using Native_view = Androidplayer.Native_view;
 
 namespace Androidplayer.Src.Rawinput;
 
@@ -28,10 +28,10 @@ public class Mouse_Locker
         public int Bottom;
     }
 
-    private my_flyleaf my_image;
+    private Native_view my_image;
     private bool isMouseClipped = false;
 
-    public Mouse_Locker(my_flyleaf image)
+    public Mouse_Locker(Native_view image)
     {
         my_image = image;
 

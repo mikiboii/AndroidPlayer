@@ -19,7 +19,7 @@ public class App_manager : IDisposable
     private app_worker my_app_worker;
     private Scrcpy_worker scrcpy_worker;
 
-    private FlyleafHost my_image;
+    private Native_view my_image;
 
     private bool first_frame_displayed = false;
 
@@ -31,7 +31,7 @@ public class App_manager : IDisposable
 
     private bool is_running = true;
 
-    public App_manager(FlyleafHost image)
+    public App_manager(Native_view image)
     {
         my_image = image;
 
@@ -39,7 +39,7 @@ public class App_manager : IDisposable
 
         if (!my_info.Instance.DeveloperMode)
         {
-            k_info.Instance.directx = new DirectX(my_image.SurfaceHandle);
+            k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
 
             my_adb_worker = new Adb_worker();
             my_adb_worker.ProgressChanged += my_app_worker_ProgressChanged;
@@ -50,13 +50,13 @@ public class App_manager : IDisposable
         }
         else
         {
-            k_info.Instance.directx = new DirectX(my_image.SurfaceHandle);
+            k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
 
-            var w = my_image.Surface.Bounds.Width;
-            var h = my_image.Surface.Bounds.Height;
+            var w = my_image.Bounds.Width;
+            var h = my_image.Bounds.Height;
 
             Console.WriteLine($"Surface size FIXED after init: {w} x {h}");
-            Console.WriteLine(my_image.SurfaceHandle);
+            Console.WriteLine(my_image.PlatformHandle.Handle);
 
             my_app_worker = new app_worker();
 
@@ -145,10 +145,10 @@ public class App_manager : IDisposable
                 {
                     if (my_info.Instance.TakeScreenshot)
                     {
-                        if (my_image.Surface != null)
+                        if (my_image != null)
                         {
-                            var w = my_image.Surface.Bounds.Width;
-                            var h = my_image.Surface.Bounds.Height;
+                            var w = my_image.Bounds.Width;
+                            var h = my_image.Bounds.Height;
                             // Hook here if you need to react to screenshot state
                         }
 
@@ -167,13 +167,13 @@ public class App_manager : IDisposable
 
                     Dispatcher.UIThread.Post(() =>
                     {
-                        Console.WriteLine($" Display view {my_image.Surface.Width}, {my_image.Surface.Height}");
+                        Console.WriteLine($" Display view {my_image.Width}, {my_image.Height}");
 
                         if (my_image != null)
                         {
                             k_info.Instance.directx?.ResizeSwapChain(
-                                (int)my_image.Surface.Width,
-                                (int)my_image.Surface.Height);
+                                (int)my_image.Width,
+                                (int)my_image.Height);
 
                             if (my_info.Instance.DeveloperMode)
                             {
@@ -190,10 +190,10 @@ public class App_manager : IDisposable
     {
         Dispatcher.UIThread.Post(() =>
         {
-            if (my_image.Surface != null)
+            if (my_image != null)
             {
-                var w = my_image.Surface.Bounds.Width;
-                var h = my_image.Surface.Bounds.Height;
+                var w = my_image.Bounds.Width;
+                var h = my_image.Bounds.Height;
 
                 Console.WriteLine($"Surface size FIXED: {w} x {h}");
                 Console.WriteLine($"INIT DX SIZE: {w} x {h}");
@@ -216,8 +216,8 @@ public class App_manager : IDisposable
         {
             if (Home.Instance != null)
             {
-                Home.Instance.loadingpage.IsVisible = true;
-                Home.Instance.displayView.IsVisible = false;
+                // Home.Instance.loadingpage.IsVisible = true;
+                // Home.Instance.displayView.IsVisible = false;
             }
         });
 
@@ -230,8 +230,8 @@ public class App_manager : IDisposable
         {
             if (Home.Instance != null)
             {
-                Home.Instance.loadingpage.IsVisible = false;
-                Home.Instance.displayView.IsVisible = true;
+                // Home.Instance.loadingpage.IsVisible = false;
+                // Home.Instance.displayView.IsVisible = true;
             }
 
             del_mm();
@@ -246,7 +246,7 @@ public class App_manager : IDisposable
     {
         Dispatcher.UIThread.Post(() =>
         {
-            Home.Instance?.loadingpage.UpdateProgress((double)num, status);
+            // Home.Instance?.loadingpage.UpdateProgress((double)num, status);
         });
     }
 
@@ -286,8 +286,8 @@ public class App_manager : IDisposable
         {
             if (Home.Instance != null)
             {
-                Home.Instance.loadingpage.IsVisible = false;
-                Home.Instance.displayView.IsVisible = true;
+                // Home.Instance.loadingpage.IsVisible = false;
+                // Home.Instance.displayView.IsVisible = true;
             }
 
             OverlayManager.Instance?.rerender_overlay();

@@ -40,18 +40,20 @@ public partial class Display_view : UserControl
             
             // Wire up surface events — using the Avalonia host's Surface control
 
-            if (MainImage.Surface != null)
+            if (MainImage != null)
             {
+
+                Console.WriteLine("serring mainimage events");
                 
-                MainImage.Surface.PointerPressed += MainImage_OnMouseDown;
-                MainImage.Surface.PointerReleased += MainImage_OnMouseUp;
-                MainImage.Surface.PointerMoved += MainImage_OnMouseMove;
-                MainImage.Surface.PointerWheelChanged += MainImage_OnMouseWheel;
+                MainImage.PointerPressed += MainImage_OnMouseDown;
+                MainImage.PointerReleased += MainImage_OnMouseUp;
+                MainImage.PointerMoved += MainImage_OnMouseMove;
+                MainImage.PointerWheelChanged += MainImage_OnMouseWheel;
 
-                MainImage.Surface.AddHandler(DragDrop.DragEnterEvent, MainImage_DragEnter);
-                MainImage.Surface.AddHandler(DragDrop.DropEvent, MainImage_Drop);
+                MainImage.AddHandler(DragDrop.DragEnterEvent, MainImage_DragEnter);
+                MainImage.AddHandler(DragDrop.DropEvent, MainImage_Drop);
 
-                MainImage.Surface.Focusable = true;
+                MainImage.Focusable = true;
             }
             MainImage.Focusable = true;
             
@@ -83,17 +85,18 @@ public partial class Display_view : UserControl
         Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
 
 
-        if (MainImage.Surface != null)
+        if (MainImage != null)
         {
-        MainImage.Surface.Cursor = customCursor;
+        MainImage.Cursor = customCursor;
             
         }
         
-        if (MainImage.Overlay != null)
-        {
-        MainImage.Overlay.Cursor = customCursor;
-            
-        }
+        // if (MainImage.Overlay != null)
+        // {
+        // MainImage.Overlay.Cursor = customCursor;
+        //     
+        // }
+        
         
 
         this.Cursor = customCursor;
@@ -111,6 +114,7 @@ public partial class Display_view : UserControl
 
         Loaded += OnLoaded;
         
+        // MainImage.HandleCreated += MainImageOnHandleCreated;
         MainImage.HandleCreated += MainImageOnHandleCreated;
         
         SizeChanged += OnSizeChanged;
@@ -120,6 +124,8 @@ public partial class Display_view : UserControl
         _resizeTimer.Interval = TimeSpan.FromMilliseconds(200);
         _resizeTimer.Tick += ResizeTimer_Tick;
     }
+
+    
 
     // private void MainImageOnHandleCreated(object? sender, EventArgs e)
     // {
@@ -136,25 +142,26 @@ public partial class Display_view : UserControl
         mouse_normal = new Mouse_normal();
     
         Console.WriteLine("display_view file loaded");
-    
-        MainImage.Width = Width;
-        MainImage.Height = Height;
+
+        // Console.WriteLine(Width);
+        // MainImage.Width = Width;
+        // MainImage.Height = Height;
         
         
-        Dispatcher.UIThread.Post(() =>
-        {
-            if (Home.Instance != null)
-            {
-                Home.Instance.loadingpage.IsVisible = false;
-                Home.Instance.displayView.IsVisible = true;
-            }
-        
-        
-        
-            Console.WriteLine("displayview ready ##################");
-        
-            OverlayManager.Instance?.rerender_overlay();
-        });
+        // Dispatcher.UIThread.Post(() =>
+        // {
+        //     if (Home.Instance != null)
+        //     {
+        //         Home.Instance.loadingpage.IsVisible = false;
+        //         Home.Instance.displayView.IsVisible = true;
+        //     }
+        //
+        //
+        //
+        //     Console.WriteLine("displayview ready ##################");
+        //
+        //     // OverlayManager.Instance?.rerender_overlay();
+        // });
         
         
         // var timer = new DispatcherTimer
@@ -177,16 +184,53 @@ public partial class Display_view : UserControl
         // };
         // timer.Start();
     
-        if (MainImage.Surface != null && MainImage.isSurfaceCreated)
-        {
-            InitAppManager();   // safe now
-        }
+        
+        
+        
+        
+        
+        // if (MainImage != null && MainImage.isSurfaceCreated)
+        // {
+        //     InitAppManager();   // safe now
+        // }
+        
+        
+        
         // else: do NOT construct App_manager here — wait for HandleCreated
     }
     
-    private void MainImageOnHandleCreated(object? sender, EventArgs e)
+    private void MainImageOnHandleCreated(object? sender, IPlatformHandle e)
     {
         Console.WriteLine("handle created in display view");
+        
+        
+        
+        
+        
+        if (MainImage != null)
+        {
+            
+            // Wire up surface events — using the Avalonia host's Surface control
+
+            if (MainImage != null)
+            {
+
+                Console.WriteLine("serring mainimage events");
+                
+                MainImage.PointerPressed += MainImage_OnMouseDown;
+                MainImage.PointerReleased += MainImage_OnMouseUp;
+                MainImage.PointerMoved += MainImage_OnMouseMove;
+                MainImage.PointerWheelChanged += MainImage_OnMouseWheel;
+
+                MainImage.AddHandler(DragDrop.DragEnterEvent, MainImage_DragEnter);
+                MainImage.AddHandler(DragDrop.DropEvent, MainImage_Drop);
+
+                MainImage.Focusable = true;
+            }
+            MainImage.Focusable = true;
+            
+        }
+        
         InitAppManager();
     }
     
@@ -220,6 +264,9 @@ public partial class Display_view : UserControl
 
     private void OnUnloaded(object? sender, RoutedEventArgs e)
     {
+        
+        
+        
         MainImage?.Dispose();
     }
 
@@ -257,8 +304,8 @@ public partial class Display_view : UserControl
         if (my_info.Instance.Window_resizing == false)
         {
             // WPF had Visibility.Hidden — Avalonia has only IsVisible = false
-            MainImage.IsVisible = false;
-            Console.WriteLine("hiding mian image");
+            MainImage.IsVisible= false;
+            // Console.WriteLine("hiding mian image");
         }
 
         my_info.Instance.Window_resizing = true;
@@ -266,7 +313,7 @@ public partial class Display_view : UserControl
 
     // private void OnLoaded(object? sender, RoutedEventArgs e)
     // {
-    //     if (MainImage.Surface != null && MainImage.isSurfaceCreated)
+    //     if (MainImage != null && MainImage.isSurfaceCreated)
     //     {
     //         Console.WriteLine(this.IsVisible);
     //         Console.WriteLine("surface already created");
@@ -443,37 +490,84 @@ public partial class Display_view : UserControl
         OverlayManager.Instance?.rerender_overlay();
     }
 
+    // public void ScaleFormToFit(int videoWidth, int videoHeight)
+    // {
+    //     // double availableWidth = this.Bounds.Width;
+    //     // double availableHeight = this.Bounds.Height;
+    //
+    //     var margin = MainImages_parent.Margin;
+    //     
+    //     double availableWidth  = this.Bounds.Width  - margin.Left - margin.Right;
+    //     double availableHeight = this.Bounds.Height - margin.Top  - margin.Bottom;
+    //
+    //     var frame_size = new Size(this.Bounds.Width, this.Bounds.Height);
+    //
+    //     double original_width = videoWidth;
+    //     double original_height = videoHeight;
+    //     double aspect_ratio = original_width / original_height;
+    //
+    //     int new_width, new_height;
+    //
+    //     if (frame_size.Width / frame_size.Height > aspect_ratio)
+    //     {
+    //         new_height = (int)frame_size.Height;
+    //         new_width = (int)(new_height * aspect_ratio);
+    //     }
+    //     else
+    //     {
+    //         new_width = (int)frame_size.Width;
+    //         new_height = (int)(new_width / aspect_ratio);
+    //     }
+    //
+    //     ImageContainer.Width = new_width;
+    //     ImageContainer.Height = new_height;
+    //
+    //     MainImage.Width = new_width;
+    //     MainImage.Height = new_height;
+    //
+    //     ModeOverlay.Width = new_width;
+    //     ModeOverlay.Height = new_height;
+    //
+    //     My_Store.Instance.SetDisplayResolution(
+    //         (int)MainImage.Bounds.Width,
+    //         (int)MainImage.Bounds.Height);
+    // }
+    
+    
     public void ScaleFormToFit(int videoWidth, int videoHeight)
     {
-        double availableWidth = this.Bounds.Width;
-        double availableHeight = this.Bounds.Height;
+        // Available area = this UserControl's bounds, minus the margins
+        // that the layout system will apply around MainImage.
+        var margin = MainImages_parent.Margin;
 
-        var frame_size = new Size(this.Bounds.Width, this.Bounds.Height);
+        double availableWidth  = this.Bounds.Width  - margin.Left - margin.Right;
+        double availableHeight = this.Bounds.Height - margin.Top  - margin.Bottom;
 
-        double original_width = videoWidth;
-        double original_height = videoHeight;
-        double aspect_ratio = original_width / original_height;
+        if (availableWidth <= 0 || availableHeight <= 0)
+            return;
+
+        double aspect_ratio = (double)videoWidth / videoHeight;
 
         int new_width, new_height;
 
-        if (frame_size.Width / frame_size.Height > aspect_ratio)
+        if (availableWidth / availableHeight > aspect_ratio)
         {
-            new_height = (int)frame_size.Height;
-            new_width = (int)(new_height * aspect_ratio);
+            new_height = (int)availableHeight;
+            new_width  = (int)(new_height * aspect_ratio);
         }
         else
         {
-            new_width = (int)frame_size.Width;
+            new_width  = (int)availableWidth;
             new_height = (int)(new_width / aspect_ratio);
         }
 
-        ImageContainer.Width = new_width;
+        ImageContainer.Width  = new_width;
         ImageContainer.Height = new_height;
 
-        MainImage.Width = new_width;
+        MainImage.Width  = new_width;
         MainImage.Height = new_height;
 
-        ModeOverlay.Width = new_width;
+        ModeOverlay.Width  = new_width;
         ModeOverlay.Height = new_height;
 
         My_Store.Instance.SetDisplayResolution(
@@ -483,7 +577,7 @@ public partial class Display_view : UserControl
 
     private void MainImage_OnMouseDown(object? sender, PointerPressedEventArgs e)
     {
-        var pos = e.GetPosition(MainImage.Surface);
+        var pos = e.GetPosition(MainImage);
 
         double x = pos.X;
         double y = pos.Y;

@@ -13,11 +13,11 @@ namespace Androidplayer
         private Window mainWindow;
         public event Action<string>? SidebarButtonClicked;
 
-        // public SidebarWindow()
-        // {
-        //     InitializeComponent();
-        // }
-        //
+        public SidebarWindow()
+        {
+            InitializeComponent();
+        }
+        
         
         
         public SidebarWindow(Window mainWindow)

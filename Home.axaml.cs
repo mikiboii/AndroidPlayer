@@ -59,37 +59,82 @@ public partial class Home : Window
     public static Home? Instance { get; private set; }
 
     private bool already_activated = false;
+//
+//     public Home()
+//     {
+//         StartupTimer.Mark("Home ctor start");
+// // ... each significant step ...
+//         
+//         string _filePath = Path.Combine(Environment.CurrentDirectory, "user", "data.db");
+//
+//         my_info.Instance.Dataeditor = new LiteDbEditor(_filePath, new LiteDbEditorOptions { Autosave = true });
+//
+//         InitializeComponent();
+//
+//         Instance = this;
+//
+//         rawInputHandler = new handle_rawinput(this);
+//
+//         if (_settingsWindow == null)
+//             _settingsWindow = new settings();
+//
+//         keymap_worker.GetInstance().StartWorker();
+//
+//         gaming_keyboard = new Gaming_Keyboard();
+//         normal_keyboard = new Normal_Keyboard();
+//
+//         this.Closed += Home_OnClosed;
+//         this.Activated += home_activated;
+//
+//         // displayView.MainImage.Loaded += MainImageOnLoaded;
+//         // displayView.Loaded += MainImageOnLoaded;
+//
+//         
+//         Loaded += MainImageOnLoaded;
+//         k_info.Instance.PropertyChanged += K_info_changed;
+//         
+//         StartupTimer.Mark("Home ctor end");
+//     }
+
+
 
     public Home()
     {
+        StartupTimer.Mark("Home ctor start");
+
         string _filePath = Path.Combine(Environment.CurrentDirectory, "user", "data.db");
 
         my_info.Instance.Dataeditor = new LiteDbEditor(_filePath, new LiteDbEditorOptions { Autosave = true });
+        StartupTimer.Mark("  LiteDbEditor done");
 
         InitializeComponent();
+        StartupTimer.Mark("  InitializeComponent done");
 
         Instance = this;
 
         rawInputHandler = new handle_rawinput(this);
+        StartupTimer.Mark("  rawInputHandler done");
 
         if (_settingsWindow == null)
             _settingsWindow = new settings();
+        StartupTimer.Mark("  settings done");
 
         keymap_worker.GetInstance().StartWorker();
+        StartupTimer.Mark("  keymap_worker done");
 
         gaming_keyboard = new Gaming_Keyboard();
         normal_keyboard = new Normal_Keyboard();
+        StartupTimer.Mark("  keyboards done");
 
         this.Closed += Home_OnClosed;
         this.Activated += home_activated;
 
-        // displayView.MainImage.Loaded += MainImageOnLoaded;
-        // displayView.Loaded += MainImageOnLoaded;
-
-        
         Loaded += MainImageOnLoaded;
         k_info.Instance.PropertyChanged += K_info_changed;
+
+        StartupTimer.Mark("Home ctor end");
     }
+
 
     private void K_info_changed(object? sender, PropertyChangedEventArgs e)
     {
@@ -113,12 +158,14 @@ public partial class Home : Window
 
     private void MainImageOnLoaded(object? sender, RoutedEventArgs e)
     {
+        StartupTimer.Mark("Home Loaded");
         ShowSidebar();
 
         sidebarWindow?.Activate();
         this.Activate();
 
         keymapWindow = new Keymap_Window(this);
+        StartupTimer.Mark("Sidebar shown");
     }
 
     private void my_store_propertychanged(object? sender, PropertyChangedEventArgs e)
@@ -363,6 +410,7 @@ public partial class Home : Window
         rawInputHandler?.Dispose();
         
 
+        keymapWindow?.Close(); 
         sidebarWindow?.Close();
         _settingsWindow?.Close();
         sidebarVisible = false;

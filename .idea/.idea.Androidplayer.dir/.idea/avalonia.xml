@@ -7,6 +7,7 @@
         <entry key="Home.axaml" value="Androidplayer.csproj" />
         <entry key="MainWindow.axaml" value="Androidplayer.csproj" />
         <entry key="Native_test/My_window.axaml" value="Androidplayer.csproj" />
+        <entry key="Native_test/my_view.axaml" value="Androidplayer.csproj" />
         <entry key="Scroll.axaml" value="Androidplayer.csproj" />
         <entry key="SidebarWindow.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Display_view.axaml" value="Androidplayer.csproj" />

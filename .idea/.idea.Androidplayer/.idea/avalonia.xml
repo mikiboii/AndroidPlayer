@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="Home.axaml" value="Androidplayer.csproj" />
+        <entry key="MainWindow.axaml" value="Androidplayer.csproj" />
+        <entry key="Native_test/My_window.axaml" value="Androidplayer.csproj" />
+        <entry key="Native_test/VideoPlayer.axaml" value="Androidplayer.csproj" />
+        <entry key="Native_test/my_view.axaml" value="Androidplayer.csproj" />
+        <entry key="SidebarWindow.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Display_view.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Keymap/Keymap_items/Image_key.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Keymap/keymap_menu.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Pages/TitleBar.axaml" value="Androidplayer.csproj" />
+        <entry key="windows/Keymap_Window.axaml" value="Androidplayer.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

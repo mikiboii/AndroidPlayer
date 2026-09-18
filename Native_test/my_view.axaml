@@ -2,7 +2,43 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:androidplayer="clr-namespace:Androidplayer"
+            
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Height="400"
              x:Class="Androidplayer.Native_test.my_view">
-    Welcome to Avalonia!
+    <Grid Margin="4"  Height="500" Width="300" Background="Aqua" ClipToBounds="True">
+        
+        <!-- <androidplayer:FlyleafHost  x:Name="AndroidVideo"  Width="200" Height="388" d:DesignWidth="500" d:DesignHeight="500"  > -->
+        <!-- -->
+        <!--     <Grid> -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!--         <Button Content="click"  Width="50" Height="30" Background="Aqua"  ></Button> -->
+        <!--     </Grid> -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!-- </androidplayer:FlyleafHost> -->
+        
+        
+      
+        
+        <!-- <androidplayer:Native_view  x:Name="VideoView" Grid.Row="1"  Width="500" Height="300"  ClipToBounds="True"> -->
+        <!-- -->
+        <!--     <Grid > -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!--         <Button Content="click"  Width="50" Height="30" Background="Aqua"  ></Button> -->
+        <!--         <Button >PLAY</Button> -->
+        <!--     </Grid> -->
+        <!-- -->
+        <!-- </androidplayer:Native_view> -->
+        <!-- -->
+        
+    </Grid>
 </UserControl>

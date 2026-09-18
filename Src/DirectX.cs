@@ -360,7 +360,12 @@ namespace Androidplayer.Src
         {
             try
             {
-                string imagePath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+                // string imagePath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+                
+                
+                string imagePath = Path.IsPathRooted(fileName)
+                    ? fileName
+                    : Path.Combine(AppContext.BaseDirectory, fileName);
                 Console.WriteLine($"Loading image from: {imagePath}");
 
                 if (!File.Exists(imagePath))
@@ -652,3 +657,4 @@ namespace Androidplayer.Src
         }
     }
 }
+

@@ -166,8 +166,11 @@ public partial class keymap_menu : UserControl
             Width = 24;
 
             // Change icon to "arrow-right"
+            // ToggleIcon.Source = new Bitmap(AssetLoader.Open(
+            //     new Uri("avares://Androidplayer/K_icons/arrow-right.png")));
+            
             ToggleIcon.Source = new Bitmap(AssetLoader.Open(
-                new Uri("avares://Androidplayer/K_icons/arrow-right.png")));
+                new Uri("avares://Androidplayer/Src/Keymap/K_icons/arrow-right.png")));
 
             k_info.Instance.Collapsed = true;
         }
@@ -179,7 +182,7 @@ public partial class keymap_menu : UserControl
 
             // Change icon back to "arrow-left"
             ToggleIcon.Source = new Bitmap(AssetLoader.Open(
-                new Uri("avares://Androidplayer/K_icons/arrow-left.png")));
+                new Uri("avares://Androidplayer/Src/Keymap/K_icons/arrow-left.png")));
 
             k_info.Instance.Collapsed = false;
         }

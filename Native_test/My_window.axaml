@@ -7,33 +7,54 @@
         xmlns:pages="using:Androidplayer.Pages"
         xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
         xmlns:local="using:Androidplayer"
-      
-        
-        Background="Black"
-        Title="My_window">
-      <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        xmlns:nativeTest="clr-namespace:Androidplayer.Native_test"
 
-             <!-- <pages:TitleBar Grid.Row="0"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar> -->
-             
-             <Grid  Margin="10">
-             
-                  <local:FlyleafHost  x:Name="AndroidVideo"  d:DesignWidth="500" d:DesignHeight="500"  >
+        CanResize="True"
+
+        Width="300"
+        Height="720"
+        
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+
+        WindowStartupLocation="CenterScreen"
+
+        
+        Title="My_window">
+    <Grid Margin="0"
+          Background="red"
+          Focusable="True"
+          IsEnabled="True"
+          ClipToBounds="True"
+          IsVisible="True">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <pages:TitleBar Grid.Row="0" ClipToBounds="True"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar>
+
+
+     <!--  <local:FlyleafHost  x:Name="AndroidVideo"  d:DesignWidth="500" d:DesignHeight="500"  > -->
+                 <!-- -->
+                 <!--      <Grid> -->
+                 <!-- -->
+                 <!-- -->
+                 <!-- -->
+                 <!-- <Button Content="click"  Width="50" Height="30" Background="Aqua"  ></Button> -->
+                 <!--      </Grid> -->
+                 <!-- -->
+                 <!-- -->
+                 <!-- -->
+                 <!-- -->
+                 <!-- -->
+                 <!--  </local:FlyleafHost> -->
                  
-                      <Grid>
                  
+                 <!-- <nativeTest:my_view x:Name="MyView"  Grid.Row="1"  IsVisible="True" ClipToBounds="True" /> -->
                  
-                 
-                 <Button Content="click"  Width="50" Height="30" Background="Aqua"  ></Button>
-                      </Grid>
-                 
-                 
-                 
-                 
-                 
-                  </local:FlyleafHost>
-                 
-                 
-                 
+                 <nativeTest:VideoPlayer  Grid.Row="1" ></nativeTest:VideoPlayer>
                  
                  <!-- <local:FlyleafHost -->
                  <!--     x:Name="AndroidVideo" -->
@@ -60,8 +81,8 @@
                  
                  
                  
-                 
-                 <!-- <vlc:VideoView x:Name="VideoView"  > -->
+                 <!-- -->
+                 <!-- <vlc:VideoView x:Name="VideoView" Grid.Row="1"    > -->
                  <!--          <Grid> -->
                  <!-- -->
                  <!-- -->
@@ -70,9 +91,75 @@
                  <!--     <Button >PLAY</Button> -->
                  <!--          </Grid> -->
                  <!-- </vlc:VideoView> -->
-                 
-             </Grid>
-             
-           
+                 <!-- -->
+        
+        
+
     </Grid>
+    <!-- <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"> -->
+    <!-- -->
+    <!--          <pages:TitleBar Grid.Row="0"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar> -->
+    <!--           -->
+    <!--          <Grid  Margin="10"> -->
+    <!--           -->
+    <!--              ~1~  <local:FlyleafHost  x:Name="AndroidVideo"  d:DesignWidth="500" d:DesignHeight="500"  > @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~      <Grid> @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ <Button Content="click"  Width="50" Height="30" Background="Aqua"  ></Button> @1@ -->
+    <!--              ~1~      </Grid> @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~  </local:FlyleafHost> @1@ -->
+    <!--               -->
+    <!--               -->
+    <!--              <nativeTest:my_view x:Name="MyView" IsVisible="False" /> -->
+    <!--               -->
+    <!--               -->
+    <!--               -->
+    <!--              ~1~ <local:FlyleafHost @1@ -->
+    <!--              ~1~     x:Name="AndroidVideo" @1@ -->
+    <!--              ~1~     Width="400" @1@ -->
+    <!--              ~1~     Height="300" @1@ -->
+    <!--              ~1~     HorizontalAlignment="Left" @1@ -->
+    <!--              ~1~     VerticalAlignment="Top"/> @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ <Grid @1@ -->
+    <!--              ~1~     Width="400" @1@ -->
+    <!--              ~1~     Height="300" @1@ -->
+    <!--              ~1~     HorizontalAlignment="Left" @1@ -->
+    <!--              ~1~     VerticalAlignment="Top" @1@ -->
+    <!--              ~1~     IsHitTestVisible="False"> @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~     <Button @1@ -->
+    <!--              ~1~         Content="CLICK" @1@ -->
+    <!--              ~1~         Width="100" @1@ -->
+    <!--              ~1~         Height="50" @1@ -->
+    <!--              ~1~         HorizontalAlignment="Left" @1@ -->
+    <!--              ~1~         VerticalAlignment="Top"/> @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ </Grid> @1@ -->
+    <!--               -->
+    <!--               -->
+    <!--               -->
+    <!--               -->
+    <!--              ~1~ <vlc:VideoView x:Name="VideoView"  > @1@ -->
+    <!--              ~1~          <Grid> @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~ @1@ -->
+    <!--              ~1~     <Button Content="click"  Width="50" Height="30" Background="Aqua"  ></Button> @1@ -->
+    <!--              ~1~     <Button >PLAY</Button> @1@ -->
+    <!--              ~1~          </Grid> @1@ -->
+    <!--              ~1~ </vlc:VideoView> @1@ -->
+    <!--               -->
+    <!--          </Grid> -->
+    <!--           -->
+    <!--         -->
+    <!-- </Grid> -->
 </Window>

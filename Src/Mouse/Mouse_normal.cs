@@ -7,7 +7,7 @@ using Avalonia.Input;
 using Androidplayer.Src.Android;
 using Androidplayer.Store;
 
-using my_flyleaf = Androidplayer.FlyleafHost;
+using Native_view = Androidplayer.Native_view;
 
 namespace Androidplayer.Src.Mouse;
 
@@ -24,15 +24,15 @@ public class Mouse_normal
     {
     }
 
-    public void mouse_Move(PointerEventArgs e, my_flyleaf my_MainImage)
+    public void mouse_Move(PointerEventArgs e, Native_view my_MainImage)
     {
-        var pos = e.GetPosition(my_MainImage.Surface);
+        var pos = e.GetPosition(my_MainImage);
 
         double x = pos.X;
         double y = pos.Y;
 
         // Avalonia: get button state from the current pointer point.
-        var point = e.GetCurrentPoint(my_MainImage.Surface);
+        var point = e.GetCurrentPoint(my_MainImage);
         if (!point.Properties.IsLeftButtonPressed)
             return;
 
@@ -46,14 +46,14 @@ public class Mouse_normal
         SendData(data);
     }
 
-    public void OnMouseDown(PointerPressedEventArgs e, my_flyleaf my_MainImage)
+    public void OnMouseDown(PointerPressedEventArgs e, Native_view my_MainImage)
     {
-        var pos = e.GetPosition(my_MainImage.Surface);
+        var pos = e.GetPosition(my_MainImage);
 
         double x = pos.X;
         double y = pos.Y;
 
-        var point = e.GetCurrentPoint(my_MainImage.Surface);
+        var point = e.GetCurrentPoint(my_MainImage);
 
         if (point.Properties.IsLeftButtonPressed)
         {
@@ -72,9 +72,9 @@ public class Mouse_normal
         }
     }
 
-    public void OnMouseUp(PointerReleasedEventArgs e, my_flyleaf my_MainImage)
+    public void OnMouseUp(PointerReleasedEventArgs e, Native_view my_MainImage)
     {
-        var pos = e.GetPosition(my_MainImage.Surface);
+        var pos = e.GetPosition(my_MainImage);
 
         double x = pos.X;
         double y = pos.Y;
@@ -125,9 +125,9 @@ public class Mouse_normal
         return true;
     }
 
-    public void mouse_Wheel(PointerWheelEventArgs e, my_flyleaf my_MainImage)
+    public void mouse_Wheel(PointerWheelEventArgs e, Native_view my_MainImage)
     {
-        var pos = e.GetPosition(my_MainImage.Surface);
+        var pos = e.GetPosition(my_MainImage);
         var (x, y) = ScaleCoordinates(pos.X, pos.Y);
 
         // WPF gave delta: +120, -120 on a single axis.

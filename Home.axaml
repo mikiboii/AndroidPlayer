@@ -19,6 +19,7 @@
         
         CanResize="True"
 
+           
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
 
@@ -36,6 +37,8 @@
         
         >
 
+ 
+    
     <Grid Margin="0"
           Background="Black"
           Focusable="True"
@@ -50,15 +53,16 @@
         <pages1:TitleBar x:Name="CustomTitleBar"
                         Grid.Row="0"
                         Title="Android Player"
-                        ParentWindow="{Binding $parent[Window]}"/>
+                       />
+
 
         <src:Display_view x:Name="displayView"
-                          IsVisible="False"
+                         
                           Grid.Row="1"/>
         
-        <pages:Loading_page x:Name="loadingpage"
-                            
-                            Grid.Row="1"/>
+        <!-- <pages:Loading_page x:Name="loadingpage" -->
+        <!--                     IsVisible="False" -->
+        <!--                     Grid.Row="1"/> -->
 
     </Grid>
 </Window>
