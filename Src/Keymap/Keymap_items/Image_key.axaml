@@ -30,6 +30,52 @@
     <Style Selector="Button.removeBtn:pointerover">
       <Setter Property="RenderTransform" Value="scale(1.3)"/>
     </Style>
+    
+    
+    
+    
+    <Style Selector="TextBox#InputField">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Border"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <ScrollViewer Name="PART_ContentPresenter"
+                          Padding="0"
+                          HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollBarVisibility="Hidden">
+              <Panel>
+                <TextBlock Name="PART_Watermark"
+                           Text="{TemplateBinding Watermark}"
+                           Foreground="Gray"
+                           IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"/>
+                <TextPresenter Name="PART_TextPresenter"
+                               Text="{TemplateBinding Text, Mode=TwoWay}"
+                               CaretIndex="{TemplateBinding CaretIndex}"
+                               SelectionStart="{TemplateBinding SelectionStart}"
+                               SelectionEnd="{TemplateBinding SelectionEnd}"
+                               
+                               TextWrapping="{TemplateBinding TextWrapping}"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Stretch"
+                               TextAlignment="Center"
+                               CaretBrush="White"
+                               TextElement.FontSize="{TemplateBinding FontSize}"
+                               TextElement.Foreground="{TemplateBinding Foreground}" />
+              </Panel>
+            </ScrollViewer>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    
+    
+    
   </UserControl.Styles>
 
   <Grid x:Name="RootGrid" IsHitTestVisible="True" Background="Transparent"
@@ -82,6 +128,7 @@
                      Background="Transparent"
                      BorderThickness="0"
                      IsVisible="False"
+                     Margin="-4,0,0,0"
                      VerticalContentAlignment="Center"
                      HorizontalContentAlignment="Center"/>
           </Grid>

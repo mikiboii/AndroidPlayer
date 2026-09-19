@@ -59,6 +59,11 @@ public partial class Home : Window
     public static Home? Instance { get; private set; }
 
     private bool already_activated = false;
+    
+    private DispatcherTimer _resizeTimer;
+    
+    private  String currently_active = null;
+    
 //
 //     public Home()
 //     {
@@ -128,11 +133,30 @@ public partial class Home : Window
 
         this.Closed += Home_OnClosed;
         this.Activated += home_activated;
+        this.Deactivated += OnDeactivated;
+        
 
         Loaded += MainImageOnLoaded;
         k_info.Instance.PropertyChanged += K_info_changed;
 
+        
+        _resizeTimer = new DispatcherTimer();
+        _resizeTimer.Interval = TimeSpan.FromMilliseconds(200);
+        _resizeTimer.Tick += ResizeTimer_Tick;
         StartupTimer.Mark("Home ctor end");
+    }
+
+    private void OnDeactivated(object? sender, EventArgs e)
+    {
+        // if (keymapWindow?.IsVisible == true)
+        // {
+        //     
+        //     
+        //     
+        //     // keymapWindow.Topmost = true;
+        //     keymapWindow.Topmost = false;
+        //         
+        // }
     }
 
 
@@ -145,11 +169,11 @@ public partial class Home : Window
                 {
                     if (k_info.Instance.KeymapMode)
                     {
-                        ShowKeymap_window();
+                        // ShowKeymap_window();
                     }
                     else
                     {
-                        keymapWindow?.Hide();
+                        // keymapWindow?.Hide();
                     }
                 });
                 break;
@@ -164,7 +188,9 @@ public partial class Home : Window
         sidebarWindow?.Activate();
         this.Activate();
 
-        keymapWindow = new Keymap_Window(this);
+        // keymapWindow = new Keymap_Window(this);
+        
+        
         StartupTimer.Mark("Sidebar shown");
     }
 
@@ -244,36 +270,153 @@ public partial class Home : Window
         // this.Cursor = new Cursor(stream);
     }
 
+    
+     private void ResizeTimer_Tick(object? sender, EventArgs e)
+        {
+            _resizeTimer.Stop();
+    
+           
+    
+            var resetTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(100)
+            };
+            resetTimer.Tick += (s, args) =>
+            {
+                resetTimer.Stop();
+
+
+
+                // Console.WriteLine($"window activation finished {currently_active}" );
+                currently_active = null;
+            };
+            resetTimer.Start();
+        }
     private void home_activated(object? sender, EventArgs e)
     {
-        if (!already_activated)
+        // if (!already_activated)
+        // {
+        //
+        //     Console.WriteLine("Home activated called");
+        //     sidebarWindow?.Activate();
+        //     this.Activate();
+        //
+        //     keymapWindow?.Activate();
+        //
+        //     already_activated = true;
+        //
+        //     // var cursorUri = new Uri("avares://Androidplayer/Icons/cursor/black_sword.cur");
+        //     // using var stream = AssetLoader.Open(cursorUri);
+        //     // Cursor customCursor = new Cursor(stream);
+        //     //
+        //     // this.Cursor = customCursor;
+        //     //
+        //     // if (sidebarWindow != null)
+        //     // {
+        //     //     sidebarWindow.Cursor = customCursor;
+        //     // }
+        //     
+        //     
+        //     
+        //     
+        // }
+        
+        _resizeTimer.Stop();
+        _resizeTimer.Start();
+
+        if (currently_active == null)
         {
-            sidebarWindow?.Activate();
-            this.Activate();
-
-            keymapWindow?.Activate();
-
-            already_activated = true;
-
-            // var cursorUri = new Uri("avares://Androidplayer/Icons/cursor/black_sword.cur");
-            // using var stream = AssetLoader.Open(cursorUri);
-            // Cursor customCursor = new Cursor(stream);
-            //
-            // this.Cursor = customCursor;
-            //
-            // if (sidebarWindow != null)
-            // {
-            //     sidebarWindow.Cursor = customCursor;
-            // }
             
+            currently_active = "Home";
+            Console.WriteLine("activating in home");
+            // sidebarWindow?.Activate();
+            // keymapWindow?.Activate();
+
+            if (sidebarWindow?.IsVisible == true)
+            {
+                sidebarWindow.Topmost = true;
+                sidebarWindow.Topmost = false;
+                
+            }
+            
+            // if (keymapWindow?.IsVisible == true)
+            // {
+            //     keymapWindow.Topmost = true;
+            //     // keymapWindow.Topmost = false;
+            //     
+            // }
+            // keymapWindow?.Activate();
+        }
+        else
+        {
             
             
             
         }
+        
+        
+        
+        
+        
     }
 
+    
+    
     #region Sidebar_window
 
+    // private void KeymapWindowOnActivated(object? sender, EventArgs e)
+    // {
+    //     _resizeTimer.Stop();
+    //     _resizeTimer.Start();
+    //
+    //     if (currently_active == null)
+    //     {
+    //         
+    //         currently_active = "keymap";
+    //         
+    //         if (sidebarWindow?.IsVisible == true)
+    //         {
+    //             sidebarWindow.Topmost = true;
+    //             sidebarWindow.Topmost = false;
+    //             
+    //         }
+    //         
+    //         if (keymapWindow?.IsVisible == true)
+    //         {
+    //             keymapWindow.Topmost = true;
+    //             keymapWindow.Topmost = false;
+    //             
+    //         }
+    //     }
+    // }
+    //
+    //
+    private void SidebarWindowOnActivated(object? sender, EventArgs e)
+    {
+        _resizeTimer.Stop();
+        _resizeTimer.Start();
+
+        if (currently_active == null)
+        {
+            
+            currently_active = "sidebar";
+            
+            if (sidebarWindow?.IsVisible == true)
+            {
+                sidebarWindow.Topmost = true;
+                sidebarWindow.Topmost = false;
+                
+            }
+            
+            // if (keymapWindow?.IsVisible == true)
+            // {
+            //     keymapWindow.Topmost = true;
+            //     keymapWindow.Topmost = false;
+            //     
+            // }
+        }
+    }
+    
     public void SendAndroidKeycode(int keycode)
     {
         SendKey(keycode, ACTION_DOWN);
@@ -324,14 +467,16 @@ public partial class Home : Window
 
     private void ShowKeymap_window()
     {
-        if (keymapWindow == null || !keymapWindow.IsVisible)
-        {
-            keymapWindow = new Keymap_Window(this);
-        }
-
-        keymapWindow.Show();
+        // if (keymapWindow == null || !keymapWindow.IsVisible)
+        // {
+        //     keymapWindow = new Keymap_Window(this);
+        //     keymapWindow.Activated += KeymapWindowOnActivated;
+        // }
+        //
+        // keymapWindow.Show();
     }
 
+  
     private void ShowSidebar()
     {
         if (sidebarWindow == null || !sidebarWindow.IsVisible)
@@ -340,11 +485,16 @@ public partial class Home : Window
             sidebarWindow.Closed += (s, e) => { sidebarVisible = false; };
 
             sidebarWindow.SidebarButtonClicked += SidebarWindowOnSidebarButtonClicked;
+            
+            sidebarWindow.Activated += SidebarWindowOnActivated;
         }
 
         sidebarWindow.Show();
         sidebarVisible = true;
     }
+
+    
+   
 
     private void SidebarWindowOnSidebarButtonClicked(string tag)
     {
@@ -392,14 +542,16 @@ public partial class Home : Window
 
         if (!this.IsActive)
         {
-            this.Activate();
+            // this.Activate();
         }
+
+        // Console.WriteLine("sidebar buttons");
     }
 
     private void CloseSidebar()
     {
         sidebarWindow?.Close();
-        keymapWindow?.Close();
+        // keymapWindow?.Close();
         sidebarVisible = false;
     }
 
@@ -410,7 +562,7 @@ public partial class Home : Window
         rawInputHandler?.Dispose();
         
 
-        keymapWindow?.Close(); 
+        // keymapWindow?.Close(); 
         sidebarWindow?.Close();
         _settingsWindow?.Close();
         sidebarVisible = false;
@@ -526,5 +678,18 @@ public partial class Home : Window
                 wnd.Focus();
             }
         }
+    }
+
+    private void CustomTitleBar_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // Console.WriteLine("pressed title bar");
+        
+        
+        // if (keymapWindow?.IsVisible == true)
+        // {
+        //     keymapWindow.Topmost = true;
+        //     // keymapWindow.Topmost = false;
+        //         
+        // }
     }
 }

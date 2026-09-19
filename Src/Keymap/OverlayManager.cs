@@ -64,7 +64,7 @@ namespace Androidplayer.Src.Keymap
                 case nameof(my_info.Typing_mode):
                     Dispatcher.UIThread.Post(() =>
                     {
-                        ShowToast("done", "typing mode changed");
+                        // ShowToast("done", "typing mode changed");
 
                         if (my_info.Instance.Typing_mode)
                         {
@@ -299,76 +299,253 @@ namespace Androidplayer.Src.Keymap
 
         #region handling Keymap Json data
 
+        // public void Save_keymap_data()
+        // {
+        //     Console.WriteLine("called on overlaymanager");
+        //
+        //     // var allData = new List<Dictionary<string, object>>();
+        //
+        //     // foreach (var element in DroppedElements)
+        //     // {
+        //     //     if (element is IKeymapElement keyEl)
+        //     //     {
+        //     //         var elementData = keyEl.GetJsonData() as Dictionary<string, object>;
+        //     //         Console.WriteLine(elementData);
+        //     //         if (elementData != null)
+        //     //             allData.Add(elementData);
+        //     //     }
+        //     // }
+        //     //
+        //     
+        //     
+        //     
+        //     
+        //     
+        //     var allData = new List<BsonDocument>();
+        //
+        //     Console.WriteLine($"[Save] DroppedElements count = {DroppedElements.Count}");
+        //
+        //     foreach (var element in DroppedElements)
+        //     {
+        //         Console.WriteLine($"[Save] element type = {element?.GetType().FullName}");
+        //
+        //         if (element is IKeymapElement keyEl)
+        //         {
+        //             object raw = keyEl.GetJsonData();
+        //
+        //             if (raw == null)
+        //             {
+        //                 Console.WriteLine($"[Save] ⚠ GetJsonData returned null for {element.GetType().Name}");
+        //                 continue;
+        //             }
+        //
+        //             BsonDocument doc = raw is BsonDocument bd
+        //                 ? bd
+        //                 : BsonMapper.Global.ToDocument(raw);
+        //
+        //             Console.WriteLine($"[Save] GetJsonData → {doc.Count} keys");
+        //             allData.Add(doc);
+        //         }
+        //     }
+        //     
+        //    
+        //     
+        //     
+        //     
+        //     // Console.WriteLine($"[Save] DroppedElements count = {DroppedElements.Count}");
+        //     //
+        //     // foreach (var element in DroppedElements)
+        //     // {
+        //     //     Console.WriteLine($"[Save] element type = {element?.GetType().FullName}");
+        //     //     Console.WriteLine($"[Save] is IKeymapElement = {element is IKeymapElement}");
+        //     //
+        //     //     if (element is IKeymapElement keyEl)
+        //     //     {
+        //     //         var elementData = keyEl.GetJsonData() as Dictionary<string, object>;
+        //     //         Console.WriteLine($"[Save] GetJsonData returned: {(elementData == null ? "null" : elementData.Count + " keys")}");
+        //     //
+        //     //         if (elementData != null)
+        //     //             allData.Add(elementData);
+        //     //     }
+        //     // }
+        //     
+        //     
+        //
+        //     var editor = my_info.Instance.Dataeditor;
+        //     if (editor == null)
+        //     {
+        //         Console.WriteLine("❌ Dataeditor is null!");
+        //         return;
+        //     }
+        //
+        //     var defaultKeymapName = editor.Get("default_keymap")?.AsString;
+        //     if (string.IsNullOrEmpty(defaultKeymapName))
+        //     {
+        //         Console.WriteLine("❌ No default keymap set.");
+        //         return;
+        //     }
+        //
+        //     var keymaps = editor.Get("keymaps");
+        //     if (keymaps.IsNull || !keymaps.IsArray)
+        //     {
+        //         Console.WriteLine("❌ No keymaps array found.");
+        //         return;
+        //     }
+        //     //
+        //     // var bsonArray = new BsonArray();
+        //     // foreach (var elementDict in allData)
+        //     //     bsonArray.Add(BsonMapper.Global.ToDocument(elementDict));
+        //
+        //     
+        //     var bsonArray = new BsonArray();
+        //     foreach (var doc in allData)
+        //         bsonArray.Add(doc);
+        //     
+        //     
+        //     var json = LiteDB.JsonSerializer.Serialize(bsonArray);
+        //     Console.WriteLine("=== Keymap JSON ===");
+        //     Console.WriteLine(json);
+        //     Console.WriteLine("===================");
+        //     
+        //     var keymapsArray = keymaps.AsArray;
+        //     bool updated = false;
+        //
+        //     foreach (var entry in keymapsArray)
+        //     {
+        //         if (entry.IsDocument && entry.AsDocument.ContainsKey(defaultKeymapName))
+        //         {
+        //             entry.AsDocument[defaultKeymapName] = bsonArray;
+        //             updated = true;
+        //             break;
+        //         }
+        //     }
+        //
+        //     if (!updated)
+        //     {
+        //         var newKeymap = new BsonDocument { [defaultKeymapName] = bsonArray };
+        //         keymapsArray.Add(newKeymap);
+        //     }
+        //
+        //     editor.Set("keymaps", keymapsArray);
+        //     editor.Save();
+        //
+        //     Console.WriteLine($"✅ Saved keymap '{defaultKeymapName}' with {allData.Count} items.");
+        //
+        //     keymap_worker.GetInstance().Restart();
+        //
+        //     ShowToast("done", "Keymap saved!");
+        // }
+
+
+        
+        
+        
         public void Save_keymap_data()
+{
+    Console.WriteLine("called on overlaymanager");
+
+    // 1. Collect the KeymapElement objects
+    var allData = new List<KeymapElement>();
+
+    foreach (var element in DroppedElements)
+    {
+        if (element is IKeymapElement keyEl)
         {
-            Console.WriteLine("called on overlaymanager");
-
-            var allData = new List<Dictionary<string, object>>();
-
-            foreach (var element in DroppedElements)
-            {
-                if (element is IKeymapElement keyEl)
-                {
-                    var elementData = keyEl.GetJsonData() as Dictionary<string, object>;
-                    if (elementData != null)
-                        allData.Add(elementData);
-                }
-            }
-
-            var editor = my_info.Instance.Dataeditor;
-            if (editor == null)
-            {
-                Console.WriteLine("❌ Dataeditor is null!");
-                return;
-            }
-
-            var defaultKeymapName = editor.Get("default_keymap")?.AsString;
-            if (string.IsNullOrEmpty(defaultKeymapName))
-            {
-                Console.WriteLine("❌ No default keymap set.");
-                return;
-            }
-
-            var keymaps = editor.Get("keymaps");
-            if (keymaps.IsNull || !keymaps.IsArray)
-            {
-                Console.WriteLine("❌ No keymaps array found.");
-                return;
-            }
-
-            var bsonArray = new BsonArray();
-            foreach (var elementDict in allData)
-                bsonArray.Add(BsonMapper.Global.ToDocument(elementDict));
-
-            var keymapsArray = keymaps.AsArray;
-            bool updated = false;
-
-            foreach (var entry in keymapsArray)
-            {
-                if (entry.IsDocument && entry.AsDocument.ContainsKey(defaultKeymapName))
-                {
-                    entry.AsDocument[defaultKeymapName] = bsonArray;
-                    updated = true;
-                    break;
-                }
-            }
-
-            if (!updated)
-            {
-                var newKeymap = new BsonDocument { [defaultKeymapName] = bsonArray };
-                keymapsArray.Add(newKeymap);
-            }
-
-            editor.Set("keymaps", keymapsArray);
-            editor.Save();
-
-            Console.WriteLine($"✅ Saved keymap '{defaultKeymapName}' with {allData.Count} items.");
-
-            keymap_worker.GetInstance().Restart();
-
-            ShowToast("done", "Keymap saved!");
+            object raw = keyEl.GetJsonData();
+            
+            
+    
+            if (raw is KeymapElement ke)
+                allData.Add(ke);
+            else if (raw != null)
+                Console.WriteLine($"[Save] ⚠ Unexpected type: {raw.GetType().Name}");
         }
+    }
+    
+    
+    
+    //
+    // foreach (var element in DroppedElements)
+    // {
+    //     if (element is IKeymapElement keyEl)
+    //     {
+    //         object raw = keyEl.GetJsonData();
+    //
+    //         Console.WriteLine($"[Save] source={element.GetType().FullName} → raw={raw?.GetType().Name}");
+    //
+    //         if (raw is KeymapElement ke)
+    //         {
+    //             Console.WriteLine($"[Save]   Type='{ke.Type}' X={ke.X} Y={ke.Y}");
+    //             allData.Add(ke);
+    //         }
+    //         else if (raw != null)
+    //             Console.WriteLine($"[Save] ⚠ Unexpected type: {raw.GetType().Name}");
+    //     }
+    // }
+    
+    
+    
+    // 2. Serialize with System.Text.Json, using the source-generated context
+    string json = System.Text.Json.JsonSerializer.Serialize(
+        allData,
+        KeymapJsonContext.Default.ListKeymapElement);
 
+
+    // Console.WriteLine(json);
+
+    // 3. Convert JSON string → BsonArray so it fits into LiteDB's config
+    var bsonArray = LiteDB.JsonSerializer.Deserialize(json).AsArray;
+
+    var editor = my_info.Instance.Dataeditor;
+    if (editor == null) { Console.WriteLine("❌ Dataeditor is null!"); return; }
+
+    var defaultKeymapName = editor.Get("default_keymap")?.AsString;
+    if (string.IsNullOrEmpty(defaultKeymapName))
+    {
+        Console.WriteLine("❌ No default keymap set.");
+        return;
+    }
+
+    var keymaps = editor.Get("keymaps");
+    if (keymaps.IsNull || !keymaps.IsArray)
+    {
+        Console.WriteLine("❌ No keymaps array found.");
+        return;
+    }
+
+    // 4. Update the correct entry
+    var keymapsArray = keymaps.AsArray;
+    bool updated = false;
+
+    foreach (var entry in keymapsArray)
+    {
+        if (entry.IsDocument && entry.AsDocument.ContainsKey(defaultKeymapName))
+        {
+            entry.AsDocument[defaultKeymapName] = bsonArray;
+            updated = true;
+            break;
+        }
+    }
+
+    if (!updated)
+    {
+        var newKeymap = new BsonDocument { [defaultKeymapName] = bsonArray };
+        keymapsArray.Add(newKeymap);
+    }
+
+    editor.Set("keymaps", keymapsArray);
+    editor.Save();
+
+    Console.WriteLine($"✅ Saved keymap '{defaultKeymapName}' with {allData.Count} items.");
+
+    keymap_worker.GetInstance().Restart();
+    ShowToast("done", "Keymap saved!");
+}
+        
+        
+        
+        
+        
         #endregion
 
         #region animation
@@ -522,6 +699,18 @@ namespace Androidplayer.Src.Keymap
                 return;
             }
 
+            
+            // var list = allElements.ToList();
+            // Console.WriteLine($"[Rerender] allElements.Count = {list.Count}");
+            //
+            // for (int i = 0; i < list.Count; i++)
+            // {
+            //     var el = list[i];
+            //     Console.WriteLine($"[Rerender] el[{i}] Type='{el.Type}', X={el.X}, Y={el.Y}, W={el.Width}, H={el.Height}, Keys=[{(el.Keys == null ? "null" : string.Join(",", el.Keys))}]");
+            // }
+            //
+            //
+            
             foreach (var element in DroppedElements.ToList())
             {
                 _canvas.Children.Remove(element);
@@ -600,6 +789,7 @@ namespace Androidplayer.Src.Keymap
                     {
                         _canvas.Children.Add(control);
                         DroppedElements.Add(control);
+                     
                         newElement.SetJsonData(el);
                     }
                 }

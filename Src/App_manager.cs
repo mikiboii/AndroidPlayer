@@ -58,12 +58,20 @@ public class App_manager : IDisposable
             Console.WriteLine($"Surface size FIXED after init: {w} x {h}");
             Console.WriteLine(my_image.PlatformHandle.Handle);
 
-            my_app_worker = new app_worker();
-
-            my_app_worker.ProgressChanged += my_app_worker_ProgressChanged;
-            my_app_worker.CountingCompleted += my_app_worker_Completed;
-
-            my_app_worker.StartCounting();
+            // my_app_worker = new app_worker();
+            //
+            // my_app_worker.ProgressChanged += my_app_worker_ProgressChanged;
+            // my_app_worker.CountingCompleted += my_app_worker_Completed;
+            //
+            // my_app_worker.StartCounting();
+            
+            
+            my_app_worker_Completed();
+            
+            
+            
+            
+            
         }
     }
 
@@ -167,13 +175,15 @@ public class App_manager : IDisposable
 
                     Dispatcher.UIThread.Post(() =>
                     {
-                        Console.WriteLine($" Display view {my_image.Width}, {my_image.Height}");
+                        Console.WriteLine($" Display view {my_image.Bounds.Width}, {my_image.Bounds.Height}");
 
                         if (my_image != null)
                         {
                             k_info.Instance.directx?.ResizeSwapChain(
-                                (int)my_image.Width,
-                                (int)my_image.Height);
+                                (int)my_image.Bounds.Width,
+                                (int)my_image.Bounds.Height);
+                            
+                            
 
                             if (my_info.Instance.DeveloperMode)
                             {
@@ -216,8 +226,8 @@ public class App_manager : IDisposable
         {
             if (Home.Instance != null)
             {
-                // Home.Instance.loadingpage.IsVisible = true;
-                // Home.Instance.displayView.IsVisible = false;
+                Home.Instance.loadingpage.IsVisible = true;
+                Home.Instance.displayView.IsVisible = false;
             }
         });
 
@@ -230,8 +240,8 @@ public class App_manager : IDisposable
         {
             if (Home.Instance != null)
             {
-                // Home.Instance.loadingpage.IsVisible = false;
-                // Home.Instance.displayView.IsVisible = true;
+                Home.Instance.loadingpage.IsVisible = false;
+                Home.Instance.displayView.IsVisible = true;
             }
 
             del_mm();
@@ -246,7 +256,7 @@ public class App_manager : IDisposable
     {
         Dispatcher.UIThread.Post(() =>
         {
-            // Home.Instance?.loadingpage.UpdateProgress((double)num, status);
+            Home.Instance?.loadingpage.UpdateProgress((double)num, status);
         });
     }
 
@@ -286,8 +296,8 @@ public class App_manager : IDisposable
         {
             if (Home.Instance != null)
             {
-                // Home.Instance.loadingpage.IsVisible = false;
-                // Home.Instance.displayView.IsVisible = true;
+                Home.Instance.loadingpage.IsVisible = false;
+                Home.Instance.displayView.IsVisible = true;
             }
 
             OverlayManager.Instance?.rerender_overlay();

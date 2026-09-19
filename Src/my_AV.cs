@@ -392,6 +392,7 @@
 
 using System;
 using System.IO;
+using Androidplayer.Src.Keymap.K_store;
 using FFmpeg.AutoGen;
 using SharpDX;
 using SharpDX.Direct3D11;
@@ -1151,19 +1152,32 @@ public unsafe class my_AV : IDisposable
              * Copy FFmpeg D3D11 frame → our texture.
              * ---------------------------------------------------------
              */
-            device.ImmediateContext
-                .CopySubresourceRegion(
-                    ffmpegTexture,
-                    arrayIndex,
-                    new ResourceRegion(
-                        0,
-                        0,
-                        0,
-                        videoWidth,
-                        videoHeight,
-                        1),
-                    hwTexture,
-                    0);
+            // device.ImmediateContext
+            //     .CopySubresourceRegion(
+            //         ffmpegTexture,
+            //         arrayIndex,
+            //         new ResourceRegion(
+            //             0,
+            //             0,
+            //             0,
+            //             videoWidth,
+            //             videoHeight,
+            //             1),
+            //         hwTexture,
+            //         0);
+            //
+            k_info.Instance.directx.RunOnContext(ctx =>
+            {
+                ctx.CopySubresourceRegion(ffmpegTexture, arrayIndex,
+                    new ResourceRegion(0, 0, 0, videoWidth, videoHeight, 1),
+                    hwTexture, 0);
+
+                result = new Texture2D(device, hwTexture.Description);
+
+                ctx.CopyResource(hwTexture, result);
+            });
+            
+            
 
             /*
              * ---------------------------------------------------------

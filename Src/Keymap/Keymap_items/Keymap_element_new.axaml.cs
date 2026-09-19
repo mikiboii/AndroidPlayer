@@ -497,6 +497,9 @@ namespace Androidplayer.Src.Keymap.Keymap_items
 
             double x = Canvas.GetLeft(this);
             double y = Canvas.GetTop(this);
+
+            // Console.WriteLine($"getting item position {x} x {y}");
+            
             if (double.IsNaN(x)) x = 0;
             if (double.IsNaN(y)) y = 0;
 
@@ -535,6 +538,12 @@ namespace Androidplayer.Src.Keymap.Keymap_items
         {
             try
             {
+                // Console.WriteLine($"[SetJsonData] got Type={data.Type}, X={data.X}, Y={data.Y}, W={data.Width}, H={data.Height}");
+                // Console.WriteLine($"[SetJsonData]   Keys={(data.Keys == null ? "null" : string.Join(",", data.Keys))}");
+
+      
+
+              
                 Name = data.Type;
                 KeyName = string.Join("+", data.Keys);
                 Width = data.Width;
@@ -554,6 +563,9 @@ namespace Androidplayer.Src.Keymap.Keymap_items
 
                 if (this.Parent is Canvas parentCanvas)
                     FixPosOnParentResize(parentCanvas.Bounds.Width, parentCanvas.Bounds.Height);
+                
+                // Console.WriteLine($"[SetJsonData]   after apply → this.Bounds={Bounds}, Canvas.Left={Canvas.GetLeft(this)}, Canvas.Top={Canvas.GetTop(this)}");
+
             }
             catch (Exception ex)
             {

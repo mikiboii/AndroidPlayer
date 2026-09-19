@@ -54,7 +54,9 @@
                  
                  <!-- <nativeTest:my_view x:Name="MyView"  Grid.Row="1"  IsVisible="True" ClipToBounds="True" /> -->
                  
-                 <nativeTest:VideoPlayer  Grid.Row="1" ></nativeTest:VideoPlayer>
+                 <!-- <nativeTest:VideoPlayer  Grid.Row="1" ></nativeTest:VideoPlayer> -->
+     
+                 <nativeTest:VideoPlayer_2  Grid.Row="1" ></nativeTest:VideoPlayer_2>
                  
                  <!-- <local:FlyleafHost -->
                  <!--     x:Name="AndroidVideo" -->

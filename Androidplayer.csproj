@@ -82,10 +82,10 @@
         <LangVersion>12.0</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-        <PublishAot>true</PublishAot>
-        <IsAotCompatible>true</IsAotCompatible>
-        <SelfContained>true</SelfContained>
-        <!-- <PublishSingleFile>true</PublishSingleFile> -->
+<!--        <PublishAot>true</PublishAot>-->
+<!--        <IsAotCompatible>true</IsAotCompatible>-->
+<!--        <SelfContained>true</SelfContained>-->
+        
     </PropertyGroup>
 
     <ItemGroup>
@@ -93,10 +93,13 @@
         <PackageReference Include="Avalonia.Desktop" Version="11.2.6" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.6" />
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.6" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.6">
-            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-        </PackageReference>
+        
+<!--        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.6">-->
+<!--            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>-->
+<!--            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>-->
+<!--        </PackageReference>-->
+        
+        
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 
         <PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
@@ -116,6 +119,7 @@
         <PackageReference Include="Silk.NET.Direct3D11" Version="2.23.0" />
         <PackageReference Include="Silk.NET.DXVK.Native" Version="2.23.0" />
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
+        <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
     </ItemGroup>
 
     <!-- ============================================================ -->

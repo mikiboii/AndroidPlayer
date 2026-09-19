@@ -616,14 +616,20 @@ namespace Androidplayer.Src
                     {
                         sw.Restart();
 
-                        Texture2D frame = _decoder.DecodePacket(
+                        Texture2D frame = null;
+                        
+                        k_info.Instance.directx?.RunOnContext(_ =>
+                        {
+                            
+                        frame = _decoder.DecodePacket(
                             packet.Data,
                             packet.Pts,
                             packet.IsConfig);
 
                         if (frame == null)
                         {
-                            continue;
+                            return;
+                            // continue;
                         }
 
                         // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
@@ -657,6 +663,11 @@ namespace Androidplayer.Src
                         }
 
                         _previousFrame = frame;
+                            
+                        });
+                        
+                        
+                        
 
                         RenderTexture(frame);
 

@@ -113,7 +113,8 @@ public partial class Direction_keymap : UserControl, IKeymapElement
 
         // RootGrid.CaptureMouse();
         // WPF: RootGrid.CaptureMouse();
-        e.Pointer.Capture(this);  // Avalonia
+        // e.Pointer.Capture(this);
+        e.Pointer.Capture(RootGrid); 
         e.Handled = true;
     }
 

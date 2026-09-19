@@ -43,6 +43,7 @@ public unsafe class FFmpeg
 
         // Console.WriteLine(current);
 
+        // av_log_set_level(ffmpeg.AV_LOG_DEBUG);
         // RootPath = current;
         // av_log_set_level(ffmpeg.AV_LOG_ERROR);
     }
@@ -297,6 +298,7 @@ public unsafe class FFmpeg
 
     private void OpenFailed(int ret, bool opened = true)
     {
+        // Log($"[OpenFailed] ret={ret} msg={ErrorCodeToMsg(ret)}");
         Log(ErrorCodeToMsg(ret));
         AVFormatContext* fmtCtxPtr = fmtCtx;
         if (fmtCtx != null && opened) avformat_close_input(&fmtCtxPtr);

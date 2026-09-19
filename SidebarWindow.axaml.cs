@@ -26,21 +26,49 @@ namespace Androidplayer
 
             this.mainWindow = mainWindow;
 
-            this.Owner = this.mainWindow;
+            // this.Owner = this.mainWindow;
 
             Loaded += SidebarWindow_Loaded;
 
+            // this.Activated += OnActivated;
+
             mainWindow.PositionChanged += MainWindow_PositionChanged;
             mainWindow.PropertyChanged += MainWindow_PropertyChanged;
-            mainWindow.Activated += MainWindow_Activated;
+            // mainWindow.Activated += MainWindow_Activated;
         }
 
         private void OnActivated(object? sender, EventArgs e)
         {
-            if (mainWindow != null && !mainWindow.IsActive)
-            {
-                mainWindow.Activate();
-            }
+
+
+            
+            Console.WriteLine("sidebar activated ");
+            Console.WriteLine(this.Topmost);
+            // this.mainWindow.Activate();
+            this.Topmost = true;
+            this.Topmost = false;
+            
+            
+            
+            // if (this.IsVisible)
+            // {
+            // this.Topmost = true;
+            // this.Topmost = false;
+            //     // Avalonia has no UpdateLayout() — layout is done automatically.
+            // }
+            //
+            
+            // if (mainWindow != null && !mainWindow.IsActive)
+            // {
+            //     // mainWindow.Activate();
+            //     this.mainWindow.Activate();
+            //     if (this.IsVisible)
+            //     {
+            //         this.Topmost = true;
+            //         this.Topmost = false;
+            //         // Avalonia has no UpdateLayout() — layout is done automatically.
+            //     }
+            // }
         }
 
         private void OnSidebarButtonClick(object? sender, PointerPressedEventArgs e)

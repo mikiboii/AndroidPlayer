@@ -62,6 +62,8 @@ public partial class keymap_menu : UserControl
                 }
             }
         }
+        
+   
 
         k_info.Instance.PropertyChanged += InstanceOnPropertyChanged;
     }

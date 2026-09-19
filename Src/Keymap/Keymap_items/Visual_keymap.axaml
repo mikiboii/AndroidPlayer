@@ -1,356 +1,740 @@
-﻿<UserControl x:Class="Androidplayer.Src.Keymap.Keymap_items.Visual_keymap"
-             xmlns="https://github.com/avaloniaui"
+﻿<!-- <UserControl x:Class="Androidplayer.Src.Keymap.Keymap_items.Visual_keymap" -->
+<!--              xmlns="https://github.com/avaloniaui" -->
+<!--              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" -->
+<!--              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" -->
+<!--              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" -->
+<!--              xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls" -->
+<!--              mc:Ignorable="d" -->
+<!--              d:DesignHeight="180" d:DesignWidth="360" -->
+<!--              Background="Transparent"> -->
+<!-- -->
+<!--   <UserControl.Styles> -->
+<!--     ~1~ Numeric + / − buttons: base look @1@ -->
+<!--     <Style Selector="Border.spinBtn"> -->
+<!--       <Setter Property="Cursor" Value="Hand"/> -->
+<!--       <Setter Property="RenderTransform" Value="scale(1.0)"/> -->
+<!--       <Setter Property="Transitions"> -->
+<!--         <Transitions> -->
+<!--           <BrushTransition Property="Background" Duration="0:0:0.1"/> -->
+<!--           <BrushTransition Property="BorderBrush" Duration="0:0:0.1"/> -->
+<!--           <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.08"/> -->
+<!--         </Transitions> -->
+<!--       </Setter> -->
+<!--     </Style> -->
+<!-- -->
+<!--     <Style Selector="Border.spinBtn:pointerover"> -->
+<!--       <Setter Property="Background" Value="#1A73E8"/> -->
+<!--       <Setter Property="BorderBrush" Value="#1A73E8"/> -->
+<!--       <Setter Property="RenderTransform" Value="scale(1.05)"/> -->
+<!--     </Style> -->
+<!-- -->
+<!--     <Style Selector="Border.spinBtn:pointerover TextBlock"> -->
+<!--       <Setter Property="Foreground" Value="White"/> -->
+<!--     </Style> -->
+<!-- -->
+<!--     ~1~ Remove button styles (shared) @1@ -->
+<!--     <Style Selector="Button.removeBtn"> -->
+<!--       <Setter Property="Background" Value="#FFE4C4"/> -->
+<!--       <Setter Property="BorderBrush" Value="#1A73E8"/> -->
+<!--       <Setter Property="BorderThickness" Value="2"/> -->
+<!--       <Setter Property="Padding" Value="0"/> -->
+<!--       <Setter Property="HorizontalContentAlignment" Value="Center"/> -->
+<!--       <Setter Property="VerticalContentAlignment" Value="Center"/> -->
+<!--       <Setter Property="RenderTransform" Value="scale(1.0)"/> -->
+<!--       <Setter Property="Transitions"> -->
+<!--         <Transitions> -->
+<!--           <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.08"/> -->
+<!--         </Transitions> -->
+<!--       </Setter> -->
+<!--     </Style> -->
+<!-- -->
+<!--     <Style Selector="Button.removeBtn:pointerover"> -->
+<!--       <Setter Property="RenderTransform" Value="scale(1.3)"/> -->
+<!--     </Style> -->
+<!--   </UserControl.Styles> -->
+<!-- -->
+<!--   <Grid x:Name="RootGrid" IsHitTestVisible="True" Background="Transparent" -->
+         <!-- PointerPressed="RootGrid_MouseLeftButtonDown" -->
+         <!-- PointerMoved="RootGrid_MouseMove" -->
+         <!-- PointerReleased="RootGrid_MouseLeftButtonUp"> -->
+<!-- -->
+<!--     <Viewbox Stretch="Uniform" Margin="5" StretchDirection="Both"> -->
+<!--       <Grid > -->
+<!--         <Grid.ColumnDefinitions> -->
+<!--           <ColumnDefinition Width="Auto"/> -->
+<!--           <ColumnDefinition Width="Auto"/> -->
+<!--           <ColumnDefinition Width="Auto"/> -->
+<!--         </Grid.ColumnDefinitions> -->
+<!-- -->
+<!--         ~1~ ============ LEFT CONTROL (X) ============ @1@ -->
+<!--         <Border Grid.Column="0" -->
+<!--                 CornerRadius="10" -->
+<!--                 Background="#D8DBE4" -->
+<!--                 BorderBrush="#DADFE6" -->
+<!--                 BorderThickness="2.5" -->
+<!--                 Margin="8" -->
+<!--                 VerticalAlignment="Center"> -->
+<!--           <Grid Width="38"> -->
+<!--             <Grid.RowDefinitions> -->
+<!--               <RowDefinition Height="Auto"/> -->
+<!--               <RowDefinition Height="Auto"/> -->
+<!--               <RowDefinition Height="Auto"/> -->
+<!--               <RowDefinition Height="Auto"/> -->
+<!--             </Grid.RowDefinitions> -->
+<!-- -->
+<!--             ~1~ + button @1@ -->
+<!--             <Border Grid.Row="0" -->
+<!--                     Classes="spinBtn" -->
+<!--                     Margin="0,0,0,3" -->
+<!--                     Height="35" -->
+<!--                     CornerRadius="10,10,7,7" -->
+<!--                     BorderThickness="0,0,0,1" -->
+<!--                     Background="#F5F7FA" -->
+<!--                     BorderBrush="#E0E4EA"> -->
+<!--               <TextBlock Text="+" -->
+<!--                          Foreground="#1A73E8" -->
+<!--                          FontWeight="Bold" -->
+<!--                          FontSize="22" -->
+<!--                          HorizontalAlignment="Center" -->
+<!--                          VerticalAlignment="Center" -->
+<!--                          IsHitTestVisible="False"/> -->
+<!--             </Border> -->
+<!-- -->
+<!--             ~1~ 25 display @1@ -->
+<!--             <Border Grid.Row="1" -->
+<!--                     Height="42" -->
+<!--                     Background="#FFFFFF" -->
+<!--                     BorderBrush="#E0E4EA" -->
+<!--                     CornerRadius="8,8,0,0" -->
+<!--                     BorderThickness="0,0,0,0"> -->
+<!--               <TextBlock Text="25" -->
+<!--                          Foreground="#1A73E8" -->
+<!--                          FontWeight="Bold" -->
+<!--                          FontSize="20" -->
+<!--                          HorizontalAlignment="Center" -->
+<!--                          VerticalAlignment="Center"/> -->
+<!--             </Border> -->
+<!-- -->
+<!--             ~1~ − button @1@ -->
+<!--             <Border Grid.Row="2" -->
+<!--                     Classes="spinBtn" -->
+<!--                     Height="42" -->
+<!--                     Margin="0,0,0,2" -->
+<!--                     CornerRadius="0,0,8,8" -->
+<!--                     BorderThickness="0,0,0,1" -->
+<!--                     Background="#F5F7FA" -->
+<!--                     BorderBrush="#E0E4EA"> -->
+<!--               <TextBlock Text="−" -->
+<!--                          Foreground="#1A73E8" -->
+<!--                          FontWeight="Bold" -->
+<!--                          FontSize="22" -->
+<!--                          HorizontalAlignment="Center" -->
+<!--                          VerticalAlignment="Center" -->
+<!--                          IsHitTestVisible="False"/> -->
+<!--             </Border> -->
+<!-- -->
+<!--             ~1~ X label @1@ -->
+<!--             <Border Grid.Row="3" -->
+<!--                     Height="32" -->
+<!--                     Background="#F5F7FA" -->
+<!--                     Margin="0,0,0,1" -->
+<!--                     CornerRadius="9,9,10,10"> -->
+<!--               <TextBlock Text="X" -->
+<!--                          Foreground="#000" -->
+<!--                          FontWeight="Bold" -->
+<!--                          FontSize="18" -->
+<!--                          HorizontalAlignment="Center" -->
+<!--                          VerticalAlignment="Center"/> -->
+<!--             </Border> -->
+<!--           </Grid> -->
+<!--         </Border> -->
+<!-- -->
+<!--         ~1~ ============ CENTER CIRCLE ============ @1@ -->
+<!--         <Grid x:Name="Circle_Grid" -->
+<!--               Grid.Column="1" -->
+<!--               HorizontalAlignment="Center" -->
+<!--               VerticalAlignment="Center"> -->
+<!-- -->
+<!--           <Grid Width="120" Height="120"> -->
+<!--             <Ellipse Width="120" Height="120" -->
+<!--                      Stroke="#1A73E8" StrokeThickness="6" -->
+<!--                      Fill="Transparent"/> -->
+<!-- -->
+<!--             ~1~ Remove button @1@ -->
+<!--             <Button Classes="removeBtn" -->
+<!--                     Width="26" Height="26" -->
+<!--                     HorizontalAlignment="Right" -->
+<!--                     VerticalAlignment="Top" -->
+<!--                     Margin="0,6,6,0" -->
+<!--                     Click="remove_btn_OnClick"> -->
+<!--               <Button.Template> -->
+<!--                 <ControlTemplate TargetType="Button"> -->
+<!--                   <Border Background="{TemplateBinding Background}" -->
+<!--                           BorderBrush="{TemplateBinding BorderBrush}" -->
+<!--                           BorderThickness="{TemplateBinding BorderThickness}" -->
+<!--                           CornerRadius="13" -->
+<!--                           RenderTransformOrigin="0.5,0.5"> -->
+<!--                     <TextBlock Text="X" -->
+<!--                                Foreground="Red" -->
+<!--                                TextAlignment="Center" -->
+<!--                                FontSize="14" -->
+<!--                                HorizontalAlignment="Center" -->
+<!--                                VerticalAlignment="Center"/> -->
+<!--                   </Border> -->
+<!--                 </ControlTemplate> -->
+<!--               </Button.Template> -->
+<!--             </Button> -->
+<!-- -->
+<!--             ~1~ Crosshair marks @1@ -->
+<!--             <Canvas Width="70" Height="70" IsHitTestVisible="False"> -->
+<!--               <Ellipse Canvas.Left="21" Canvas.Top="21" Width="28" Height="28" -->
+<!--                        Stroke="#000" StrokeThickness="3" Fill="Transparent"/> -->
+<!--               <Rectangle Canvas.Left="34" Canvas.Top="8" Width="3" Height="10" Fill="#000"/> -->
+<!--               <Rectangle Canvas.Left="34" Canvas.Top="52" Width="3" Height="10" Fill="#000"/> -->
+<!--               <Rectangle Canvas.Left="8" Canvas.Top="34" Width="10" Height="3" Fill="#000"/> -->
+<!--               <Rectangle Canvas.Left="52" Canvas.Top="34" Width="10" Height="3" Fill="#000"/> -->
+<!--               <Ellipse Canvas.Left="33" Canvas.Top="33" Width="4" Height="4" Fill="#000"/> -->
+<!--             </Canvas> -->
+<!-- -->
+<!--             ~1~ Editable label @1@ -->
+<!--             <Grid HorizontalAlignment="Center" VerticalAlignment="Center"> -->
+<!--               <TextBlock x:Name="DisplayKey" -->
+<!--                          Text="y" -->
+<!--                          Foreground="White" -->
+<!--                          FontSize="42" -->
+<!--                          FontWeight="Bold" -->
+<!--                          TextAlignment="Center" -->
+<!--                          VerticalAlignment="Center" -->
+<!--                          HorizontalAlignment="Center" -->
+<!--                          IsVisible="True" -->
+<!--                          TextWrapping="NoWrap"/> -->
+<!-- -->
+<!--               <TextBox x:Name="InputField" -->
+<!--                        Text="" -->
+<!--                        FontSize="42" -->
+<!--                        FontWeight="Bold" -->
+<!--                        TextChanged="InputField_TextChanged" -->
+<!--                        Foreground="White" -->
+<!--                        Background="Transparent" -->
+<!--                        BorderThickness="0" -->
+<!--                        IsVisible="False" -->
+<!--                        VerticalContentAlignment="Center" -->
+<!--                        HorizontalContentAlignment="Center"/> -->
+<!--             </Grid> -->
+<!--           </Grid> -->
+<!--         </Grid> -->
+<!-- -->
+<!--         ~1~ ============ RIGHT CONTROL (Y) ============ @1@ -->
+<!--         <Border Grid.Column="2" -->
+<!--                 CornerRadius="10" -->
+<!--                 Background="#D8DBE4" -->
+<!--                 BorderBrush="#DADFE6" -->
+<!--                 BorderThickness="2.5" -->
+<!--                 Margin="8" -->
+<!--                 VerticalAlignment="Center"> -->
+<!--           <Grid Width="38"> -->
+<!--             <Grid.RowDefinitions> -->
+<!--               <RowDefinition Height="Auto"/> -->
+<!--               <RowDefinition Height="Auto"/> -->
+<!--               <RowDefinition Height="Auto"/> -->
+<!--               <RowDefinition Height="Auto"/> -->
+<!--             </Grid.RowDefinitions> -->
+<!-- -->
+<!--             ~1~ + button @1@ -->
+<!--             <Border Grid.Row="0" -->
+<!--                     Classes="spinBtn" -->
+<!--                     Margin="0,0,0,3" -->
+<!--                     Height="35" -->
+<!--                     CornerRadius="10,10,7,7" -->
+<!--                     BorderThickness="0,0,0,1" -->
+<!--                     Background="#F5F7FA" -->
+<!--                     BorderBrush="#E0E4EA"> -->
+<!--               <TextBlock Text="+" -->
+<!--                          Foreground="#1A73E8" -->
+<!--                          FontWeight="Bold" -->
+<!--                          FontSize="22" -->
+<!--                          HorizontalAlignment="Center" -->
+<!--                          VerticalAlignment="Center" -->
+<!--                          IsHitTestVisible="False"/> -->
+<!--             </Border> -->
+<!-- -->
+<!--             <Border Grid.Row="1" -->
+<!--                     Height="42" -->
+<!--                     Background="#FFFFFF" -->
+<!--                     BorderBrush="#E0E4EA" -->
+<!--                     CornerRadius="8,8,0,0" -->
+<!--                     BorderThickness="0,0,0,0"> -->
+<!--               <TextBlock Text="25" -->
+<!--                          Foreground="#1A73E8" -->
+<!--                          FontWeight="Bold" -->
+<!--                          FontSize="20" -->
+<!--                          HorizontalAlignment="Center" -->
+<!--                          VerticalAlignment="Center"/> -->
+<!--             </Border> -->
+<!-- -->
+<!--             <Border Grid.Row="2" -->
+<!--                     Classes="spinBtn" -->
+<!--                     Height="42" -->
+<!--                     Margin="0,0,0,2" -->
+<!--                     CornerRadius="0,0,8,8" -->
+<!--                     BorderThickness="0,0,0,1" -->
+<!--                     Background="#F5F7FA" -->
+<!--                     BorderBrush="#E0E4EA"> -->
+<!--               <TextBlock Text="−" -->
+<!--                          Foreground="#1A73E8" -->
+<!--                          FontWeight="Bold" -->
+<!--                          FontSize="22" -->
+<!--                          HorizontalAlignment="Center" -->
+<!--                          VerticalAlignment="Center" -->
+<!--                          IsHitTestVisible="False"/> -->
+<!--             </Border> -->
+<!-- -->
+<!--             <Border Grid.Row="3" -->
+<!--                     Height="32" -->
+<!--                     Background="#F5F7FA" -->
+<!--                     Margin="0,0,0,1" -->
+<!--                     CornerRadius="9,9,10,10"> -->
+<!--               <TextBlock Text="Y" -->
+<!--                          Foreground="#000" -->
+<!--                          FontWeight="Bold" -->
+<!--                          FontSize="18" -->
+<!--                          HorizontalAlignment="Center" -->
+<!--                          VerticalAlignment="Center"/> -->
+<!--             </Border> -->
+<!--           </Grid> -->
+<!--         </Border> -->
+<!--       </Grid> -->
+<!--     </Viewbox> -->
+<!-- -->
+<!--     ~1~ Dashed outline @1@ -->
+<!--     <Rectangle x:Name="DashedBorder" -->
+<!--                Stroke="#1A73E8" -->
+<!--                StrokeThickness="2" -->
+<!--                StrokeDashArray="4,2" -->
+<!--                RadiusX="8" RadiusY="8" -->
+<!--                HorizontalAlignment="Stretch" -->
+<!--                VerticalAlignment="Stretch"/> -->
+<!-- -->
+<!--     ~1~ Resize thumbs @1@ -->
+<!--     <primitives:Thumb x:Name="TopLeftThumb" Width="10" Height="10" -->
+<!--                       HorizontalAlignment="Left" VerticalAlignment="Top" -->
+<!--                       Cursor="TopLeftCorner" -->
+<!--                       DragDelta="ResizeThumb_DragDelta"> -->
+<!--       <primitives:Thumb.Template> -->
+<!--         <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate> -->
+<!--       </primitives:Thumb.Template> -->
+<!--     </primitives:Thumb> -->
+<!-- -->
+<!--     <primitives:Thumb x:Name="TopRightThumb" Width="10" Height="10" -->
+<!--                       HorizontalAlignment="Right" VerticalAlignment="Top" -->
+<!--                       Cursor="TopRightCorner" -->
+<!--                       DragDelta="ResizeThumb_DragDelta"> -->
+<!--       <primitives:Thumb.Template> -->
+<!--         <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate> -->
+<!--       </primitives:Thumb.Template> -->
+<!--     </primitives:Thumb> -->
+<!-- -->
+<!--     <primitives:Thumb x:Name="BottomLeftThumb" Width="10" Height="10" -->
+<!--                       HorizontalAlignment="Left" VerticalAlignment="Bottom" -->
+<!--                       Cursor="TopRightCorner" -->
+<!--                       DragDelta="ResizeThumb_DragDelta"> -->
+<!--       <primitives:Thumb.Template> -->
+<!--         <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate> -->
+<!--       </primitives:Thumb.Template> -->
+<!--     </primitives:Thumb> -->
+<!-- -->
+<!--     <primitives:Thumb x:Name="BottomRightThumb" Width="10" Height="10" -->
+<!--                       HorizontalAlignment="Right" VerticalAlignment="Bottom" -->
+<!--                       Cursor="TopLeftCorner" -->
+<!--                       DragDelta="ResizeThumb_DragDelta"> -->
+<!--       <primitives:Thumb.Template> -->
+<!--         <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate> -->
+<!--       </primitives:Thumb.Template> -->
+<!--     </primitives:Thumb> -->
+<!-- -->
+<!--   </Grid> -->
+<!-- </UserControl> -->
+
+
+
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:primitives="clr-namespace:Avalonia.Controls.Primitives;assembly=Avalonia.Controls"
              mc:Ignorable="d"
              d:DesignHeight="180" d:DesignWidth="360"
+             x:Class="Androidplayer.Src.Keymap.Keymap_items.Visual_keymap"
              Background="Transparent">
 
-  <UserControl.Styles>
-    <!-- Numeric + / − buttons: base look -->
-    <Style Selector="Border.spinBtn">
-      <Setter Property="Cursor" Value="Hand"/>
-      <Setter Property="RenderTransform" Value="scale(1.0)"/>
-      <Setter Property="Transitions">
-        <Transitions>
-          <BrushTransition Property="Background" Duration="0:0:0.1"/>
-          <BrushTransition Property="BorderBrush" Duration="0:0:0.1"/>
-          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.08"/>
-        </Transitions>
-      </Setter>
-    </Style>
+    <UserControl.Styles>
 
-    <Style Selector="Border.spinBtn:pointerover">
-      <Setter Property="Background" Value="#1A73E8"/>
-      <Setter Property="BorderBrush" Value="#1A73E8"/>
-      <Setter Property="RenderTransform" Value="scale(1.05)"/>
-    </Style>
+        <!-- ===== + / − key buttons (replaces the WPF EventTrigger storyboards) ===== -->
+        <Style Selector="Border.key">
+            <Setter Property="Background" Value="#F5F7FA"/>
+            <Setter Property="BorderBrush" Value="#E0E4EA"/>
+            <Setter Property="RenderTransform" Value="scale(1)"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.1"/>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.1"/>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.08"/>
+                </Transitions>
+            </Setter>
+        </Style>
 
-    <Style Selector="Border.spinBtn:pointerover TextBlock">
-      <Setter Property="Foreground" Value="White"/>
-    </Style>
+        <Style Selector="Border.key > TextBlock">
+            <Setter Property="Foreground" Value="#1A73E8"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Foreground" Duration="0:0:0.1"/>
+                </Transitions>
+            </Setter>
+        </Style>
 
-    <!-- Remove button styles (shared) -->
-    <Style Selector="Button.removeBtn">
-      <Setter Property="Background" Value="#FFE4C4"/>
-      <Setter Property="BorderBrush" Value="#1A73E8"/>
-      <Setter Property="BorderThickness" Value="2"/>
-      <Setter Property="Padding" Value="0"/>
-      <Setter Property="HorizontalContentAlignment" Value="Center"/>
-      <Setter Property="VerticalContentAlignment" Value="Center"/>
-      <Setter Property="RenderTransform" Value="scale(1.0)"/>
-      <Setter Property="Transitions">
-        <Transitions>
-          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.08"/>
-        </Transitions>
-      </Setter>
-    </Style>
+        <Style Selector="Border.key:pointerover">
+            <Setter Property="Background" Value="#1A73E8"/>
+            <Setter Property="RenderTransform" Value="scale(1.05)"/>
+        </Style>
 
-    <Style Selector="Button.removeBtn:pointerover">
-      <Setter Property="RenderTransform" Value="scale(1.3)"/>
-    </Style>
-  </UserControl.Styles>
+        <Style Selector="Border.key:pointerover > TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
 
-  <Grid x:Name="RootGrid" IsHitTestVisible="True" Background="Transparent"
-        PointerPressed="RootGrid_MouseLeftButtonDown"
-        PointerMoved="RootGrid_MouseMove"
-        PointerReleased="RootGrid_MouseLeftButtonUp">
+        <!-- The minus key also recolors its border on hover (the plus key keeps #E0E4EA) -->
+        <Style Selector="Border.keyMinus:pointerover">
+            <Setter Property="BorderBrush" Value="#1A73E8"/>
+        </Style>
 
-    <Viewbox Stretch="Uniform" Margin="5" StretchDirection="Both">
-      <Grid>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto"/>
-          <ColumnDefinition Width="Auto"/>
-          <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+        <!-- ===== Round "X" remove button ===== -->
+        <Style Selector="Button.removeBtn /template/ Border#RemoveBorder">
+            <Setter Property="RenderTransform" Value="scale(1)"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.08"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.removeBtn:pointerover /template/ Border#RemoveBorder">
+            <Setter Property="RenderTransform" Value="scale(1.3)"/>
+        </Style>
 
-        <!-- ============ LEFT CONTROL (X) ============ -->
-        <Border Grid.Column="0"
-                CornerRadius="10"
-                Background="#D8DBE4"
-                BorderBrush="#DADFE6"
-                BorderThickness="2.5"
-                Margin="8"
-                VerticalAlignment="Center">
-          <Grid Width="38">
-            <Grid.RowDefinitions>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <!-- ===== Keep the inline TextBox transparent in every state (Fluent theme overrides it) ===== -->
+        <Style Selector="TextBox#InputField /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="TextBox#InputField:pointerover /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="TextBox#InputField:focus /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
 
-            <!-- + button -->
-            <Border Grid.Row="0"
-                    Classes="spinBtn"
-                    Margin="0,0,0,3"
-                    Height="35"
-                    CornerRadius="10,10,7,7"
-                    BorderThickness="0,0,0,1"
-                    Background="#F5F7FA"
-                    BorderBrush="#E0E4EA">
-              <TextBlock Text="+"
-                         Foreground="#1A73E8"
-                         FontWeight="Bold"
-                         FontSize="22"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         IsHitTestVisible="False"/>
-            </Border>
+    </UserControl.Styles>
 
-            <!-- 25 display -->
-            <Border Grid.Row="1"
-                    Height="42"
-                    Background="#FFFFFF"
-                    BorderBrush="#E0E4EA"
-                    CornerRadius="8,8,0,0"
-                    BorderThickness="0,0,0,0">
-              <TextBlock Text="25"
-                         Foreground="#1A73E8"
-                         FontWeight="Bold"
-                         FontSize="20"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"/>
-            </Border>
+    <Grid x:Name="RootGrid" IsHitTestVisible="True" Background="Transparent"
+          PointerPressed="RootGrid_MouseLeftButtonDown"
+          PointerMoved="RootGrid_MouseMove"
+          PointerReleased="RootGrid_MouseLeftButtonUp">
 
-            <!-- − button -->
-            <Border Grid.Row="2"
-                    Classes="spinBtn"
-                    Height="42"
-                    Margin="0,0,0,2"
-                    CornerRadius="0,0,8,8"
-                    BorderThickness="0,0,0,1"
-                    Background="#F5F7FA"
-                    BorderBrush="#E0E4EA">
-              <TextBlock Text="−"
-                         Foreground="#1A73E8"
-                         FontWeight="Bold"
-                         FontSize="22"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         IsHitTestVisible="False"/>
-            </Border>
+        <!-- Main content with Viewbox for auto-scaling -->
+        <Viewbox Stretch="Uniform" Margin="5" StretchDirection="Both">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- X label -->
-            <Border Grid.Row="3"
-                    Height="32"
-                    Background="#F5F7FA"
-                    Margin="0,0,0,1"
-                    CornerRadius="9,9,10,10">
-              <TextBlock Text="X"
-                         Foreground="#000"
-                         FontWeight="Bold"
-                         FontSize="18"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"/>
-            </Border>
-          </Grid>
-        </Border>
+                <!-- Left Control (X) -->
+                <Border Grid.Column="0"
+                        CornerRadius="10"
+                        Background="#D8DBE4"
+                        BorderBrush="#DADFE6"
+                        BorderThickness="2.5"
+                        Margin="8"
+                        VerticalAlignment="Center"
+                        UseLayoutRounding="True">
+                    <Grid Width="38">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>   <!-- + -->
+                            <RowDefinition Height="Auto"/>   <!-- 25 -->
+                            <RowDefinition Height="Auto"/>   <!-- - -->
+                            <RowDefinition Height="Auto"/>   <!-- X -->
+                        </Grid.RowDefinitions>
 
-        <!-- ============ CENTER CIRCLE ============ -->
-        <Grid x:Name="Circle_Grid"
-              Grid.Column="1"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Center">
+                        <!-- + -->
+                        <Border Grid.Row="0"
+                                Classes="key"
+                                Margin="0,0,0,3"
+                                Height="35"
+                                Cursor="Hand"
+                                CornerRadius="10,10,7,7"
+                                BorderThickness="0,0,0,1"
+                                RenderTransformOrigin="50%,50%">
+                            <TextBlock x:Name="plusText_left"
+                                       Text="+"
+                                       FontWeight="Bold"
+                                       FontSize="22"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"/>
+                        </Border>
 
-          <Grid Width="120" Height="120">
-            <Ellipse Width="120" Height="120"
-                     Stroke="#1A73E8" StrokeThickness="6"
-                     Fill="Transparent"/>
+                        <!-- 25 -->
+                        <Border Grid.Row="1"
+                                Height="42"
+                                Background="#FFFFFF"
+                                BorderBrush="#E0E4EA"
+                                CornerRadius="8,8,0,0"
+                                BorderThickness="0">
+                            <TextBlock Text="25"
+                                       Foreground="#1A73E8"
+                                       FontWeight="Bold"
+                                       FontSize="20"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
 
-            <!-- Remove button -->
-            <Button Classes="removeBtn"
-                    Width="26" Height="26"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    Margin="0,6,6,0"
-                    Click="remove_btn_OnClick">
-              <Button.Template>
-                <ControlTemplate TargetType="Button">
-                  <Border Background="{TemplateBinding Background}"
-                          BorderBrush="{TemplateBinding BorderBrush}"
-                          BorderThickness="{TemplateBinding BorderThickness}"
-                          CornerRadius="13"
-                          RenderTransformOrigin="0.5,0.5">
-                    <TextBlock Text="X"
-                               Foreground="Red"
-                               TextAlignment="Center"
-                               FontSize="14"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"/>
-                  </Border>
-                </ControlTemplate>
-              </Button.Template>
-            </Button>
+                        <!-- − -->
+                        <Border Grid.Row="2"
+                                Classes="key keyMinus"
+                                Height="42"
+                                Margin="0,0,0,2"
+                                CornerRadius="0,0,8,8"
+                                BorderThickness="0,0,0,1"
+                                Cursor="Hand"
+                                RenderTransformOrigin="50%,50%">
+                            <TextBlock x:Name="minusText_left"
+                                       Text="−"
+                                       FontWeight="Bold"
+                                       FontSize="22"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"/>
+                        </Border>
 
-            <!-- Crosshair marks -->
-            <Canvas Width="70" Height="70" IsHitTestVisible="False">
-              <Ellipse Canvas.Left="21" Canvas.Top="21" Width="28" Height="28"
-                       Stroke="#000" StrokeThickness="3" Fill="Transparent"/>
-              <Rectangle Canvas.Left="34" Canvas.Top="8" Width="3" Height="10" Fill="#000"/>
-              <Rectangle Canvas.Left="34" Canvas.Top="52" Width="3" Height="10" Fill="#000"/>
-              <Rectangle Canvas.Left="8" Canvas.Top="34" Width="10" Height="3" Fill="#000"/>
-              <Rectangle Canvas.Left="52" Canvas.Top="34" Width="10" Height="3" Fill="#000"/>
-              <Ellipse Canvas.Left="33" Canvas.Top="33" Width="4" Height="4" Fill="#000"/>
-            </Canvas>
+                        <!-- X -->
+                        <Border Grid.Row="3"
+                                Height="32"
+                                Background="#F5F7FA"
+                                Margin="0,0,0,1"
+                                CornerRadius="9,9,10,10">
+                            <TextBlock Text="X"
+                                       Foreground="#000000"
+                                       FontWeight="Bold"
+                                       FontSize="18"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                </Border>
 
-            <!-- Editable label -->
-            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-              <TextBlock x:Name="DisplayKey"
-                         Text="y"
-                         Foreground="White"
-                         FontSize="42"
-                         FontWeight="Bold"
-                         TextAlignment="Center"
-                         VerticalAlignment="Center"
-                         HorizontalAlignment="Center"
-                         IsVisible="True"
-                         TextWrapping="NoWrap"/>
+                <!-- Center Circular Control -->
+                <Grid x:Name="Circle_Grid" Grid.Column="1"
+                      HorizontalAlignment="Center" VerticalAlignment="Center">
 
-              <TextBox x:Name="InputField"
-                       Text=""
-                       FontSize="42"
-                       FontWeight="Bold"
-                       TextChanged="InputField_TextChanged"
-                       Foreground="White"
-                       Background="Transparent"
-                       BorderThickness="0"
-                       IsVisible="False"
-                       VerticalContentAlignment="Center"
-                       HorizontalContentAlignment="Center"/>
+                    <Grid Width="120" Height="120">
+
+                        <!-- Outer Blue Ring -->
+                        <Ellipse Width="120" Height="120" Stroke="#1A73E8" StrokeThickness="6" Fill="Transparent"/>
+
+                        <!-- Remove button -->
+                        <Button Classes="removeBtn"
+                                Width="26" Height="26"
+                                Background="#FFE4C4"
+                                BorderBrush="#1A73E8"
+                                BorderThickness="2"
+                                Click="remove_btn_OnClick"
+                                Padding="0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Margin="0,6,6,0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="RemoveBorder"
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="13"
+                                            RenderTransformOrigin="50%,50%">
+                                        <TextBlock Text="X"
+                                                   Foreground="Red"
+                                                   TextAlignment="Center"
+                                                   FontSize="14"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+
+                    <!-- Inner Target Mark -->
+                    <Canvas Width="70" Height="70" IsHitTestVisible="False">
+                        <Ellipse Canvas.Left="21" Canvas.Top="21" Width="28" Height="28" Stroke="#000000" StrokeThickness="3" Fill="Transparent"/>
+                        <Rectangle Canvas.Left="34" Canvas.Top="8"  Width="3"  Height="10" Fill="#000000"/>
+                        <Rectangle Canvas.Left="34" Canvas.Top="52" Width="3"  Height="10" Fill="#000000"/>
+                        <Rectangle Canvas.Left="8"  Canvas.Top="34" Width="10" Height="3"  Fill="#000000"/>
+                        <Rectangle Canvas.Left="52" Canvas.Top="34" Width="10" Height="3"  Fill="#000000"/>
+                        <Ellipse Canvas.Left="33" Canvas.Top="33" Width="4" Height="4" Fill="#000000"/>
+                    </Canvas>
+
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <!-- Display text -->
+                        <TextBlock x:Name="DisplayKey"
+                                   Text="y"
+                                   Foreground="White"
+                                   FontSize="42"
+                                   FontWeight="Bold"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   IsVisible="True"
+                                   TextWrapping="NoWrap"/>
+
+                        <!-- Editing input -->
+                        <TextBox x:Name="InputField"
+                                 Text=""
+                                 FontSize="42"
+                                 FontWeight="Bold"
+                                 Foreground="White"
+                                 CaretBrush="White"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 IsVisible="False"
+                                 VerticalContentAlignment="Center"
+                                 HorizontalContentAlignment="Center"/>
+                    </Grid>
+                </Grid>
+
+                <!-- Right Control (Y) -->
+                <Border Grid.Column="2"
+                        CornerRadius="10"
+                        Background="#D8DBE4"
+                        BorderBrush="#DADFE6"
+                        BorderThickness="2.5"
+                        Margin="8"
+                        VerticalAlignment="Center"
+                        UseLayoutRounding="True">
+                    <Grid Width="38">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>   <!-- + -->
+                            <RowDefinition Height="Auto"/>   <!-- 25 -->
+                            <RowDefinition Height="Auto"/>   <!-- - -->
+                            <RowDefinition Height="Auto"/>   <!-- Y -->
+                        </Grid.RowDefinitions>
+
+                        <!-- + -->
+                        <Border Grid.Row="0"
+                                Classes="key"
+                                Margin="0,0,0,3"
+                                Height="35"
+                                Cursor="Hand"
+                                CornerRadius="10,10,7,7"
+                                BorderThickness="0,0,0,1"
+                                RenderTransformOrigin="50%,50%">
+                            <TextBlock x:Name="plusText_right"
+                                       Text="+"
+                                       FontWeight="Bold"
+                                       FontSize="22"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"/>
+                        </Border>
+
+                        <!-- 25 -->
+                        <Border Grid.Row="1"
+                                Height="42"
+                                Background="#FFFFFF"
+                                BorderBrush="#E0E4EA"
+                                CornerRadius="8,8,0,0"
+                                BorderThickness="0">
+                            <TextBlock Text="25"
+                                       Foreground="#1A73E8"
+                                       FontWeight="Bold"
+                                       FontSize="20"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- − -->
+                        <Border Grid.Row="2"
+                                Classes="key keyMinus"
+                                Height="42"
+                                Margin="0,0,0,2"
+                                CornerRadius="0,0,8,8"
+                                BorderThickness="0,0,0,1"
+                                Cursor="Hand"
+                                RenderTransformOrigin="50%,50%">
+                            <TextBlock x:Name="minusText"
+                                       Text="−"
+                                       FontWeight="Bold"
+                                       FontSize="22"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"/>
+                        </Border>
+
+                        <!-- Y -->
+                        <Border Grid.Row="3"
+                                Height="32"
+                                Background="#F5F7FA"
+                                Margin="0,0,0,1"
+                                CornerRadius="9,9,10,10">
+                            <TextBlock Text="Y"
+                                       Foreground="#000000"
+                                       FontWeight="Bold"
+                                       FontSize="18"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                </Border>
             </Grid>
-          </Grid>
-        </Grid>
+        </Viewbox>
 
-        <!-- ============ RIGHT CONTROL (Y) ============ -->
-        <Border Grid.Column="2"
-                CornerRadius="10"
-                Background="#D8DBE4"
-                BorderBrush="#DADFE6"
-                BorderThickness="2.5"
-                Margin="8"
-                VerticalAlignment="Center">
-          <Grid Width="38">
-            <Grid.RowDefinitions>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <!-- Dashed border outline -->
+        <Rectangle x:Name="DashedBorder"
+                   Stroke="#1A73E8"
+                   StrokeThickness="2"
+                   StrokeDashArray="4,2"
+                   RadiusX="8" RadiusY="8"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch"/>
 
-            <!-- + button -->
-            <Border Grid.Row="0"
-                    Classes="spinBtn"
-                    Margin="0,0,0,3"
-                    Height="35"
-                    CornerRadius="10,10,7,7"
-                    BorderThickness="0,0,0,1"
-                    Background="#F5F7FA"
-                    BorderBrush="#E0E4EA">
-              <TextBlock Text="+"
-                         Foreground="#1A73E8"
-                         FontWeight="Bold"
-                         FontSize="22"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         IsHitTestVisible="False"/>
-            </Border>
+        <!-- Resize Thumbs -->
+        <Thumb x:Name="TopLeftThumb" Width="10" Height="10"
+               HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="TopLeftCorner">
+            <Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </Thumb.Template>
+        </Thumb>
 
-            <Border Grid.Row="1"
-                    Height="42"
-                    Background="#FFFFFF"
-                    BorderBrush="#E0E4EA"
-                    CornerRadius="8,8,0,0"
-                    BorderThickness="0,0,0,0">
-              <TextBlock Text="25"
-                         Foreground="#1A73E8"
-                         FontWeight="Bold"
-                         FontSize="20"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"/>
-            </Border>
+        <Thumb x:Name="TopRightThumb" Width="10" Height="10"
+               HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="TopRightCorner">
+            <Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </Thumb.Template>
+        </Thumb>
 
-            <Border Grid.Row="2"
-                    Classes="spinBtn"
-                    Height="42"
-                    Margin="0,0,0,2"
-                    CornerRadius="0,0,8,8"
-                    BorderThickness="0,0,0,1"
-                    Background="#F5F7FA"
-                    BorderBrush="#E0E4EA">
-              <TextBlock Text="−"
-                         Foreground="#1A73E8"
-                         FontWeight="Bold"
-                         FontSize="22"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         IsHitTestVisible="False"/>
-            </Border>
+        <Thumb x:Name="BottomLeftThumb" Width="10" Height="10"
+               HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="BottomLeftCorner">
+            <Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </Thumb.Template>
+        </Thumb>
 
-            <Border Grid.Row="3"
-                    Height="32"
-                    Background="#F5F7FA"
-                    Margin="0,0,0,1"
-                    CornerRadius="9,9,10,10">
-              <TextBlock Text="Y"
-                         Foreground="#000"
-                         FontWeight="Bold"
-                         FontSize="18"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"/>
-            </Border>
-          </Grid>
-        </Border>
-      </Grid>
-    </Viewbox>
+        <Thumb x:Name="BottomRightThumb" Width="10" Height="10"
+               HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="BottomRightCorner">
+            <Thumb.Template>
+                <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
+            </Thumb.Template>
+        </Thumb>
 
-    <!-- Dashed outline -->
-    <Rectangle x:Name="DashedBorder"
-               Stroke="#1A73E8"
-               StrokeThickness="2"
-               StrokeDashArray="4,2"
-               RadiusX="8" RadiusY="8"
-               HorizontalAlignment="Stretch"
-               VerticalAlignment="Stretch"/>
-
-    <!-- Resize thumbs -->
-    <primitives:Thumb x:Name="TopLeftThumb" Width="10" Height="10"
-                      HorizontalAlignment="Left" VerticalAlignment="Top"
-                      Cursor="TopLeftCorner"
-                      DragDelta="ResizeThumb_DragDelta">
-      <primitives:Thumb.Template>
-        <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
-      </primitives:Thumb.Template>
-    </primitives:Thumb>
-
-    <primitives:Thumb x:Name="TopRightThumb" Width="10" Height="10"
-                      HorizontalAlignment="Right" VerticalAlignment="Top"
-                      Cursor="TopRightCorner"
-                      DragDelta="ResizeThumb_DragDelta">
-      <primitives:Thumb.Template>
-        <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
-      </primitives:Thumb.Template>
-    </primitives:Thumb>
-
-    <primitives:Thumb x:Name="BottomLeftThumb" Width="10" Height="10"
-                      HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                      Cursor="TopRightCorner"
-                      DragDelta="ResizeThumb_DragDelta">
-      <primitives:Thumb.Template>
-        <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
-      </primitives:Thumb.Template>
-    </primitives:Thumb>
-
-    <primitives:Thumb x:Name="BottomRightThumb" Width="10" Height="10"
-                      HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                      Cursor="TopLeftCorner"
-                      DragDelta="ResizeThumb_DragDelta">
-      <primitives:Thumb.Template>
-        <ControlTemplate TargetType="Thumb"><Rectangle Fill="#1A73E8"/></ControlTemplate>
-      </primitives:Thumb.Template>
-    </primitives:Thumb>
-
-  </Grid>
+    </Grid>
 </UserControl>

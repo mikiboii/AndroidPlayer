@@ -148,27 +148,52 @@ namespace Androidplayer.Src.Keymap.Keymap_items
                     .Select(k => k.Trim())
                     .ToList();
 
-            var data = new Dictionary<string, object>
+            // var data = new Dictionary<string, object>
+            // {
+            //     ["type"] = Name,
+            //     ["keys"] = keys,
+            //     ["x"] = x,
+            //     ["y"] = y,
+            //     ["width"] = this.Bounds.Width,
+            //     ["height"] = this.Bounds.Height,
+            //     ["parent_width"] = parentW,
+            //     ["parent_height"] = parentH,
+            //     ["Img path"] = null!,
+            //     ["App name"] = my_info.Instance?.Appname!
+            // };
+            //
+            // return data;
+            
+            
+            var data = new KeymapElement
             {
-                ["type"] = Name,
-                ["keys"] = keys,
-                ["x"] = x,
-                ["y"] = y,
-                ["width"] = this.Bounds.Width,
-                ["height"] = this.Bounds.Height,
-                ["parent_width"] = parentW,
-                ["parent_height"] = parentH,
-                ["Img path"] = null!,
-                ["App name"] = my_info.Instance?.Appname!
+                Type         = Name,
+                Keys         = keys,
+                X            = x,
+                Y            = y,
+                Width        = this.Bounds.Width,
+                Height       = this.Bounds.Height,
+                ParentWidth  = parentW,
+                ParentHeight = parentH,
+                ScaledWidth  = 0,
+                ScaledHeight = 0,
+                ImagePath    = null,
+                AppName      = my_info.Instance?.Appname
             };
 
             return data;
+            
         }
 
         public void SetJsonData(KeymapElement data)
         {
             try
             {
+                
+                 // Console.WriteLine($"[SetJsonData] got Type={data.Type}, X={data.X}, Y={data.Y}, W={data.Width}, H={data.Height}");
+                // Console.WriteLine($"[SetJsonData]   Keys={(data.Keys == null ? "null" : string.Join(",", data.Keys))}");
+                
+                      
                 Name = data.Type;
                 KeyName = string.Join("+", data.Keys);
 
@@ -194,6 +219,11 @@ namespace Androidplayer.Src.Keymap.Keymap_items
 
                 if (this.Parent is Canvas parentCanvas)
                     FixPosOnParentResize(parentCanvas.Bounds.Width, parentCanvas.Bounds.Height);
+                
+                
+                
+                // Console.WriteLine($"[SetJsonData]   after apply → this.Bounds={Bounds}, Canvas.Left={Canvas.GetLeft(this)}, Canvas.Top={Canvas.GetTop(this)}");
+
             }
             catch (Exception ex)
             {

@@ -4,7 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:avalonia="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
              xmlns:androidplayer="clr-namespace:Androidplayer"
+             xmlns:local="clr-namespace:Androidplayer.Native_test"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="local:VideoPlayer"
              x:Class="Androidplayer.Native_test.VideoPlayer">
     <Grid RowDefinitions="Auto, *, Auto" Margin="4">
         <!-- <Label Grid.Row="0" HorizontalAlignment="Center">Video Player</Label> -->
@@ -47,19 +49,33 @@
         
         
         
-        <androidplayer:Native_view x:Name="NativeView" Grid.Row="1"
+        <!-- <androidplayer:Native_view x:Name="NativeView" Grid.Row="1" -->
+        <!-- -->
+        <!--                    -->
+        <!--                      -->
+        <!--                      -->
+        <!--                     > -->
+        <!--     <Panel Name="ControlsPanel"> -->
+        <!--         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Background="#900000FF" Spacing="20"> -->
+        <!--             <Button  Margin="20">Play</Button> -->
+        <!--             <Button  Margin="20">Stop</Button> -->
+        <!--         </StackPanel> -->
+        <!--     </Panel> -->
+        <!-- </androidplayer:Native_view > -->
         
-                          
-                            
-                            
-                            >
+        
+        <avalonia:VideoView Grid.Row="1" MediaPlayer="{Binding MediaPlayer}"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"
+                       PointerEntered="VideoViewOnPointerEntered"
+                       PointerExited="VideoViewOnPointerExited">
             <Panel Name="ControlsPanel">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Background="#900000FF" Spacing="20">
-                    <Button  Margin="20">Play</Button>
-                    <Button  Margin="20">Stop</Button>
+                    <Button Command="{Binding Play}" Margin="20">Play</Button>
+                    <Button Command="{Binding Stop}" Margin="20">Stop</Button>
                 </StackPanel>
             </Panel>
-        </androidplayer:Native_view >
+        </avalonia:VideoView>
         
         
     </Grid>

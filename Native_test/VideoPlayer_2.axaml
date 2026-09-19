@@ -1,0 +1,94 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:androidplayer="clr-namespace:Androidplayer"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Androidplayer.Native_test.VideoPlayer_2">
+      <Grid RowDefinitions="Auto, *, Auto" Margin="4">
+        <!-- <Label Grid.Row="0" HorizontalAlignment="Center">Video Player</Label> -->
+        <Label ZIndex="3" HorizontalAlignment="Center">Video Player</Label>
+
+        <!-- <avalonia:VideoView Grid.Row="1"  -->
+        <!--                HorizontalAlignment="Stretch" -->
+        <!--                VerticalAlignment="Stretch" -->
+        <!--                PointerEntered="VideoViewOnPointerEntered" -->
+        <!--                PointerExited="VideoViewOnPointerExited"> -->
+        <!--     <Panel Name="ControlsPanel"> -->
+        <!--         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Background="#900000FF" Spacing="20"> -->
+        <!--             <Button  Margin="20">Play</Button> -->
+        <!--             <Button  Margin="20">Stop</Button> -->
+        <!--         </StackPanel> -->
+        <!--     </Panel> -->
+        <!-- </avalonia:VideoView> -->
+        
+        
+        
+        
+        <!-- <androidplayer:FlyleafHost  x:Name="NativeView" Grid.Row="1"  Width="500" Height="500" d:DesignWidth="500" d:DesignHeight="500"  > -->
+        <!-- -->
+        <!--     <Grid> -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!--         <Button Content="click"  Width="50" Height="30" Background="Aqua"  ></Button> -->
+        <!--     </Grid> -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!-- </androidplayer:FlyleafHost> -->
+        <!-- -->
+        
+        
+        
+        
+        
+        <!-- Width="600" Height="500" -->
+        
+        <androidplayer:Native_view x:Name="NativeView" Grid.Row="1">
+            
+            
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                 >
+                
+                
+                
+                <Canvas x:Name="my_overlay"
+                        
+                        PointerPressed="My_overlay_OnPointerPressed"
+                        Background="Transparent"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Width="500"
+                        Height="500" />
+                <Rectangle Fill="Aqua"
+                           Width="200"
+                           Height="500"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center" 
+                           IsHitTestVisible="True"
+                           ></Rectangle>
+            </Grid>
+            
+            
+            
+            
+            <!-- <Canvas x:Name="my_overlay"  PointerPressed="My_overlay_OnPointerPressed" Background="Transparent" Width="500" Height="500" HorizontalAlignment="Center" VerticalAlignment="Center"></Canvas> -->
+            
+            
+            <!-- -->
+            <!-- <Panel Name="ControlsPanel"> -->
+            <!--     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Background="#900000FF" Spacing="20"> -->
+            <!--         <Button Click="Button_OnClick"  Margin="20">Play</Button> -->
+            <!--         <Button  Margin="20">Stop</Button> -->
+            <!--     </StackPanel> -->
+            <!-- </Panel> -->
+        </androidplayer:Native_view >
+        
+        
+       
+        
+        
+    </Grid>
+</UserControl>

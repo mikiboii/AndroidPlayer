@@ -19,7 +19,7 @@ public partial class Keymap_Window : Window
 
         this.mainWindow = mainWindow;
 
-        this.Owner = mainWindow;
+        // this.Owner = mainWindow;
 
         Loaded += Keymap_Window_Loaded;
 
@@ -29,9 +29,23 @@ public partial class Keymap_Window : Window
         // Size and state are property changes, not separate events
         mainWindow.PropertyChanged += MainWindow_PropertyChanged;
 
-        mainWindow.Activated += MainWindow_Activated;
+        // mainWindow.Activated += MainWindow_Activated;
+        
+        // this.Activated += OnActivated;
 
         k_info.Instance.PropertyChanged += K_info_PropertyChanged;
+    }
+
+    private void OnActivated(object? sender, EventArgs e)
+    {
+        
+        this.mainWindow.Activate();
+        if (this.IsVisible)
+        {
+            this.Topmost = true;
+            this.Topmost = false;
+            // Avalonia has no UpdateLayout() — layout is done automatically.
+        }
     }
 
     private void MainWindow_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
@@ -75,6 +89,9 @@ public partial class Keymap_Window : Window
 
     private void MainWindow_Activated(object? sender, EventArgs e)
     {
+
+        Console.WriteLine("from keymapwindow MainWindow_Activated called");
+        // this.Activate();
         if (this.IsVisible)
         {
             this.Topmost = true;

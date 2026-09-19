@@ -609,21 +609,39 @@ public partial class Image_key : UserControl, IKeymapElement
         double scaled_width = this.Bounds.Width / parentW * deviceW;
         double scaled_height = this.Bounds.Height / parentH * deviceH;
 
-        return new Dictionary<string, object>
+        // return new Dictionary<string, object>
+        // {
+        //     ["type"] = Name,
+        //     ["keys"] = keys,
+        //     ["x"] = scaledX,
+        //     ["y"] = scaledY,
+        //     ["width"] = this.Bounds.Width,
+        //     ["height"] = this.Bounds.Height,
+        //     ["parent_width"] = deviceW,
+        //     ["parent_height"] = deviceH,
+        //     ["scaled_width"] = scaled_width,
+        //     ["scaled_height"] = scaled_height,
+        //     ["Img path"] = imgPath!,
+        //     ["App name"] = my_info.Instance?.Appname!
+        // };
+        
+        
+        return new KeymapElement
         {
-            ["type"] = Name,
-            ["keys"] = keys,
-            ["x"] = scaledX,
-            ["y"] = scaledY,
-            ["width"] = this.Bounds.Width,
-            ["height"] = this.Bounds.Height,
-            ["parent_width"] = deviceW,
-            ["parent_height"] = deviceH,
-            ["scaled_width"] = scaled_width,
-            ["scaled_height"] = scaled_height,
-            ["Img path"] = imgPath!,
-            ["App name"] = my_info.Instance?.Appname!
+            Type         = Name,
+            Keys         = keys,
+            X            = scaledX,
+            Y            = scaledY,
+            Width        = this.Bounds.Width,
+            Height       = this.Bounds.Height,
+            ParentWidth  = deviceW,
+            ParentHeight = deviceH,
+            ScaledWidth  = scaled_width,
+            ScaledHeight = scaled_height,
+            ImagePath    = imgPath,
+            AppName      = my_info.Instance?.Appname
         };
+        
     }
 
     public void SetJsonData(KeymapElement data)

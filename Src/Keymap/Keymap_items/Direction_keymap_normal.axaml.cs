@@ -99,18 +99,35 @@ public partial class Direction_keymap_normal : UserControl, IKeymapElement
                 .Select(k => k.Trim())
                 .ToList();
 
-        return new Dictionary<string, object>
+        // return new Dictionary<string, object>
+        // {
+        //     ["type"] = Name,
+        //     ["keys"] = new List<string> { "W", "A", "S", "D" },
+        //     ["x"] = x,
+        //     ["y"] = y,
+        //     ["width"] = this.Bounds.Width,
+        //     ["height"] = this.Bounds.Height,
+        //     ["parent_width"] = parentW,
+        //     ["parent_height"] = parentH,
+        //     ["Img path"] = null!,
+        //     ["App name"] = my_info.Instance?.Appname!
+        // };
+        
+        
+        return new KeymapElement
         {
-            ["type"] = Name,
-            ["keys"] = new List<string> { "W", "A", "S", "D" },
-            ["x"] = x,
-            ["y"] = y,
-            ["width"] = this.Bounds.Width,
-            ["height"] = this.Bounds.Height,
-            ["parent_width"] = parentW,
-            ["parent_height"] = parentH,
-            ["Img path"] = null!,
-            ["App name"] = my_info.Instance?.Appname!
+            Type         = Name,
+            Keys         = new List<string> { "W", "A", "S", "D" },
+            X            = x,
+            Y            = y,
+            Width        = this.Bounds.Width,
+            Height       = this.Bounds.Height,
+            ParentWidth  = parentW,
+            ParentHeight = parentH,
+            ScaledWidth  = 0,
+            ScaledHeight = 0,
+            ImagePath    = null,
+            AppName      = my_info.Instance?.Appname
         };
     }
 

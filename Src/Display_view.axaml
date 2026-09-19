@@ -25,7 +25,7 @@
     
     <!-- HorizontalAlignment="Center" -->
     <!-- VerticalAlignment="Center" -->
-    
+   
     
     <androidplayer:Native_view x:Name="MainImage"
                      
@@ -34,12 +34,18 @@
                        
                       
                        >
+      
+      <Grid>
+        
 
       <Canvas x:Name="ImageContainer"
               Background="Transparent"
-              HorizontalAlignment="Stretch"
-              VerticalAlignment="Stretch"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
               DragDrop.AllowDrop="True"
+              
+              ClipToBounds="True"
+              
               Focusable="True">
 
         <!-- Toast notification -->
@@ -77,6 +83,11 @@
         </Border>
 
         <!-- Mode overlay (keyboard / controller icon animation) -->
+        
+        <!-- -->
+        <!-- HorizontalAlignment="Stretch" -->
+        <!-- VerticalAlignment="Stretch" -->
+        
         <Border x:Name="ModeOverlay"
                 
                 
@@ -88,6 +99,7 @@
                 IsHitTestVisible="False"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
+                
                 IsVisible="True">
           <Grid>
             <Image x:Name="ModeOverlayImage"
@@ -100,6 +112,7 @@
                    RenderTransformOrigin="0.5,0.5">
               <!-- <Image.RenderTransform> -->
               <!--   <ScaleTransform x:Name="OverlayScale" ScaleX="0.2" ScaleY="0.2"/> -->
+    
               <!-- </Image.RenderTransform> -->
               
               <Image.RenderTransform>
@@ -111,6 +124,12 @@
         </Border>
 
       </Canvas>
+      
+      
+      <keymap:keymap_menu  HorizontalAlignment="Left" VerticalAlignment="Stretch" IsVisible="False"/>
+      
+      </Grid>
+      
     </androidplayer:Native_view>
   </Grid>
 </UserControl>

@@ -7,7 +7,7 @@ using Avalonia.Input;
 using Androidplayer.Src.Android;
 using Androidplayer.Store;
 
-using Native_view = Androidplayer.Native_view;
+using Canvas = Avalonia.Controls.Canvas ;
 
 namespace Androidplayer.Src.Mouse;
 
@@ -24,7 +24,7 @@ public class Mouse_normal
     {
     }
 
-    public void mouse_Move(PointerEventArgs e, Native_view my_MainImage)
+    public void mouse_Move(PointerEventArgs e, Canvas my_MainImage)
     {
         var pos = e.GetPosition(my_MainImage);
 
@@ -46,7 +46,7 @@ public class Mouse_normal
         SendData(data);
     }
 
-    public void OnMouseDown(PointerPressedEventArgs e, Native_view my_MainImage)
+    public void OnMouseDown(PointerPressedEventArgs e, Canvas my_MainImage)
     {
         var pos = e.GetPosition(my_MainImage);
 
@@ -72,7 +72,7 @@ public class Mouse_normal
         }
     }
 
-    public void OnMouseUp(PointerReleasedEventArgs e, Native_view my_MainImage)
+    public void OnMouseUp(PointerReleasedEventArgs e, Canvas my_MainImage)
     {
         var pos = e.GetPosition(my_MainImage);
 
@@ -125,7 +125,7 @@ public class Mouse_normal
         return true;
     }
 
-    public void mouse_Wheel(PointerWheelEventArgs e, Native_view my_MainImage)
+    public void mouse_Wheel(PointerWheelEventArgs e, Canvas my_MainImage)
     {
         var pos = e.GetPosition(my_MainImage);
         var (x, y) = ScaleCoordinates(pos.X, pos.Y);

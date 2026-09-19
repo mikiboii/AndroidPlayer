@@ -35,29 +35,31 @@ public partial class Display_view : UserControl
     {
         InitializeComponent();
 
-        if (MainImage != null)
-        {
-            
-            // Wire up surface events — using the Avalonia host's Surface control
-
-            if (MainImage != null)
-            {
-
-                Console.WriteLine("serring mainimage events");
-                
-                MainImage.PointerPressed += MainImage_OnMouseDown;
-                MainImage.PointerReleased += MainImage_OnMouseUp;
-                MainImage.PointerMoved += MainImage_OnMouseMove;
-                MainImage.PointerWheelChanged += MainImage_OnMouseWheel;
-
-                MainImage.AddHandler(DragDrop.DragEnterEvent, MainImage_DragEnter);
-                MainImage.AddHandler(DragDrop.DropEvent, MainImage_Drop);
-
-                MainImage.Focusable = true;
-            }
-            MainImage.Focusable = true;
-            
-        }
+        // if (MainImage != null)
+        // {
+        //     
+        //     // Wire up surface events — using the Avalonia host's Surface control
+        //
+        //     if (ImageContainer != null)
+        //     {
+        //
+        //         Console.WriteLine("serring mainimage events");
+        //         
+        //         ImageContainer.PointerPressed += ImageContainer_OnMouseDown;
+        //         ImageContainer.PointerReleased += ImageContainer_OnMouseUp;
+        //         ImageContainer.PointerMoved += ImageContainer_OnMouseMove;
+        //         ImageContainer.PointerWheelChanged += ImageContainer_OnMouseWheel;
+        //
+        //         ImageContainer.AddHandler(DragDrop.DragEnterEvent, ImageContainer_DragEnter);
+        //         ImageContainer.AddHandler(DragDrop.DropEvent, ImageContainer_Drop);
+        //
+        //         ImageContainer.Focusable = true;
+        //         MainImage.Focusable = true;
+        //     }
+        //     ImageContainer.Focusable = true;
+        //     MainImage.Focusable = true;
+        //     
+        // }
 
         
         ModeOverlay.ZIndex = 999;
@@ -114,10 +116,15 @@ public partial class Display_view : UserControl
 
         Loaded += OnLoaded;
         
-        // MainImage.HandleCreated += MainImageOnHandleCreated;
+        // MainImage.HandleCreated += testOnHandleCreated;
+        
         MainImage.HandleCreated += MainImageOnHandleCreated;
         
-        SizeChanged += OnSizeChanged;
+        MainImage.SizeChanged += MainImageOnSizeChanged;
+        
+        // SizeChanged += OnSizeChanged;
+        
+        
         Unloaded += OnUnloaded;
 
         _resizeTimer = new DispatcherTimer();
@@ -125,20 +132,77 @@ public partial class Display_view : UserControl
         _resizeTimer.Tick += ResizeTimer_Tick;
     }
 
-    
+    private void MainImageOnSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        int v_width = My_Store.Instance.VideoWidth;
+        int v_height = My_Store.Instance.VideoHeight;
 
-    // private void MainImageOnHandleCreated(object? sender, EventArgs e)
-    // {
-    //     Console.WriteLine("handle created in display view");
-    // }
-    
-    
+        if (v_height > 0 && v_width > 0)
+        {
+            ScaleFormToFit(v_width, v_height);
+        }
+
+
+        // MainImage.IsVisible = false;
+        
+        // k_info.Instance.directx?.ResizeSwapChain(
+        //     (int)MainImage.Bounds.Width,
+        //     (int)MainImage.Bounds.Height);
+        //                     
+                            
+        
+        // k_info.Instance.directx?.ResizeToClient(MainImage.NativeHandle);
+        //
+        // if (my_info.Instance.DeveloperMode)
+        // {
+        //     k_info.Instance.directx?.HandleResize();
+        // }
+        
+        
+        
+        var dx = k_info.Instance.directx;
+        if (dx != null)
+        {
+            // Take the SAME lock the decoder uses, so resize and decode
+            // cannot touch the D3D11 context at the same time.
+            dx.RunOnContext(_ =>
+            {
+                dx.ResizeToClient(MainImage.NativeHandle);
+
+                if (my_info.Instance.DeveloperMode)
+                {
+                    dx.HandleResize();
+                }
+            });
+        }
+        
+        
+        _resizeTimer.Stop();
+        _resizeTimer.Start();
+        
+    }
+
+    private void testOnHandleCreated(object? sender, IPlatformHandle e)
+    {
+
+        Console.WriteLine($" main image size {MainImage.Bounds.Width } x {MainImage.Bounds.Height}");
+            
+        
+        
+        
+        
+        
+    }
+
+
+
+
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
         My_Store.Instance.PropertyChanged += OnStorePropertyChanged;
         my_info.Instance.PropertyChanged += on_my_info_propertychanged;
     
-        my_mouse_locker = new Mouse_Locker(MainImage);
+        my_mouse_locker = new Mouse_Locker(ImageContainer);
         mouse_normal = new Mouse_normal();
     
         Console.WriteLine("display_view file loaded");
@@ -212,21 +276,23 @@ public partial class Display_view : UserControl
             
             // Wire up surface events — using the Avalonia host's Surface control
 
-            if (MainImage != null)
+            if (ImageContainer != null)
             {
 
                 Console.WriteLine("serring mainimage events");
                 
-                MainImage.PointerPressed += MainImage_OnMouseDown;
-                MainImage.PointerReleased += MainImage_OnMouseUp;
-                MainImage.PointerMoved += MainImage_OnMouseMove;
-                MainImage.PointerWheelChanged += MainImage_OnMouseWheel;
+                ImageContainer.PointerPressed += ImageContainer_OnMouseDown;
+                ImageContainer.PointerReleased += ImageContainer_OnMouseUp;
+                ImageContainer.PointerMoved += ImageContainer_OnMouseMove;
+                ImageContainer.PointerWheelChanged += ImageContainer_OnMouseWheel;
 
-                MainImage.AddHandler(DragDrop.DragEnterEvent, MainImage_DragEnter);
-                MainImage.AddHandler(DragDrop.DropEvent, MainImage_Drop);
+                ImageContainer.AddHandler(DragDrop.DragEnterEvent, ImageContainer_DragEnter);
+                ImageContainer.AddHandler(DragDrop.DropEvent, ImageContainer_Drop);
 
                 MainImage.Focusable = true;
+                ImageContainer.Focusable = true;
             }
+            ImageContainer.Focusable = true;
             MainImage.Focusable = true;
             
         }
@@ -246,18 +312,18 @@ public partial class Display_view : UserControl
             ScaleFormToFit(v_width, v_height);
     
         My_Store.Instance.SetDisplayResolution(
-            (int)MainImage.Bounds.Width,
-            (int)MainImage.Bounds.Height);
+            (int)ImageContainer.Bounds.Width,
+            (int)ImageContainer.Bounds.Height);
     
         // OverlayManager.Instance?.rerender_overlay();
     }
 
-    private void MainImage_DragEnter(object? sender, DragEventArgs e)
+    private void ImageContainer_DragEnter(object? sender, DragEventArgs e)
     {
         k_info.Instance.overlayManager?.Canvas_DragEnter(sender, e);
     }
 
-    private void MainImage_Drop(object? sender, DragEventArgs e)
+    private void ImageContainer_Drop(object? sender, DragEventArgs e)
     {
         k_info.Instance.overlayManager?.Canvas_Drop(sender, e);
     }
@@ -283,7 +349,26 @@ public partial class Display_view : UserControl
         resetTimer.Tick += (s, args) =>
         {
             resetTimer.Stop();
-            my_info.Instance.Window_resizing = false;
+            // my_info.Instance.Window_resizing = false;
+            
+            //
+            // k_info.Instance.directx?.ResizeSwapChain(
+            //     (int)MainImage.Bounds.Width,
+            //     (int)MainImage.Bounds.Height);
+            //                 
+            //         
+            
+            k_info.Instance.directx?.ResizeToClient(MainImage.NativeHandle);
+
+            if (my_info.Instance.DeveloperMode)
+            {
+                k_info.Instance.directx?.HandleResize();
+            }
+            
+            
+            
+             // Console.WriteLine($" Display view _resizeTimer  {MainImage.Bounds.Width}, {MainImage.Bounds.Height}");
+
         };
         resetTimer.Start();
     }
@@ -366,13 +451,13 @@ public partial class Display_view : UserControl
                             double storedWidth = visual.ParentWidth;
                             double storedHeight = visual.ParentHeight;
 
-                            if (storedWidth <= 0 || storedHeight <= 0 || MainImage == null)
+                            if (storedWidth <= 0 || storedHeight <= 0 || ImageContainer == null)
                             {
                                 return;
                             }
 
-                            double uiWidth = MainImage.Bounds.Width;
-                            double uiHeight = MainImage.Bounds.Height;
+                            double uiWidth = ImageContainer.Bounds.Width;
+                            double uiHeight = ImageContainer.Bounds.Height;
 
                             Console.WriteLine($"image size : {uiWidth}, {uiHeight}");
 
@@ -389,7 +474,7 @@ public partial class Display_view : UserControl
                             uiY = Math.Clamp(uiY, 0, Math.Max(0, uiHeight - 1));
 
                             var relativePoint = new Point(uiX, uiY);
-                            var screenPoint = MainImage.PointToScreen(relativePoint);
+                            var screenPoint = ImageContainer.PointToScreen(relativePoint);
 
                             SetCursorPos((int)screenPoint.X, (int)screenPoint.Y);
                         }
@@ -539,9 +624,16 @@ public partial class Display_view : UserControl
         // Available area = this UserControl's bounds, minus the margins
         // that the layout system will apply around MainImage.
         var margin = MainImages_parent.Margin;
+        // Console.WriteLine($" main image size {MainImage.Bounds.Width } x {MainImage.Bounds.Height}");
 
-        double availableWidth  = this.Bounds.Width  - margin.Left - margin.Right;
-        double availableHeight = this.Bounds.Height - margin.Top  - margin.Bottom;
+        // double availableWidth  = this.Bounds.Width  - margin.Left - margin.Right;
+        // double availableHeight = this.Bounds.Height - margin.Top  - margin.Bottom;
+        
+        
+        double availableWidth  = MainImage.Bounds.Width ;
+        double availableHeight = MainImage.Bounds.Height ;
+
+        // Console.WriteLine($" from scaletofit {availableWidth} x {availableHeight}");
 
         if (availableWidth <= 0 || availableHeight <= 0)
             return;
@@ -561,30 +653,76 @@ public partial class Display_view : UserControl
             new_height = (int)(new_width / aspect_ratio);
         }
 
-        ImageContainer.Width  = new_width;
-        ImageContainer.Height = new_height;
+        
+        
+        
+        double scale = Math.Min(
+            availableWidth / videoWidth,
+            availableHeight / videoHeight
+        );
 
-        MainImage.Width  = new_width;
-        MainImage.Height = new_height;
+        double displayWidth = videoWidth * scale;
+        double displayHeight = videoHeight * scale;
+        
+        
+        
+        ImageContainer.Width  = displayWidth;
+        ImageContainer.Height = displayHeight;
+
+        // Console.WriteLine($"imagecontainer scaled {new_width}x{new_height}");
+        
+        // MainImage.Width  = new_width;
+        // MainImage.Height = new_height;
 
         ModeOverlay.Width  = new_width;
         ModeOverlay.Height = new_height;
 
         My_Store.Instance.SetDisplayResolution(
-            (int)MainImage.Bounds.Width,
-            (int)MainImage.Bounds.Height);
+            (int)new_width,
+            (int)new_height);
+        //
+        // Console.WriteLine($"[SFT] set ImageContainer={new_width}x{new_height}, " +
+        //                   $"ModeOverlay={new_width}x{new_height}, " +
+        //                   $"video={videoWidth}x{videoHeight}, " +
+        //                   $"avail={availableWidth}x{availableHeight}");
+        // Console.WriteLine($" main image size {MainImage.Width } x {MainImage.Height}");
     }
 
-    private void MainImage_OnMouseDown(object? sender, PointerPressedEventArgs e)
+    private void ImageContainer_OnMouseDown(object? sender, PointerPressedEventArgs e)
     {
-        var pos = e.GetPosition(MainImage);
+        var pos = e.GetPosition(ImageContainer);
+
+        // Console.WriteLine("clicking image");
+        
+        
+        // int v_width = My_Store.Instance.VideoWidth;
+        // int v_height = My_Store.Instance.VideoHeight;
+        //
+        // if (v_height > 0 && v_width > 0)
+        // {
+        //     ScaleFormToFit(v_width, v_height);
+        // }
+        
+        
+        // k_info.Instance.directx?.ResizeSwapChain(
+        //     (int)MainImage.Bounds.Width,
+        //     (int)MainImage.Bounds.Height);
+        //                     
+        //                     
+        //
+        // if (my_info.Instance.DeveloperMode)
+        // {
+        //     k_info.Instance.directx?.HandleResize();
+        // }
+        
+        
 
         double x = pos.X;
         double y = pos.Y;
 
         if (!my_info.Instance.IsMouseLocked && !k_info.Instance.KeymapMode)
         {
-            mouse_normal.OnMouseDown(e, MainImage);
+            mouse_normal.OnMouseDown(e, ImageContainer);
         }
 
         if (k_info.Instance.KeymapMode)
@@ -593,29 +731,29 @@ public partial class Display_view : UserControl
         }
     }
 
-    private void MainImage_OnMouseUp(object? sender, PointerReleasedEventArgs e)
+    private void ImageContainer_OnMouseUp(object? sender, PointerReleasedEventArgs e)
     {
         e.Pointer.Capture(null);
 
         if (!my_info.Instance.IsMouseLocked && !k_info.Instance.KeymapMode)
         {
-            mouse_normal.OnMouseUp(e, MainImage);
+            mouse_normal.OnMouseUp(e, ImageContainer);
         }
     }
 
-    private void MainImage_OnMouseMove(object? sender, PointerEventArgs e)
+    private void ImageContainer_OnMouseMove(object? sender, PointerEventArgs e)
     {
         if (!my_info.Instance.IsMouseLocked && !k_info.Instance.KeymapMode)
         {
-            mouse_normal.mouse_Move(e, MainImage);
+            mouse_normal.mouse_Move(e, ImageContainer);
         }
     }
 
-    private void MainImage_OnMouseWheel(object? sender, PointerWheelEventArgs e)
+    private void ImageContainer_OnMouseWheel(object? sender, PointerWheelEventArgs e)
     {
         if (!my_info.Instance.IsMouseLocked && !k_info.Instance.KeymapMode)
         {
-            mouse_normal.mouse_Wheel(e, MainImage);
+            mouse_normal.mouse_Wheel(e, ImageContainer);
         }
     }
 }

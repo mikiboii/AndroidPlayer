@@ -129,19 +129,37 @@ public partial class Image_nokey_normal : UserControl, IKeymapElement
         // Avalonia: no BitmapImage.UriSource — use our stored path
         string? imgPath = _imagePath;
 
-        return new Dictionary<string, object>
+        // return new Dictionary<string, object>
+        // {
+        //     ["type"] = Name,
+        //     ["keys"] = keys,
+        //     ["x"] = x,
+        //     ["y"] = y,
+        //     ["width"] = this.Bounds.Width,
+        //     ["height"] = this.Bounds.Height,
+        //     ["parent_width"] = parentW,
+        //     ["parent_height"] = parentH,
+        //     ["Img path"] = imgPath!,
+        //     ["App name"] = my_info.Instance?.Appname!
+        // };
+        
+        
+        return new KeymapElement
         {
-            ["type"] = Name,
-            ["keys"] = keys,
-            ["x"] = x,
-            ["y"] = y,
-            ["width"] = this.Bounds.Width,
-            ["height"] = this.Bounds.Height,
-            ["parent_width"] = parentW,
-            ["parent_height"] = parentH,
-            ["Img path"] = imgPath!,
-            ["App name"] = my_info.Instance?.Appname!
+            Type         = Name,
+            Keys         = keys,
+            X            = x,
+            Y            = y,
+            Width        = this.Bounds.Width,
+            Height       = this.Bounds.Height,
+            ParentWidth  = parentW,
+            ParentHeight = parentH,
+            ScaledWidth  = 0,
+            ScaledHeight = 0,
+            ImagePath    = imgPath,
+            AppName      = my_info.Instance?.Appname
         };
+        
     }
 
     public void SetJsonData(KeymapElement data)

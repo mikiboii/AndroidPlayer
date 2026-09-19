@@ -13,6 +13,9 @@ namespace Androidplayer.Src.Keyboard
 {
     public class Gaming_Keyboard
     {
+        private readonly HashSet<PhysicalKey> _heldKeys = new();
+        
+        
         private HashSet<string> activeKeys = new HashSet<string>();
 
         private HashSet<string> current_combo_Keys = new HashSet<string>();
@@ -49,14 +52,28 @@ namespace Androidplayer.Src.Keyboard
             //     D_x = directionX;
             //     D_Y = directionY;
             // }
+            
+            
         }
 
+
+        public void lost_focus()
+        {
+            
+            _heldKeys.Clear();
+        }
+        
+        
         public void Key_pressed(object? source, KeyEventArgs e)
         {
             // Avalonia: e.Key is always the real key. No Key.System / e.SystemKey.
             Key actualKey = e.Key;
             string keyStr = ConvertKeyToString(actualKey);
 
+
+            // Console.WriteLine($"from gaming keyboard {keyStr}");
+            
+            
             if (!directionKeys.Contains(keyStr))
             {
                 directionKeys.Add(keyStr);
@@ -70,65 +87,67 @@ namespace Androidplayer.Src.Keyboard
             Direction_Press(e);
 
             // if (!e.IsRepeat)
-            // {
-            //     var demo_key = KeyMapManager.Instance?.Getmultikey_ElementsByKey(keyStr);
-            //
-            //     Console.WriteLine($"length of the multi key {demo_key.Count}");
-            //
-            //     foreach (var item in demo_key)
-            //     {
-            //         if (activeKeys.Contains(item.Keys[0]))
-            //         {
-            //             if (item.Keys[1] == keyStr)
-            //             {
-            //                 current_combo_Keys.Add(item.Keys[1]);
-            //
-            //                 Console.WriteLine($" pressed : {item.Type} : {item.Keys[0]} : {item.Keys[1]}");
-            //
-            //                 if (item.Type == "Visual")
-            //                 {
-            //                     my_info.Instance.Toggle_mouseLock();
-            //
-            //                     continue;
-            //                 }
-            //
-            //                 var x = (int)item.X + ((int)item.ScaledWidth / 2);
-            //                 var y = (int)item.Y + ((int)item.ScaledHeight / 2);
-            //
-            //                 byte[] data = MyEncoder(x, y, ACTION_DOWN);
-            //                 SendData(data);
-            //             }
-            //         }
-            //     }
-            //
-            //     var single_key = KeyMapManager.Instance?.GetElementsByKey(keyStr);
-            //
-            //     if (single_key != null && single_key.Count != 0)
-            //     {
-            //         if (!current_combo_Keys.Contains(single_key[0].Keys[0]))
-            //         {
-            //             current_single_Keys.Add(keyStr);
-            //
-            //             Console.WriteLine($" pressed single key  : {single_key[0].Keys[0]}");
-            //
-            //             if (single_key[0].Type == "Visual")
-            //             {
-            //                 my_info.Instance.Toggle_mouseLock();
-            //                 return;
-            //             }
-            //
-            //             var x = (int)single_key[0].X + ((int)single_key[0].ScaledWidth / 2);
-            //             var y = (int)single_key[0].Y + ((int)single_key[0].ScaledHeight / 2);
-            //
-            //             byte[] data = MyEncoder(x, y, ACTION_DOWN);
-            //             SendData(data);
-            //         }
-            //     }
-            //
-            //     e.Handled = true;
-            // }
-            //
-            //
+            
+            if (_heldKeys.Add(e.PhysicalKey))
+            {
+                var demo_key = KeyMapManager.Instance?.Getmultikey_ElementsByKey(keyStr);
+            
+                Console.WriteLine($"length of the multi key {demo_key.Count}");
+            
+                foreach (var item in demo_key)
+                {
+                    if (activeKeys.Contains(item.Keys[0]))
+                    {
+                        if (item.Keys[1] == keyStr)
+                        {
+                            current_combo_Keys.Add(item.Keys[1]);
+            
+                            Console.WriteLine($" pressed : {item.Type} : {item.Keys[0]} : {item.Keys[1]}");
+            
+                            if (item.Type == "Visual")
+                            {
+                                my_info.Instance.Toggle_mouseLock();
+            
+                                continue;
+                            }
+            
+                            var x = (int)item.X + ((int)item.ScaledWidth / 2);
+                            var y = (int)item.Y + ((int)item.ScaledHeight / 2);
+            
+                            byte[] data = MyEncoder(x, y, ACTION_DOWN);
+                            SendData(data);
+                        }
+                    }
+                }
+            
+                var single_key = KeyMapManager.Instance?.GetElementsByKey(keyStr);
+            
+                if (single_key != null && single_key.Count != 0)
+                {
+                    if (!current_combo_Keys.Contains(single_key[0].Keys[0]))
+                    {
+                        current_single_Keys.Add(keyStr);
+            
+                        Console.WriteLine($" pressed single key  : {single_key[0].Keys[0]}");
+            
+                        if (single_key[0].Type == "Visual")
+                        {
+                            my_info.Instance.Toggle_mouseLock();
+                            return;
+                        }
+            
+                        var x = (int)single_key[0].X + ((int)single_key[0].ScaledWidth / 2);
+                        var y = (int)single_key[0].Y + ((int)single_key[0].ScaledHeight / 2);
+            
+                        byte[] data = MyEncoder(x, y, ACTION_DOWN);
+                        SendData(data);
+                    }
+                }
+            
+                e.Handled = true;
+            }
+            
+            
             
             
             
@@ -156,90 +175,92 @@ namespace Androidplayer.Src.Keyboard
                 if (string.IsNullOrEmpty(keyStr))
                     return;
 
+               
                 // if (!e.IsRepeat)
-                // {
-                //     var demo_key = KeyMapManager.Instance?.Getmultikey_ElementsByKey(keyStr);
-                //
-                //     var should_return = false;
-                //
-                //     foreach (var item in demo_key)
-                //     {
-                //         if (activeKeys.Contains(item.Keys[0]))
-                //         {
-                //             if (item.Keys[1] == keyStr)
-                //             {
-                //                 if (current_single_Keys.Contains(item.Keys[1]))
-                //                 {
-                //                     Console.WriteLine("#2 key found");
-                //                     continue;
-                //                 }
-                //
-                //                 should_return = true;
-                //
-                //                 Console.WriteLine($" released : {item.Type} : {item.Keys[0]} : {item.Keys[1]}");
-                //
-                //                 var x = (int)item.X + ((int)item.ScaledWidth / 2);
-                //                 var y = (int)item.Y + ((int)item.ScaledHeight / 2);
-                //
-                //                 byte[] data = MyEncoder(x, y, ACTION_UP);
-                //                 SendData(data);
-                //             }
-                //         }
-                //         else if (activeKeys.Contains(item.Keys[1]))
-                //         {
-                //             if (item.Keys[0] == keyStr)
-                //             {
-                //                 if (current_single_Keys.Contains(item.Keys[1]))
-                //                 {
-                //                     Console.WriteLine("#1 key found");
-                //                     continue;
-                //                 }
-                //
-                //                 should_return = true;
-                //
-                //                 Console.WriteLine($" released : {item.Type} : {item.Keys[0]} : {item.Keys[1]}");
-                //
-                //                 var x = (int)item.X + ((int)item.ScaledWidth / 2);
-                //                 var y = (int)item.Y + ((int)item.ScaledHeight / 2);
-                //
-                //                 byte[] data = MyEncoder(x, y, ACTION_UP);
-                //                 SendData(data);
-                //             }
-                //         }
-                //
-                //         if (!activeKeys.Contains(item.Keys[1]) && !activeKeys.Contains(item.Keys[0]))
-                //         {
-                //             if (current_combo_Keys.Contains(item.Keys[1]))
-                //             {
-                //                 current_combo_Keys.Remove(item.Keys[1]);
-                //                 should_return = true;
-                //             }
-                //         }
-                //     }
-                //
-                //     if (should_return)
-                //     {
-                //         return;
-                //     }
-                //
-                //     var single_key = KeyMapManager.Instance?.GetElementsByKey(keyStr);
-                //
-                //     if (single_key != null && single_key.Count != 0)
-                //     {
-                //         if (!current_combo_Keys.Contains(single_key[0].Keys[0]))
-                //         {
-                //             current_single_Keys.Remove(keyStr);
-                //
-                //             Console.WriteLine($" released single key  : {single_key[0].Keys[0]}");
-                //
-                //             var x = (int)single_key[0].X + ((int)single_key[0].ScaledWidth / 2);
-                //             var y = (int)single_key[0].Y + ((int)single_key[0].ScaledHeight / 2);
-                //
-                //             byte[] data = MyEncoder(x, y, ACTION_UP);
-                //             SendData(data);
-                //         }
-                //     }
-                // }
+                if (_heldKeys.Remove(e.PhysicalKey)) 
+                {
+                    var demo_key = KeyMapManager.Instance?.Getmultikey_ElementsByKey(keyStr);
+                
+                    var should_return = false;
+                
+                    foreach (var item in demo_key)
+                    {
+                        if (activeKeys.Contains(item.Keys[0]))
+                        {
+                            if (item.Keys[1] == keyStr)
+                            {
+                                if (current_single_Keys.Contains(item.Keys[1]))
+                                {
+                                    Console.WriteLine("#2 key found");
+                                    continue;
+                                }
+                
+                                should_return = true;
+                
+                                Console.WriteLine($" released : {item.Type} : {item.Keys[0]} : {item.Keys[1]}");
+                
+                                var x = (int)item.X + ((int)item.ScaledWidth / 2);
+                                var y = (int)item.Y + ((int)item.ScaledHeight / 2);
+                
+                                byte[] data = MyEncoder(x, y, ACTION_UP);
+                                SendData(data);
+                            }
+                        }
+                        else if (activeKeys.Contains(item.Keys[1]))
+                        {
+                            if (item.Keys[0] == keyStr)
+                            {
+                                if (current_single_Keys.Contains(item.Keys[1]))
+                                {
+                                    Console.WriteLine("#1 key found");
+                                    continue;
+                                }
+                
+                                should_return = true;
+                
+                                Console.WriteLine($" released : {item.Type} : {item.Keys[0]} : {item.Keys[1]}");
+                
+                                var x = (int)item.X + ((int)item.ScaledWidth / 2);
+                                var y = (int)item.Y + ((int)item.ScaledHeight / 2);
+                
+                                byte[] data = MyEncoder(x, y, ACTION_UP);
+                                SendData(data);
+                            }
+                        }
+                
+                        if (!activeKeys.Contains(item.Keys[1]) && !activeKeys.Contains(item.Keys[0]))
+                        {
+                            if (current_combo_Keys.Contains(item.Keys[1]))
+                            {
+                                current_combo_Keys.Remove(item.Keys[1]);
+                                should_return = true;
+                            }
+                        }
+                    }
+                
+                    if (should_return)
+                    {
+                        return;
+                    }
+                
+                    var single_key = KeyMapManager.Instance?.GetElementsByKey(keyStr);
+                
+                    if (single_key != null && single_key.Count != 0)
+                    {
+                        if (!current_combo_Keys.Contains(single_key[0].Keys[0]))
+                        {
+                            current_single_Keys.Remove(keyStr);
+                
+                            Console.WriteLine($" released single key  : {single_key[0].Keys[0]}");
+                
+                            var x = (int)single_key[0].X + ((int)single_key[0].ScaledWidth / 2);
+                            var y = (int)single_key[0].Y + ((int)single_key[0].ScaledHeight / 2);
+                
+                            byte[] data = MyEncoder(x, y, ACTION_UP);
+                            SendData(data);
+                        }
+                    }
+                }
             }
         }
 

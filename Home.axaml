@@ -39,7 +39,9 @@
 
  
     
-    <Grid Margin="0"
+    <Grid 
+        x:Name="RootGrid"
+        Margin="0"
           Background="Black"
           Focusable="True"
           IsEnabled="True"
@@ -53,16 +55,18 @@
         <pages1:TitleBar x:Name="CustomTitleBar"
                         Grid.Row="0"
                         Title="Android Player"
+                        
+                        PointerPressed="CustomTitleBar_OnPointerPressed"
                        />
 
 
         <src:Display_view x:Name="displayView"
                          
                           Grid.Row="1"/>
-        
-        <!-- <pages:Loading_page x:Name="loadingpage" -->
-        <!--                     IsVisible="False" -->
-        <!--                     Grid.Row="1"/> -->
+       
+        <pages:Loading_page x:Name="loadingpage"
+                            IsVisible="False"
+                            Grid.Row="1"/>
 
     </Grid>
 </Window>

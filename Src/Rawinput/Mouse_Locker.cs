@@ -7,7 +7,7 @@ using Avalonia.Input;
 using Avalonia.VisualTree;
 using Androidplayer.Store;
 
-using Native_view = Androidplayer.Native_view;
+using Canvas = Avalonia.Controls.Canvas ;
 
 namespace Androidplayer.Src.Rawinput;
 
@@ -28,10 +28,10 @@ public class Mouse_Locker
         public int Bottom;
     }
 
-    private Native_view my_image;
+    private Canvas my_image;
     private bool isMouseClipped = false;
 
-    public Mouse_Locker(Native_view image)
+    public Mouse_Locker(Canvas image)
     {
         my_image = image;
 
