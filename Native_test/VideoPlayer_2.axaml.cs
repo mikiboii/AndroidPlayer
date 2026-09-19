@@ -268,7 +268,7 @@ public partial class VideoPlayer_2 : UserControl
     string fileToPlay = @"M:\movie\Kung.Fu.Panda.3.2016.720p.WEBRip.x264.AAC-ETRG.mp4";
 
     Src.FFmpeg ffmpeg;          // FFmpeg Video Demuxing & HW Decoding
-    public DirectX_3 directX;   // DirectX Video Processing & Rendering
+    public DirectX directX;   // DirectX Video Processing & Rendering
     Thread threadPlay;          // Simulates FPS
 
     private volatile bool is_running = true;
@@ -399,7 +399,7 @@ public partial class VideoPlayer_2 : UserControl
         try
         {
             ffmpeg = new Src.FFmpeg();
-            directX = new DirectX_3(handle.Handle);
+            directX = new DirectX(handle.Handle);
         
             if (!ffmpeg.InitHWAccel(directX._device))
             {

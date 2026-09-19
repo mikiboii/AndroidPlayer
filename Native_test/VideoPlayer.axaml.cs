@@ -24,7 +24,7 @@ public partial class VideoPlayer : UserControl
     // string fileToPlay = @"M:\movie\demo_h264_opus.mp4";
 
     Src.FFmpeg ffmpeg; // FFmpeg Video Demuxing & HW Decoding
-    public DirectX_2 directX; // DirectX Video Processing & Rendering
+    public DirectX directX; // DirectX Video Processing & Rendering
     // public static DirectX directX { get; set; }
     Thread threadPlay; // Simulates FPS  
 
