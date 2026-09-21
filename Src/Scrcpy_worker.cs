@@ -18,6 +18,7 @@ using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Store;
 using Androidplayer.windows;
 using Androidplayer.Src.Keymap;
+using Avalonia.Media;
 using SharpDX;
 
 namespace Androidplayer.Src
@@ -549,6 +550,8 @@ namespace Androidplayer.Src
                 }
 
                 k_info.Instance.directx?.PresentFrame(_pendingFrame);
+                
+                
                 _lastFrameTime = currentTime;
                 _pendingFrame = null;
 

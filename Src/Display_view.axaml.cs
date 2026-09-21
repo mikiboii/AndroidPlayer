@@ -374,7 +374,7 @@ public partial class Display_view : UserControl
             
             
             
-            MainImage._floatingContent.Background = Brushes.Transparent;
+            // MainImage._floatingContent.Background = Brushes.Transparent;
             
             
             var dx = k_info.Instance.directx;

@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using Androidplayer.Src.Keymap;
 using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Store;
+using Avalonia.Media;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 
@@ -209,6 +210,9 @@ public class App_manager : IDisposable
                 Console.WriteLine($"INIT DX SIZE: {w} x {h}");
                 // k_info.Instance.directx?.DisplayImage("dev_img1.jpg");
                 k_info.Instance.directx?.DisplayImage("dev_img2.jpg");
+                
+                // MainImage._floatingContent.Background = Brushes.Transparent;
+                Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
 
             }
         }, DispatcherPriority.Loaded);
@@ -308,6 +312,13 @@ public class App_manager : IDisposable
     private void on_DeviceResolutionReady((int Width, int Height) div)
     {
         My_Store.Instance.SetDeviceResolution(div.Width, div.Height);
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+        
+            Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+            
+        });
+        
     }
 
     private void on_ControlSocketReady(TcpClient control_socket)

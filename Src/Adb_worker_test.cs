@@ -306,7 +306,7 @@ namespace Androidplayer.Src
         {
             // Remove any existing network stuff.
             adbClient.RemoveAllForwards(device);
-            adbClient.RemoveAllReverseForwards(device);
+            // adbClient.RemoveAllReverseForwards(device);
         }
 
         
@@ -813,7 +813,9 @@ namespace Androidplayer.Src
                
                 try
                 {
-                    _ = adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token);
+                    // _ = adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token);
+                    _ = adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token, 10);
+                    
                     // adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token).Wait(cts.Token);
                 }
                 catch (Exception ex)

@@ -258,7 +258,7 @@ namespace Androidplayer.Src
         {
             // Remove any existing network stuff.
             adbClient.RemoveAllForwards(device);
-            adbClient.RemoveAllReverseForwards(device);
+            // adbClient.RemoveAllReverseForwards(device);
         }
 
         private void run()
@@ -517,7 +517,11 @@ var back_cmd = new List<string>
                     // string result2 = ShellHelper_2.ExecuteCommand(adb_cmd2);
                     // Console.WriteLine(result2);
                     //
-                    _ = adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token);
+                    // _ = adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token);
+                 
+                    _ = adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token, 10);
+
+                    
                     // adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token).Wait(cts.Token);
                 }
                 catch (Exception ex)
