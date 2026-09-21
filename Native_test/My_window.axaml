@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Androidplayer.Native_test.My_window"
         xmlns:pages="using:Androidplayer.Pages"
-        xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
+      
         xmlns:local="using:Androidplayer"
         xmlns:nativeTest="clr-namespace:Androidplayer.Native_test"
 
@@ -17,16 +17,22 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
 
+        
+        
+        
         WindowStartupLocation="CenterScreen"
 
+        Background="Black"
         
         Title="My_window">
-    <Grid Margin="0"
+    <Grid Margin="4"
           Background="red"
           Focusable="True"
           IsEnabled="True"
           ClipToBounds="True"
-          IsVisible="True">
+          IsVisible="True"
+          
+          >
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -56,8 +62,13 @@
                  
                  <!-- <nativeTest:VideoPlayer  Grid.Row="1" ></nativeTest:VideoPlayer> -->
      
-                 <nativeTest:VideoPlayer_2  Grid.Row="1" ></nativeTest:VideoPlayer_2>
+                 <!-- <nativeTest:VideoPlayer_2  Grid.Row="1" ></nativeTest:VideoPlayer_2> -->
                  
+
+
+     
+     
+     
                  <!-- <local:FlyleafHost -->
                  <!--     x:Name="AndroidVideo" -->
                  <!--     Width="400" -->
@@ -95,6 +106,9 @@
                  <!-- </vlc:VideoView> -->
                  <!-- -->
         
+     
+     
+     <local:Native_view Grid.Row="1"   ></local:Native_view>
         
 
     </Grid>

@@ -39,6 +39,9 @@ namespace Androidplayer.Src.Keymap.Keymap_items
         private bool isDragging = false;
         private Point dragStartPoint;
 
+        private static readonly IBrush KeyColorBrush =
+            new SolidColorBrush(Color.FromRgb(0xFF, 0x01, 0xFE)); // match your COLORREF byte order
+
         public KeymapElementNew()
         {
             InitializeComponent();
@@ -47,6 +50,8 @@ namespace Androidplayer.Src.Keymap.Keymap_items
             CloseButton.Click += CloseButton_Click;
             RootGrid.PointerPressed += DisplayKey_MouseLeftButtonDown;
 
+            RootGrid.Background = KeyColorBrush;
+            
             InputField.LostFocus += InputField_LostKeyboardFocus;
             InputField.KeyDown += InputField_KeyDown;
             InputField.KeyUp += InputField_KeyUp;

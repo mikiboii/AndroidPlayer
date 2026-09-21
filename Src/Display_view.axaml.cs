@@ -15,6 +15,7 @@ using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Src.Mouse;
 using Androidplayer.Src.Rawinput;
 using Androidplayer.Store;
+using Brushes = Avalonia.Media.Brushes;
 using Point = Avalonia.Point;
 using Size = Avalonia.Size;
 
@@ -142,6 +143,7 @@ public partial class Display_view : UserControl
             ScaleFormToFit(v_width, v_height);
         }
 
+        
 
         // MainImage.IsVisible = false;
         
@@ -168,6 +170,8 @@ public partial class Display_view : UserControl
             dx.RunOnContext(_ =>
             {
                 dx.ResizeToClient(MainImage.NativeHandle);
+
+                // Console.WriteLine("resizing directx handle");
 
                 if (my_info.Instance.DeveloperMode)
                 {
@@ -271,9 +275,10 @@ public partial class Display_view : UserControl
         
         
         
+        
         if (MainImage != null)
         {
-            
+            // MainImage._floatingContent.Background = Brushes.Transparent;
             // Wire up surface events — using the Avalonia host's Surface control
 
             if (ImageContainer != null)
@@ -315,6 +320,8 @@ public partial class Display_view : UserControl
             (int)ImageContainer.Bounds.Width,
             (int)ImageContainer.Bounds.Height);
     
+        
+        // MainImage.
         // OverlayManager.Instance?.rerender_overlay();
     }
 
@@ -358,13 +365,34 @@ public partial class Display_view : UserControl
             //                 
             //         
             
-            k_info.Instance.directx?.ResizeToClient(MainImage.NativeHandle);
-
-            if (my_info.Instance.DeveloperMode)
-            {
-                k_info.Instance.directx?.HandleResize();
-            }
+            // k_info.Instance.directx?.ResizeToClient(MainImage.NativeHandle);
+            //
+            // if (my_info.Instance.DeveloperMode)
+            // {
+            //     k_info.Instance.directx?.HandleResize();
+            // }
             
+            
+            
+            MainImage._floatingContent.Background = Brushes.Transparent;
+            
+            
+            var dx = k_info.Instance.directx;
+            if (dx != null)
+            {
+                // Take the SAME lock the decoder uses, so resize and decode
+                // cannot touch the D3D11 context at the same time.
+                dx.RunOnContext(_ =>
+                {
+                    dx.ResizeToClient(MainImage.NativeHandle);
+
+                    if (my_info.Instance.DeveloperMode)
+                    {
+                        dx.HandleResize();
+                    }
+                });
+            }
+
             
             
              // Console.WriteLine($" Display view _resizeTimer  {MainImage.Bounds.Width}, {MainImage.Bounds.Height}");
@@ -658,7 +686,7 @@ public partial class Display_view : UserControl
         
         double scale = Math.Min(
             availableWidth / videoWidth,
-            availableHeight / videoHeight
+            (availableHeight - 30) / videoHeight
         );
 
         double displayWidth = videoWidth * scale;
@@ -692,7 +720,9 @@ public partial class Display_view : UserControl
     {
         var pos = e.GetPosition(ImageContainer);
 
-        // Console.WriteLine("clicking image");
+        Console.WriteLine("clicking image");
+        
+        
         
         
         // int v_width = My_Store.Instance.VideoWidth;

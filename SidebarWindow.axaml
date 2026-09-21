@@ -6,7 +6,7 @@
         Width="35"
         SystemDecorations="None"
         TransparencyLevelHint="Transparent"
-        Background="Transparent"
+        Background="#FF00FF"
         ShowInTaskbar="False">
 
   <Border Background="#f0f0f0"

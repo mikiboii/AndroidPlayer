@@ -8,7 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
-using LibVLCSharp.Shared;
+
 using SharpDX.Direct3D11;
 
 namespace Androidplayer.Native_test;
@@ -35,9 +35,7 @@ public partial class VideoPlayer : UserControl
     
     
     
-    private readonly LibVLC _libVlc = new LibVLC();
-        
-    public MediaPlayer MediaPlayer { get; }
+
     
     
     public VideoPlayer()
@@ -49,7 +47,7 @@ public partial class VideoPlayer : UserControl
         DataContext = this;  
         // NativeView.HandleCreated += NativeViewOnHandleCreated;
         
-        MediaPlayer = new MediaPlayer(_libVlc);
+  
     }
 
   
@@ -409,36 +407,21 @@ public partial class VideoPlayer : UserControl
     }
 
 
-    public void Play()
-    {
-        if (Design.IsDesignMode)
-        {
-            return;
-        }
-            
-        using var media = new Media(_libVlc, new Uri("https://streams.videolan.org/misc/unity-samples/BigBuckBunny.avi"));
-        MediaPlayer.Play(media);
-    }
-        
-    public void Stop()
-    {            
-        MediaPlayer.Stop();
-    }
+    
    
     public void Dispose()
     {
-        MediaPlayer?.Dispose();
-        _libVlc?.Dispose();
+       
     }
     
     
-    private void VideoViewOnPointerEntered(object sender, PointerEventArgs e)
-    {
-        ControlsPanel.IsVisible = true;
-    }
-    
-    private void VideoViewOnPointerExited(object sender, PointerEventArgs e)
-    {
-        ControlsPanel.IsVisible = false;
-    }
+    // private void VideoViewOnPointerEntered(object sender, PointerEventArgs e)
+    // {
+    //     ControlsPanel.IsVisible = true;
+    // }
+    //
+    // private void VideoViewOnPointerExited(object sender, PointerEventArgs e)
+    // {
+    //     ControlsPanel.IsVisible = false;
+    // }
 }

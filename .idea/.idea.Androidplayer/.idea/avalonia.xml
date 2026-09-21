@@ -11,8 +11,12 @@
         <entry key="Native_test/my_view.axaml" value="Androidplayer.csproj" />
         <entry key="SidebarWindow.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Display_view.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Keymap/Keymap_items/Direction_keymap_normal.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Keymap/Keymap_items/Image_key.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Keymap/Keymap_items/Image_nokey.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Keymap/Keymap_items/Image_nokey_normal.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Keymap/Keymap_items/Keymap_element_new.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Keymap/Keymap_items/Keymap_element_normal.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Keymap/Keymap_items/Visual_keymap.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Keymap/keymap_menu.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Pages/TitleBar.axaml" value="Androidplayer.csproj" />

@@ -11,16 +11,19 @@
              
              
              xmlns:androidplayer="clr-namespace:Androidplayer"
+             xmlns:pages="clr-namespace:Androidplayer.Pages"
 
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
-             Background="Black"
-             BorderBrush="Gray"
-             BorderThickness="0.7,0,0.7,0.7">
+             Background="Transparent"
+             BorderBrush="#38383b"
+             BorderThickness="2,2,2,2">
 
-  <Grid x:Name="MainImages_parent" Background="Black" RowDefinitions="Auto, *, Auto" Margin="4" >
+  <Grid x:Name="MainImages_parent" Background="Black" RowDefinitions="Auto, *, Auto" Margin="0" >
     
 
+
+    
     <!-- Custom Flyleaf replacement: embeds a native HWND for DirectX -->
     
     <!-- HorizontalAlignment="Center" -->
@@ -35,18 +38,19 @@
                       
                        >
       
-      <Grid>
+      <Grid  RowDefinitions="Auto, *, Auto">
+    <pages:TitleBar Grid.Row="0" ClipToBounds="True"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar>
         
 
-      <Canvas x:Name="ImageContainer"
-              Background="Transparent"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Center"
-              DragDrop.AllowDrop="True"
+      <Canvas  Grid.Row="1" x:Name="ImageContainer"
+               Background="Transparent"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               DragDrop.AllowDrop="True"
               
-              ClipToBounds="True"
+               ClipToBounds="True"
               
-              Focusable="True">
+               Focusable="True">
 
         <!-- Toast notification -->
         <Border x:Name="ToastMessage"

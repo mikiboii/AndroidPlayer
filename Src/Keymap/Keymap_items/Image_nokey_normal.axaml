@@ -14,8 +14,12 @@
             <Grid>
 
                 <!-- Circular main border -->
+                <!-- Fill="#AC3C4146" -->
                 <Ellipse Stroke="#6B7583"
-                         Fill="#AC3C4146"
+                         Fill="Transparent"
+                         RenderOptions.EdgeMode="Aliased"
+          
+                        
                          StrokeThickness="2"
                          Width="95" Height="95"
                          HorizontalAlignment="Center"
@@ -29,6 +33,9 @@
                     <Image x:Name="ImageDisplay"
                            Source="/Src/Keymap/K_icons/grenade_2.png"
                            RenderOptions.BitmapInterpolationMode="HighQuality"
+                           RenderOptions.EdgeMode="Aliased"
+          
+                           
                            Width="70"
                            Height="70"
                            HorizontalAlignment="Center"

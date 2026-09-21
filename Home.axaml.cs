@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.ComponentModel;
 using System.IO;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -17,6 +18,7 @@ using Androidplayer.Store;
 using Androidplayer.windows;
 using Androidplayer.Src;
 using Androidplayer.Src.Android;
+using Avalonia.Media;
 using Avalonia.Platform;
 using KeyEventArgs = Avalonia.Input.KeyEventArgs;
 
@@ -24,6 +26,16 @@ namespace Androidplayer;
 
 public partial class Home : Window
 {
+    
+    
+    // windows 7 code 
+    
+    
+    
+    // windows 7 code 
+    
+    
+    
     private Rect _restoreBounds; // store original window size/position
     private bool _isFullscreen = false;
 
@@ -115,6 +127,9 @@ public partial class Home : Window
         InitializeComponent();
         StartupTimer.Mark("  InitializeComponent done");
 
+        // Background = "#FF00FF";
+
+        // Background = new SolidColorBrush(Color.FromRgb(0xFF, 0x00, 0xFF));
         Instance = this;
 
         rawInputHandler = new handle_rawinput(this);
@@ -146,6 +161,9 @@ public partial class Home : Window
         StartupTimer.Mark("Home ctor end");
     }
 
+    
+    
+    
     private void OnDeactivated(object? sender, EventArgs e)
     {
         // if (keymapWindow?.IsVisible == true)
@@ -590,7 +608,7 @@ public partial class Home : Window
 
             _isFullscreen = true;
 
-            CustomTitleBar.IsVisible = false;
+            // CustomTitleBar.IsVisible = false;
         }
         else
         {
@@ -604,7 +622,7 @@ public partial class Home : Window
 
             _isFullscreen = false;
 
-            CustomTitleBar.IsVisible = true;
+            // CustomTitleBar.IsVisible = true;
         }
     }
 

@@ -18,7 +18,12 @@
                 VerticalAlignment="Center">
 
           <!-- W (Top) -->
-          <Border Background="#AC3C4146" CornerRadius="15"
+          <!-- Background="#AC3C4146"  -->
+          <Border 
+            RenderOptions.EdgeMode="Aliased"
+          
+          Background="Transparent"
+          CornerRadius="15"
                   BorderBrush="#6B7583" BorderThickness="2"
                   Width="30" Height="30"
                   Canvas.Left="35" Canvas.Top="5">
@@ -27,7 +32,11 @@
           </Border>
 
           <!-- A (Left) -->
-          <Border Background="#AC3C4146" CornerRadius="15"
+          <Border 
+                  RenderOptions.EdgeMode="Aliased"
+          
+                  Background="Transparent"
+                  CornerRadius="15"
                   BorderBrush="#6B7583" BorderThickness="2"
                   Width="30" Height="30"
                   Canvas.Left="5" Canvas.Top="35">
@@ -36,7 +45,11 @@
           </Border>
 
           <!-- D (Right) -->
-          <Border Background="#AC3C4146" CornerRadius="15"
+          <Border RenderOptions.EdgeMode="Aliased"
+          
+                  Background="Transparent"
+                  
+                  CornerRadius="15"
                   BorderBrush="#6B7583" BorderThickness="2"
                   Width="30" Height="30"
                   Canvas.Left="65" Canvas.Top="35">
@@ -45,7 +58,11 @@
           </Border>
 
           <!-- S (Bottom) -->
-          <Border Background="#AC3C4146" CornerRadius="15"
+          <Border RenderOptions.EdgeMode="Aliased"
+          
+                  Background="Transparent"
+                  
+                  CornerRadius="15"
                   BorderBrush="#6B7583" BorderThickness="2"
                   Width="30" Height="30"
                   Canvas.Left="35" Canvas.Top="65">

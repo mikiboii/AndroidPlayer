@@ -13,9 +13,13 @@
           Margin="0"
           IsHitTestVisible="True">
 
+        <!-- Background="#AC3C4146" -->
+        <!-- Background="Transparent" -->
         <Border x:Name="MainBorder"
                 BorderBrush="#6B7583"
-                Background="#AC3C4146"
+                Background="Transparent"
+                RenderOptions.EdgeMode="Aliased"
+                
                 BorderThickness="2"
                 HorizontalAlignment="Stretch"
                 IsHitTestVisible="True"

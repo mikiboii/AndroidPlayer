@@ -69,7 +69,9 @@ public partial class TitleBar : UserControl
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && ParentWindow != null)
         {
-            ParentWindow.BeginMoveDrag(e);
+            // ParentWindow.BeginMoveDrag(e);
+            
+            Home.Instance.BeginMoveDrag(e);
         }
     }
 
@@ -78,32 +80,54 @@ public partial class TitleBar : UserControl
         if (ParentWindow != null)
         {
             // k_info.Instance.KeymapMode = false;
-            ParentWindow.WindowState = WindowState.Minimized;
+            // ParentWindow.WindowState = WindowState.Minimized;
+            Home.Instance.WindowState = WindowState.Minimized;
         }
     }
 
     private void MaximizeBtn_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (ParentWindow != null)
+        // if (ParentWindow != null)
+        // {
+        //     // k_info.Instance.KeymapMode = false;
+        //     
+        //     if (ParentWindow.WindowState == WindowState.Maximized)
+        //     {
+        //         ParentWindow.WindowState = WindowState.Normal;
+        //         MaximizeBtn.Content = "☐";
+        //     }
+        //     else
+        //     {
+        //         ParentWindow.WindowState = WindowState.Maximized;
+        //         MaximizeBtn.Content = "❐";
+        //     }
+        // }
+        
+        
+        
+        if (Home.Instance != null)
         {
             // k_info.Instance.KeymapMode = false;
             
-            if (ParentWindow.WindowState == WindowState.Maximized)
+            if (Home.Instance.WindowState == WindowState.Maximized)
             {
-                ParentWindow.WindowState = WindowState.Normal;
+                Home.Instance.WindowState = WindowState.Normal;
                 MaximizeBtn.Content = "☐";
             }
             else
             {
-                ParentWindow.WindowState = WindowState.Maximized;
+                Home.Instance.WindowState = WindowState.Maximized;
                 MaximizeBtn.Content = "❐";
             }
         }
+        
+        
+        
     }
 
     private void CloseBtn_OnClick(object? sender, RoutedEventArgs e)
     {
-        ParentWindow?.Close();
+        // ParentWindow?.Close();
         
         Home.Instance?.Close();
     }
@@ -174,9 +198,9 @@ public partial class TitleBar : UserControl
     
     private void UpdateMaximizeButtonContent()
     {
-        if (ParentWindow != null)
+        if (Home.Instance != null)
         {
-            MaximizeBtn.Content = ParentWindow.WindowState == WindowState.Maximized ? "❐" : "☐";
+            MaximizeBtn.Content = Home.Instance.WindowState == WindowState.Maximized ? "❐" : "☐";
         }
     }
 }

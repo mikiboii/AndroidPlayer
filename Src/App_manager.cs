@@ -207,8 +207,9 @@ public class App_manager : IDisposable
 
                 Console.WriteLine($"Surface size FIXED: {w} x {h}");
                 Console.WriteLine($"INIT DX SIZE: {w} x {h}");
+                // k_info.Instance.directx?.DisplayImage("dev_img1.jpg");
+                k_info.Instance.directx?.DisplayImage("dev_img2.jpg");
 
-                k_info.Instance.directx?.DisplayImage("dev_img1.jpg");
             }
         }, DispatcherPriority.Loaded);
     }

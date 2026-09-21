@@ -1063,167 +1063,266 @@ public unsafe class my_AV : IDisposable
     // =============================================================
     // D3D11 FRAME → SHARPDX TEXTURE
     // =============================================================
-    private Texture2D ConvertD3D11FrameToTexture(
-        AVFrame* frame)
+    // private Texture2D ConvertD3D11FrameToTexture(
+    //     AVFrame* frame)
+    // {
+    //     if (frame == null)
+    //         return null;
+    //
+    //     Texture2D result = null;
+    //
+    //     try
+    //     {
+    //         IntPtr ptr =
+    //             (IntPtr)frame->data[0];
+    //
+    //         int arrayIndex =
+    //             (int)frame->data[1];
+    //
+    //         ffmpegTexture =
+    //             new Texture2D(ptr);
+    //
+    //         if (ffmpegTexture == null)
+    //             throw new Exception(
+    //                 "Failed to wrap texture");
+    //
+    //         int videoWidth =
+    //             codecCtx->width;
+    //
+    //         int videoHeight =
+    //             codecCtx->height;
+    //
+    //         if (videoWidth <= 0 ||
+    //             videoHeight <= 0)
+    //         {
+    //             return null;
+    //         }
+    //
+    //         /*
+    //          * ---------------------------------------------------------
+    //          * Create/recreate our D3D11 texture.
+    //          * ---------------------------------------------------------
+    //          */
+    //         if (hwTexture == null ||
+    //             hwTexture.Description.Width != videoWidth ||
+    //             hwTexture.Description.Height != videoHeight ||
+    //             hwTexture.Description.Format !=
+    //                 ffmpegTexture.Description.Format)
+    //         {
+    //             hwTexture?.Dispose();
+    //
+    //             hwTexture =
+    //                 new Texture2D(
+    //                     device,
+    //                     new Texture2DDescription
+    //                     {
+    //                         Width = videoWidth,
+    //                         Height = videoHeight,
+    //
+    //                         MipLevels = 1,
+    //                         ArraySize = 1,
+    //
+    //                         Format =
+    //                             ffmpegTexture
+    //                                 .Description
+    //                                 .Format,
+    //
+    //                         SampleDescription =
+    //                             new SampleDescription(
+    //                                 1,
+    //                                 0),
+    //
+    //                         Usage =
+    //                             ResourceUsage.Default,
+    //
+    //                         BindFlags =
+    //                             BindFlags.ShaderResource |
+    //                             BindFlags.RenderTarget,
+    //
+    //                         CpuAccessFlags =
+    //                             CpuAccessFlags.None,
+    //
+    //                         OptionFlags =
+    //                             ResourceOptionFlags.None
+    //                     });
+    //         }
+    //
+    //         /*
+    //          * ---------------------------------------------------------
+    //          * Copy FFmpeg D3D11 frame → our texture.
+    //          * ---------------------------------------------------------
+    //          */
+    //         // device.ImmediateContext
+    //         //     .CopySubresourceRegion(
+    //         //         ffmpegTexture,
+    //         //         arrayIndex,
+    //         //         new ResourceRegion(
+    //         //             0,
+    //         //             0,
+    //         //             0,
+    //         //             videoWidth,
+    //         //             videoHeight,
+    //         //             1),
+    //         //         hwTexture,
+    //         //         0);
+    //         //
+    //         k_info.Instance.directx.RunOnContext(ctx =>
+    //         {
+    //             ctx.CopySubresourceRegion(ffmpegTexture, arrayIndex,
+    //                 new ResourceRegion(0, 0, 0, videoWidth, videoHeight, 1),
+    //                 hwTexture, 0);
+    //
+    //             result = new Texture2D(device, hwTexture.Description);
+    //
+    //             ctx.CopyResource(hwTexture, result);
+    //         });
+    //         
+    //         
+    //
+    //         /*
+    //          * ---------------------------------------------------------
+    //          * Independent texture for caller.
+    //          * ---------------------------------------------------------
+    //          */
+    //         result =
+    //             new Texture2D(
+    //                 device,
+    //                 hwTexture.Description);
+    //
+    //         device.ImmediateContext.CopyResource(
+    //             hwTexture,
+    //             result);
+    //
+    //         return result;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine(
+    //             $"GPU path failed: {ex.Message}");
+    //
+    //         result?.Dispose();
+    //         result = null;
+    //
+    //         /*
+    //          * Preserve CPU fallback.
+    //          */
+    //         try
+    //         {
+    //             return ConvertFrameToTexture(frame);
+    //         }
+    //         catch (Exception fallbackEx)
+    //         {
+    //             Console.WriteLine(
+    //                 $"CPU fallback after GPU failure failed: {fallbackEx.Message}");
+    //
+    //             return null;
+    //         }
+    //     }
+    //     finally
+    //     {
+    //         ffmpegTexture?.Dispose();
+    //         ffmpegTexture = null;
+    //     }
+    // }
+    
+    
+    
+    
+    
+    
+    
+    private Texture2D ConvertD3D11FrameToTexture(AVFrame* frame)
+{
+    if (frame == null)
+        return null;
+
+    Texture2D result = null;
+
+    try
     {
-        if (frame == null)
+        IntPtr ptr = (IntPtr)frame->data[0];
+        int arrayIndex = (int)frame->data[1];
+
+        ffmpegTexture = new Texture2D(ptr);
+
+        if (ffmpegTexture == null)
+            throw new Exception("Failed to wrap texture");
+
+        // Use the FRAME's dimensions, not the codec context's.
+        // The codec context can change during streaming; the frame is what we're copying.
+        int videoWidth = frame->width;
+        int videoHeight = frame->height;
+
+        if (videoWidth <= 0 || videoHeight <= 0)
             return null;
 
-        Texture2D result = null;
+        if (hwTexture == null ||
+            hwTexture.Description.Width != videoWidth ||
+            hwTexture.Description.Height != videoHeight ||
+            hwTexture.Description.Format != ffmpegTexture.Description.Format)
+        {
+            Console.WriteLine($"[my_AV] Recreate hwTexture: {videoWidth}x{videoHeight}");
+
+            hwTexture?.Dispose();
+
+            hwTexture = new Texture2D(device, new Texture2DDescription
+            {
+                Width = videoWidth,
+                Height = videoHeight,
+                MipLevels = 1,
+                ArraySize = 1,
+                Format = ffmpegTexture.Description.Format,
+                SampleDescription = new SampleDescription(1, 0),
+                Usage = ResourceUsage.Default,
+                BindFlags = BindFlags.ShaderResource | BindFlags.RenderTarget,
+                CpuAccessFlags = CpuAccessFlags.None,
+                OptionFlags = ResourceOptionFlags.None
+            });
+        }
+
+        // Do everything under the lock — and only once.
+        k_info.Instance.directx.RunOnContext(ctx =>
+        {
+            ctx.CopySubresourceRegion(
+                ffmpegTexture,
+                arrayIndex,
+                new ResourceRegion(0, 0, 0, videoWidth, videoHeight, 1),
+                hwTexture,
+                0);
+
+            result = new Texture2D(device, hwTexture.Description);
+
+            ctx.CopyResource(hwTexture, result);
+
+            ctx.Flush();
+        });
+
+        return result;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"GPU path failed: {ex.Message}");
+
+        result?.Dispose();
+        result = null;
 
         try
         {
-            IntPtr ptr =
-                (IntPtr)frame->data[0];
-
-            int arrayIndex =
-                (int)frame->data[1];
-
-            ffmpegTexture =
-                new Texture2D(ptr);
-
-            if (ffmpegTexture == null)
-                throw new Exception(
-                    "Failed to wrap texture");
-
-            int videoWidth =
-                codecCtx->width;
-
-            int videoHeight =
-                codecCtx->height;
-
-            if (videoWidth <= 0 ||
-                videoHeight <= 0)
-            {
-                return null;
-            }
-
-            /*
-             * ---------------------------------------------------------
-             * Create/recreate our D3D11 texture.
-             * ---------------------------------------------------------
-             */
-            if (hwTexture == null ||
-                hwTexture.Description.Width != videoWidth ||
-                hwTexture.Description.Height != videoHeight ||
-                hwTexture.Description.Format !=
-                    ffmpegTexture.Description.Format)
-            {
-                hwTexture?.Dispose();
-
-                hwTexture =
-                    new Texture2D(
-                        device,
-                        new Texture2DDescription
-                        {
-                            Width = videoWidth,
-                            Height = videoHeight,
-
-                            MipLevels = 1,
-                            ArraySize = 1,
-
-                            Format =
-                                ffmpegTexture
-                                    .Description
-                                    .Format,
-
-                            SampleDescription =
-                                new SampleDescription(
-                                    1,
-                                    0),
-
-                            Usage =
-                                ResourceUsage.Default,
-
-                            BindFlags =
-                                BindFlags.ShaderResource |
-                                BindFlags.RenderTarget,
-
-                            CpuAccessFlags =
-                                CpuAccessFlags.None,
-
-                            OptionFlags =
-                                ResourceOptionFlags.None
-                        });
-            }
-
-            /*
-             * ---------------------------------------------------------
-             * Copy FFmpeg D3D11 frame → our texture.
-             * ---------------------------------------------------------
-             */
-            // device.ImmediateContext
-            //     .CopySubresourceRegion(
-            //         ffmpegTexture,
-            //         arrayIndex,
-            //         new ResourceRegion(
-            //             0,
-            //             0,
-            //             0,
-            //             videoWidth,
-            //             videoHeight,
-            //             1),
-            //         hwTexture,
-            //         0);
-            //
-            k_info.Instance.directx.RunOnContext(ctx =>
-            {
-                ctx.CopySubresourceRegion(ffmpegTexture, arrayIndex,
-                    new ResourceRegion(0, 0, 0, videoWidth, videoHeight, 1),
-                    hwTexture, 0);
-
-                result = new Texture2D(device, hwTexture.Description);
-
-                ctx.CopyResource(hwTexture, result);
-            });
-            
-            
-
-            /*
-             * ---------------------------------------------------------
-             * Independent texture for caller.
-             * ---------------------------------------------------------
-             */
-            result =
-                new Texture2D(
-                    device,
-                    hwTexture.Description);
-
-            device.ImmediateContext.CopyResource(
-                hwTexture,
-                result);
-
-            return result;
+            return ConvertFrameToTexture(frame);
         }
-        catch (Exception ex)
+        catch (Exception fallbackEx)
         {
-            Console.WriteLine(
-                $"GPU path failed: {ex.Message}");
-
-            result?.Dispose();
-            result = null;
-
-            /*
-             * Preserve CPU fallback.
-             */
-            try
-            {
-                return ConvertFrameToTexture(frame);
-            }
-            catch (Exception fallbackEx)
-            {
-                Console.WriteLine(
-                    $"CPU fallback after GPU failure failed: {fallbackEx.Message}");
-
-                return null;
-            }
-        }
-        finally
-        {
-            ffmpegTexture?.Dispose();
-            ffmpegTexture = null;
+            Console.WriteLine($"CPU fallback after GPU failure failed: {fallbackEx.Message}");
+            return null;
         }
     }
+    finally
+    {
+        // Do NOT dispose — FFmpeg owns this texture.
+        ffmpegTexture = null;
+    }
+}
+    
 
 
     // =============================================================

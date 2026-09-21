@@ -40,7 +40,7 @@
 
 <!--      <PackageReference Include="LibMpv.Avalonia" Version="1.0.0" />-->
 
-<!--      <PackageReference Include="LibVLCSharp.Avalonia" Version="3.9.6" />-->
+<!--     -->
 <!--      <PackageReference Include="LiteDB" Version="6.0.0-prerelease.65" />-->
 <!--      <PackageReference Include="SharpAdbClient" Version="2.3.23" />-->
 <!--      <PackageReference Include="SharpDX" Version="4.2.0" />-->
@@ -103,8 +103,6 @@
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 
         <PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
-
-        <PackageReference Include="LibVLCSharp.Avalonia" Version="3.9.6" />
         <PackageReference Include="LiteDB" Version="6.0.0-prerelease.65" />
         <PackageReference Include="SharpAdbClient" Version="2.3.23" />
         <PackageReference Include="SharpDX" Version="4.2.0" />
@@ -115,11 +113,7 @@
         <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
         <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
         <PackageReference Include="SharpDX.XAudio2" Version="4.2.0" />
-        <PackageReference Include="Silk.NET" Version="2.23.0" />
-        <PackageReference Include="Silk.NET.Direct3D11" Version="2.23.0" />
-        <PackageReference Include="Silk.NET.DXVK.Native" Version="2.23.0" />
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
-        <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
     </ItemGroup>
 
     <!-- ============================================================ -->
@@ -163,10 +157,8 @@
         <!-- points on some platforms.                              -->
         <TrimmerRootAssembly Include="FFmpeg.AutoGen" />
 
-        <!-- LibVLCSharp: uses reflection to bind to native LibVLC -->
-        <!-- entry points and to construct MediaPlayer types.     -->
-        <TrimmerRootAssembly Include="LibVLCSharp" />
-        <TrimmerRootAssembly Include="LibVLCSharp.Avalonia" />
+ 
+      
 
         
     </ItemGroup>

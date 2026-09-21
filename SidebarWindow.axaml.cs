@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -10,6 +11,22 @@ namespace Androidplayer
 {
     public partial class SidebarWindow : Window
     {
+        
+        // 1. P/Invoke declarations
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll")]
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+
+        private const int GWL_EXSTYLE = -20;
+        private const int WS_EX_LAYERED = 0x00080000;
+        private const uint LWA_COLORKEY = 0x00000001;
+        
+        
         private Window mainWindow;
         public event Action<string>? SidebarButtonClicked;
 
@@ -18,7 +35,38 @@ namespace Androidplayer
             InitializeComponent();
         }
         
-        
+        protected override void OnOpened(EventArgs e)
+        {
+            base.OnOpened(e);
+
+            // 2. Only apply this workaround on Windows 7 (or when DWM is not available)
+            // You can check the OS version or simply try to apply it and see if it works.
+            // For simplicity, we'll check if it's not Windows 8 or newer.
+            if (OperatingSystem.IsWindows() && !OperatingSystem.IsWindowsVersionAtLeast(6, 2))
+            {
+                var handle = this.TryGetPlatformHandle()?.Handle;
+                if (handle != null && handle != IntPtr.Zero)
+                {
+                    // Get current extended style and add WS_EX_LAYERED
+                    int exStyle = GetWindowLong(handle.Value, GWL_EXSTYLE);
+                    SetWindowLong(handle.Value, GWL_EXSTYLE, exStyle | WS_EX_LAYERED);
+
+                    // 3. Choose a color to be the "transparent key"
+                    // This color should NOT be used anywhere else in your visible UI.
+                    // A color like Magenta (255, 0, 255) is a good choice.
+                    // The crKey parameter expects a COLORREF (0x00BBGGRR).
+                    uint colorKey = 0x00FF00FF; // Magenta in BGR
+
+                    // Apply the transparency key
+                    SetLayeredWindowAttributes(handle.Value, colorKey, 0, LWA_COLORKEY);
+
+                    // 4. Update your XAML to use this color as the window background
+                    // In your SidebarWindow.axaml:
+                    // <Window ... Background="#FF00FF">  <-- This will become transparent
+                    //     <Border Background="#f0f0f0" ...>
+                }
+            }
+        }
         
         public SidebarWindow(Window mainWindow)
         {
@@ -26,7 +74,7 @@ namespace Androidplayer
 
             this.mainWindow = mainWindow;
 
-            // this.Owner = this.mainWindow;
+            this.Owner = this.mainWindow;
 
             Loaded += SidebarWindow_Loaded;
 
