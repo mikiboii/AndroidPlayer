@@ -214,6 +214,10 @@ public class App_manager : IDisposable
                 // MainImage._floatingContent.Background = Brushes.Transparent;
                 Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
 
+                // Home.Instance.displayView.MainImage.IsVisible = true;
+                
+                // Home.Instance.Show();
+                // Home.Instance.IsVisible = true;
             }
         }, DispatcherPriority.Loaded);
     }

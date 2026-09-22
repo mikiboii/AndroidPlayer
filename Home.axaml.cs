@@ -135,6 +135,7 @@ public partial class Home : Window
         // Background = new SolidColorBrush(Color.FromRgb(0xFF, 0x00, 0xFF));
         Instance = this;
 
+        
         rawInputHandler = new handle_rawinput(this);
         StartupTimer.Mark("  rawInputHandler done");
 
@@ -275,6 +276,10 @@ public partial class Home : Window
 
     private void MainImageOnLoaded(object? sender, RoutedEventArgs e)
     {
+        
+        // displayView.MainImage.IsVisible = false;
+        // this.Hide();
+        
         StartupTimer.Mark("Home Loaded");
         ShowSidebar();
 
@@ -287,6 +292,8 @@ public partial class Home : Window
         //
         // _NativeTimer.Stop();
         // _NativeTimer.Start();
+        
+        
         
         StartupTimer.Mark("Sidebar shown");
     }

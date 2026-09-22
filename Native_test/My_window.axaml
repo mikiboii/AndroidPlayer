@@ -20,7 +20,7 @@
         
         WindowStartupLocation="CenterScreen"
 
-        Background="Black"
+        Background="Transparent"
         
         Title="My_window">
     
@@ -112,7 +112,7 @@
         
      
      
-     <!-- <local:Native_view Grid.Row="1"   ></local:Native_view> -->
+     <!-- <local:Native_view x:Name="my_view" Grid.Row="1"   ></local:Native_view> -->
         
 
     </Grid>
