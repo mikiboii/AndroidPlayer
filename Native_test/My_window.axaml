@@ -14,9 +14,7 @@
         Width="300"
         Height="720"
         
-        ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
-
+     
         
         
         
@@ -25,6 +23,12 @@
         Background="Black"
         
         Title="My_window">
+    
+    <!-- ExtendClientAreaToDecorationsHint="True" -->
+    <!-- ExtendClientAreaChromeHints="NoChrome" -->
+
+    
+    
     <Grid Margin="4"
           Background="red"
           Focusable="True"
@@ -32,7 +36,7 @@
           ClipToBounds="True"
           IsVisible="True"
           
-          >
+    >
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -108,7 +112,7 @@
         
      
      
-     <local:Native_view Grid.Row="1"   ></local:Native_view>
+     <!-- <local:Native_view Grid.Row="1"   ></local:Native_view> -->
         
 
     </Grid>

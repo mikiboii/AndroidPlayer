@@ -32,7 +32,8 @@
         KeyUp="Home_OnKeyUp"
         Loaded="Home_OnLoaded"
         PointerPressed="Home_OnPreviewMouseDown"
-        
+        SizeChanged="Control_OnSizeChanged"
+      
         
         
         >
@@ -42,7 +43,7 @@
     <Grid 
         x:Name="RootGrid"
         Margin="0"
-          Background="Transparent"
+          Background="Black"
           Focusable="True"
           IsEnabled="True"
           IsVisible="True">

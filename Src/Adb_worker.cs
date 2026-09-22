@@ -448,7 +448,25 @@ var back_cmd = new List<string>
               
                 Thread.Sleep(200);
 
+                // Kill any leftover scrcpy server
+                try
+                {
+                    var killReceiver = new ConsoleOutputReceiver();
+                    adbClient.ExecuteRemoteCommand("pkill -f com.genymobile.scrcpy.Server", device, killReceiver);
+                    Thread.Sleep(300);  // give it time to die
+                }
+                catch { /* ignore if nothing to kill */ }
              
+                try
+                {
+                    var killReceiver = new ConsoleOutputReceiver();
+                    adbClient.ExecuteRemoteCommand(
+                        "for p in $(ps -A | grep scrcpy | awk '{print $2}'); do kill -9 $p; done",
+                        device, killReceiver);
+                }
+                catch { }
+                
+                
                 
                 UploadMobileServer();
                 

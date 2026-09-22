@@ -1,4 +1,5 @@
 ﻿using System;
+using Androidplayer.Src;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -11,6 +12,8 @@ namespace Androidplayer.Native_test;
 
 public partial class My_window : Window
 {
+    
+    private Adb_worker my_adb_worker;
     public My_window()
     {
         InitializeComponent();
@@ -22,6 +25,14 @@ public partial class My_window : Window
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
         // MyView.IsVisible = true;
+        
+        
+        my_adb_worker = new Adb_worker();
+        // my_adb_worker.ProgressChanged += my_app_worker_ProgressChanged;
+        // my_adb_worker.CountingCompleted += My_adb_workerOnCountingCompleted;
+        // my_adb_worker.devicedisconnected += My_adb_workerOndevicedisconnected;
+
+        my_adb_worker.StartCounting();
         
         
         // var timer = new DispatcherTimer

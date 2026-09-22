@@ -280,6 +280,11 @@ public partial class Display_view : UserControl
         {
             // MainImage._floatingContent.Background = Brushes.Transparent;
             // Wire up surface events — using the Avalonia host's Surface control
+            
+            // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Black;
+            //
+            // Home.Instance._NativeTimer.Stop();
+            // Home.Instance._NativeTimer.Start();
 
             if (ImageContainer != null)
             {
@@ -786,4 +791,6 @@ public partial class Display_view : UserControl
             mouse_normal.mouse_Wheel(e, ImageContainer);
         }
     }
+
+    
 }

@@ -1,6 +1,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Androidplayer.Src.Keymap.K_store;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
@@ -10,6 +11,7 @@ using Avalonia.Media;
 using Avalonia.Metadata;
 using Avalonia.Platform;
 using Avalonia.Reactive;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 
@@ -40,6 +42,8 @@ public class Native_view : NativeControlHost
     private bool _isClippedOut;
 
 
+    private bool _windowTransitioning;
+    
     // windows 7 code
     // P/Invoke declarations
     [DllImport("user32.dll", SetLastError = true)]
@@ -102,6 +106,8 @@ public class Native_view : NativeControlHost
 
         // Primary sync trigger — fires after every layout pass.
         LayoutUpdated += (_, _) => SyncWindows();
+        
+        
     }
 
     // ---------------------------------------------------------------------
@@ -204,10 +210,15 @@ public class Native_view : NativeControlHost
             _floatingContent.PointerPressed += FloatingContentOnPointerEvent;
             _floatingContent.PointerReleased += FloatingContentOnPointerEvent;
 
+            // _floatingContent.PropertyChanged += FloatingContentOnPropertyChanged;
+            
+
             visualRoot.LayoutUpdated += VisualRoot_UpdateOverlayPosition;
             visualRoot.PositionChanged += VisualRoot_UpdateOverlayPosition;
             visualRoot.PropertyChanged += VisualRoot_PropertyChanged;
 
+            // visualRoot.Resized += VisualRoot_Resized;
+            
             _boundsHandler = this.GetObservable(BoundsProperty)
                 .Subscribe(new AnonymousObserver<Rect>(_ => SyncWindows()));
         }
@@ -217,6 +228,68 @@ public class Native_view : NativeControlHost
         ShowNativeOverlay(IsEffectivelyVisible);
     }
 
+   
+    
+    // private void VisualRoot_Resized(object? sender, WindowResizedEventArgs e)
+    // {
+    //     if (sender is not Window owner) return;
+    //
+    //     Console.WriteLine($"Resized: {e.ClientSize}, Reason: {e.Reason}");
+    //
+    //     // Now the surface has its final size for this resize operation
+    //     if (owner.WindowState == WindowState.Maximized)
+    //     {
+    //         Console.WriteLine("Surface FULLY maximized");
+    //     
+    //         _floatingContent.Background = Brushes.Transparent;
+    //         // This is the correct moment to resize your DirectX back buffer
+    //         // or to re-sync the overlay window
+    //     }
+    // }
+    //
+    //
+    
+    private void FloatingContentOnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+
+        // Console.WriteLine("floating event called");
+        if (e.Property != Window.WindowStateProperty) return;
+    
+        if (e.NewValue is not WindowState newState) return;
+        WindowState oldState = e.OldValue is WindowState o ? o : WindowState.Normal;
+    
+        Console.WriteLine($"WindowState floating window changed: {oldState} -> {newState}");
+
+        // if ("Normal" == newState.ToString())
+        // {
+        //     _floatingContent.Background = Brushes.Transparent;
+        //     Console.WriteLine("Floating Normal");
+        // }
+        //
+        // if ("Minimized" == newState.ToString())
+        // {
+        //     _floatingContent.Background = Brushes.Black;
+        //     Console.WriteLine("Floating minimized");
+        // }
+    
+        switch (newState)
+        {
+            case WindowState.Minimized:
+                Console.WriteLine("Floating minimized");
+                // _floatingContent.Background = Brushes.Black;
+                break;
+    
+            case WindowState.Maximized:
+                Console.WriteLine("Floating maximized");
+                break;
+    
+            case WindowState.Normal:
+                Console.WriteLine("Floating Normal");
+                // _floatingContent.Background = Brushes.Transparent;
+                break;
+        }
+    }
+    
     private static void SetWindowDecorationsNone(Window window)
     {
         // Cross-platform — no P/Invoke, uses Avalonia's own enum.
@@ -228,12 +301,101 @@ public class Native_view : NativeControlHost
 
     private void VisualRoot_UpdateOverlayPosition(object? sender, EventArgs e) => SyncWindows();
 
-    private void VisualRoot_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    // private void VisualRoot_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    // {
+    //     
+    //     // if (e.Property != Window.WindowStateProperty) return;
+    //     //
+    //     // if (e.NewValue is not WindowState newState) return;
+    //     // WindowState oldState = e.OldValue is WindowState o ? o : WindowState.Normal;
+    //     //
+    //     // Console.WriteLine($"WindowState floating window changed: {oldState} -> {newState}");
+    //     //
+    //     // switch (newState)
+    //     // {
+    //     //     case WindowState.Minimized:
+    //     //         Console.WriteLine("Floating minimized");
+    //     //         _floatingContent.Background = Brushes.Black;
+    //     //         break;
+    //     //
+    //     //     case WindowState.Maximized:
+    //     //         Console.WriteLine("Floating maximized");
+    //     //         break;
+    //     //
+    //     //     case WindowState.Normal:
+    //     //         Console.WriteLine("Floating Normal");
+    //     //         _floatingContent.Background = Brushes.Transparent;
+    //     //         k_info.Instance.directx.HandleResize();
+    //     //         break;
+    //     // }
+    //     
+    //     if (e.Property == Visual.BoundsProperty)
+    //         SyncWindows();
+    // }
+
+    
+    private void VisualRoot_PropertyChanged(
+        object? sender,
+        AvaloniaPropertyChangedEventArgs e)
     {
+        if (e.Property == Window.WindowStateProperty)
+        {
+            if (e.NewValue is not WindowState newState)
+                return;
+
+            switch (newState)
+            {
+                case WindowState.Minimized:
+                    _windowTransitioning = true;
+
+                    if (_floatingContent != null)
+                    {
+                        _floatingContent.Opacity = 0;
+                        _floatingContent.IsHitTestVisible = false;
+                        // _floatingContent.Background = Brushes.Black;
+                    }
+
+                    break;
+
+                case WindowState.Normal:
+                case WindowState.Maximized:
+                    _windowTransitioning = true;
+
+                    if (_floatingContent != null)
+                    {
+                        _floatingContent.Opacity = 0;
+                        _floatingContent.IsHitTestVisible = false;
+                        // _floatingContent.Background = Brushes.Transparent;
+                    }
+
+                    // Wait until Avalonia has completed the restore/maximize layout.
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            _windowTransitioning = false;
+
+                            SyncWindows();
+
+                            if (_floatingContent != null &&
+                                IsEffectivelyVisible)
+                            {
+                                _floatingContent.Opacity = 1;
+                                _floatingContent.IsHitTestVisible = true;
+                                
+                            }
+                        });
+                    });
+
+                    break;
+            }
+        }
+
         if (e.Property == Visual.BoundsProperty)
             SyncWindows();
     }
-
+    
+    
     private void FloatingContentOnPointerEvent(object? sender, PointerEventArgs e)
         => RaiseEvent(e);
 
@@ -283,6 +445,10 @@ public class Native_view : NativeControlHost
     // ---------------------------------------------------------------------
     private void SyncWindows()
     {
+        
+        if (_windowTransitioning)
+            return;
+        
         if (_floatingContent == null) return;
         if (!_floatingContent.IsVisible) return;
         if (!IsEffectivelyVisible) return;

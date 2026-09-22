@@ -74,6 +74,9 @@ public partial class Home : Window
     
     private DispatcherTimer _resizeTimer;
     
+    public DispatcherTimer _NativeTimer;
+
+    
     private  String currently_active = null;
     
 //
@@ -150,6 +153,8 @@ public partial class Home : Window
         this.Activated += home_activated;
         this.Deactivated += OnDeactivated;
         
+        
+        this.PropertyChanged += Home_PropertyChanged;
 
         Loaded += MainImageOnLoaded;
         k_info.Instance.PropertyChanged += K_info_changed;
@@ -158,9 +163,79 @@ public partial class Home : Window
         _resizeTimer = new DispatcherTimer();
         _resizeTimer.Interval = TimeSpan.FromMilliseconds(200);
         _resizeTimer.Tick += ResizeTimer_Tick;
+        
+        
+        _NativeTimer = new DispatcherTimer();
+        _NativeTimer.Interval = TimeSpan.FromMilliseconds(200);
+        _NativeTimer.Tick += NativeTimer_Tick;
         StartupTimer.Mark("Home ctor end");
     }
 
+    private void NativeTimer_Tick(object? sender, EventArgs e)
+    {
+        _NativeTimer.Stop();
+    
+           
+    
+        var resetTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(100)
+        };
+        resetTimer.Tick += (s, args) =>
+        {
+            resetTimer.Stop();
+
+
+            
+            // Home.Instance.displayView.MainImage.IsVisible = true;
+            Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+            k_info.Instance.directx.HandleResize();
+
+
+            Console.WriteLine("native window finished");
+
+            
+        };
+        resetTimer.Start();
+    }
+
+
+    private void Home_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == WindowStateProperty)
+        {
+            var oldState = (WindowState)e.OldValue!;
+            var newState = (WindowState)e.NewValue!;
+
+            Console.WriteLine($"WindowState changed: {oldState} -> {newState}");
+
+            switch (newState)
+            {
+                case WindowState.Minimized:
+                    Console.WriteLine("got minimized");
+                    
+                    // Home.Instance.displayView.MainImage.IsVisible = false;
+                    Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Black;
+                    break;
+
+                case WindowState.Maximized:
+                    
+                    break;
+
+                case WindowState.Normal:
+                    Console.WriteLine("got Normal");
+                    
+                    
+                    // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+                    
+                    _NativeTimer.Stop();
+                    _NativeTimer.Start();
+                    
+                    
+                    break;
+            }
+        }
+    }
     
     
     
@@ -208,6 +283,10 @@ public partial class Home : Window
 
         // keymapWindow = new Keymap_Window(this);
         
+        // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Black;
+        //
+        // _NativeTimer.Stop();
+        // _NativeTimer.Start();
         
         StartupTimer.Mark("Sidebar shown");
     }
@@ -710,4 +789,14 @@ public partial class Home : Window
         //         
         // }
     }
+
+    private void Control_OnSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        
+    }
+
+    // private void WindowBase_OnResized(object? sender, WindowResizedEventArgs e)
+    // {
+    //     Console.WriteLine("resized");
+    // }
 }

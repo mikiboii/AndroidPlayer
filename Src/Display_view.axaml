@@ -15,7 +15,7 @@
 
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
-             Background="Transparent"
+             Background="Black"
              BorderBrush="#38383b"
              BorderThickness="2,2,2,2">
 
