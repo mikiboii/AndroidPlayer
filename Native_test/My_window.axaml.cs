@@ -49,7 +49,7 @@ public partial class My_window : Window
         // my_adb_worker.StartCounting();
         
         
-        my_adb_worker.Start();
+        // my_adb_worker.Start();
         
         
         // var timer = new DispatcherTimer

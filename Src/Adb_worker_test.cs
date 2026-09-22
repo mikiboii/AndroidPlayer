@@ -152,6 +152,13 @@ namespace Androidplayer.Src
             }
             
             
+            
+            
+            
+            
+            
+            
+            
         }
 
         private void OnUISettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -164,7 +171,7 @@ namespace Androidplayer.Src
 
         private void OnDeviceConnected(object? sender, DeviceDataEventArgs e)
         {
-            // device = e.Device;
+            device = e.Device;
             Console.WriteLine("device connected");
             is_deviceconnected =  true;
 
@@ -176,8 +183,10 @@ namespace Androidplayer.Src
                 // ErrorOccurred?.Invoke("Device unauthorized - please accept the RSA fingerprint on your device");
                 return;
             }
-            
-            
+
+
+            // SwitchToTcpIp(device);
+
             // var receiver = new ConsoleOutputReceiver();
             //
             // adbClient.ExecuteRemoteCommand("ip route", e.Device, receiver);
@@ -193,11 +202,100 @@ namespace Androidplayer.Src
             // }
             //
             // Console.WriteLine(ip);
+
+
+            
+            // adbClient.Connect($"192.168.100.77:5555");
+
+            
+            
+            // try
+            // {
+            //
+            //     adbClient.Disconnect(new DnsEndPoint("192.168.100.77",5555));
+            //
+            //     if (device != null)
+            //     {
+            //         Console.WriteLine("disconnected device is null");
+            //         
+            //         return;
+            //     }
+            // }
+            // catch (Exception exception)
+            // {
+            //     // Console.WriteLine(exception.Message);
+            //
+            //     Console.WriteLine("Error disconnecting from wireless device");
+            //   
+            // }
+            
+            
+            
+            
+            
+            // adbClient.Connect($"192.168.100.77");
+           
+            
+            
+            
+            
+            
+            
+            
+            // var wireless = adbClient.GetDevices()
+            //     .FirstOrDefault(d => d.State == DeviceState.Online 
+            //                          && d.Serial.Contains(":"));
+            //
+            //
+            //
+            //
+            // Console.WriteLine($"Found wireless device {wireless.Serial}");
+            //
+            //
+            // var usbDevice = adbClient.GetDevices()
+            //     .FirstOrDefault(d => d.State == DeviceState.Online && !d.Serial.Contains(":"));
+            //
+            //
+            // Console.WriteLine($"Found usb device {usbDevice.Serial}");
+            //
+            // var allDevices = adbClient.GetDevices();
+            //
+            //
+            // Console.WriteLine("--- Connected devices ---");
+            // foreach (var d in allDevices)
+            // {
+            //     Console.WriteLine(d.Serial);
+            // }
+            
             
             
             Start();
         }
+       
+        
+        
+        private bool SwitchToTcpIp(DeviceData targetDevice, int port = 5555)
+        {
+            try
+            {
+                using (IAdbSocket socket = Factories.AdbSocketFactory(adbClient.EndPoint))
+                {
+                    socket.SetDevice(targetDevice);           // <-- restore this
+                    socket.SendAdbRequest($"tcpip:{port}");
+                    var response = socket.ReadAdbResponse();   // throws on FAIL
+                }
 
+                Console.WriteLine($"Device acked tcpip:{port}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to switch device to tcpip mode: {ex.Message}");
+                return false;
+            }
+        }
+        
+        
         private void OnDeviceDisconnected(object? sender, DeviceDataEventArgs e)
         {
             Console.WriteLine("device disconnected");
@@ -357,35 +455,35 @@ namespace Androidplayer.Src
         //         else if (mode == "Wireless")
         //         {
         //             // Get wireless devices (TCP/IP connected)
-        //             string ip = UISettings.Instance.DeviceIP;
+        // string ip = UISettings.Instance.DeviceIP;
         //
-        //             Console.WriteLine("entered wireless mode");
-        //             
-        //             var devices = adbClient.GetDevices().FirstOrDefault();
+        // Console.WriteLine("entered wireless mode");
         //
-        //             device = devices;
+        // var devices = adbClient.GetDevices().FirstOrDefault();
+        //
+        // device = devices;
         //
         //
-        //             if (device == null)
-        //             {
+        // if (device == null)
+        // {
         //
-        //                 Console.WriteLine("device is null");
-        //             }
+        //     Console.WriteLine("device is null");
+        // }
         //
-        //             // Console.WriteLine(device.Usb);
-        //             
-        //             
-        //             if (ip != null)
-        //             {
+        // // Console.WriteLine(device.Usb);
         //
-        //                 Console.WriteLine("connecting to ip");
-        //                 adbClient.Connect($"{ip}:5555");
-        //                 devices = adbClient.GetDevices().FirstOrDefault();
         //
-        //                 device = devices;
-        //                 
-        //                 
-        //             }
+        // if (ip != null)
+        // {
+        //
+        //     Console.WriteLine("connecting to ip");
+        //     adbClient.Connect($"{ip}:5555");
+        //     devices = adbClient.GetDevices().FirstOrDefault();
+        //
+        //     device = devices;
+        //     
+        //     
+        // }
         //             
         //
         //             if (device != null)
@@ -773,7 +871,7 @@ private DeviceData GetDeviceBasedOnMode()
     {
         // Respect the actual setting instead of hardcoding "Wireless".
         // string mode = UISettings.Instance.SelectedConnectionType;
-        string mode = "Wireless";
+        string mode = "USB";
 
         if (mode == "USB")
         {
@@ -788,10 +886,7 @@ private DeviceData GetDeviceBasedOnMode()
     }
 }
 
-/// <summary>
-/// Returns a device that is connected over a physical USB cable
-/// (i.e. its serial is a hardware serial, not an "ip:port" pair).
-/// </summary>
+
 private DeviceData GetUsbDevice()
 {
     var usbDevice = adbClient.GetDevices()
@@ -805,23 +900,69 @@ private DeviceData GetUsbDevice()
     return usbDevice;
 }
 
-/// <summary>
-/// Returns a device reachable over Wi-Fi (adb tcpip). If one is already
-/// connected, reuse it. Otherwise, bootstrap the wireless connection
-/// from a USB-attached device: fetch its IP *first* (while USB is still
-/// stable), THEN switch it into tcpip mode, THEN connect over the network.
-/// </summary>
+
 private DeviceData GetWirelessDevice()
 {
+    string stored_ip = UISettings.Instance.DeviceIP;
+    
+    
     // 1. Already connected wirelessly? Just use it.
     var existingWireless = adbClient.GetDevices()
-        .FirstOrDefault(d => d.State == DeviceState.Online && d.Serial.Contains(":5555"));
+        .FirstOrDefault(d => d.State == DeviceState.Online && d.Serial.Contains(":"));
+    
+    // var wireless = adbClient.GetDevices()
+    //     .FirstOrDefault(d => d.State == DeviceState.Online 
+    //                          && d.Serial.Contains(":"));
 
     if (existingWireless != null)
     {
         device = existingWireless;
         return device;
     }
+
+    Console.WriteLine("Existing wireless device not found");
+    
+    //
+    
+    
+        
+        
+    if (stored_ip != null)
+    {
+        try
+        {
+
+            Console.WriteLine("connecting to ip");
+            // adbClient.Connect($"{stored_ip}:5555");
+            adbClient.Connect($"{stored_ip}");
+            device = adbClient.GetDevices()
+                .FirstOrDefault(d => d.State == DeviceState.Online && d.Serial.Contains(":"));
+        
+            // device = devices;
+
+            if (device != null)
+            {
+                return device;
+            }
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            // throw;
+        }
+        
+            
+            
+    }
+    
+    // 
+    
+    
+    
+    
+    
+    
 
     // 2. Need a USB device to bootstrap from.
     var usbDevice = adbClient.GetDevices()
@@ -856,31 +997,66 @@ private DeviceData GetWirelessDevice()
     //    "device disconnected" / "device connected (Offline)" blip you saw).
     //    Done via SharpAdbClient's own socket instead of spawning a second
     //    adb.exe process, which was fighting with the running server.
-    Console.WriteLine("Switching device to TCP/IP mode...");
-    if (!SwitchToTcpIp(usbDevice, 5555))
-    {
-        return null;
-    }
+    
+    
+    
+    // Console.WriteLine("Switching device to TCP/IP mode...");
+    // if (!SwitchToTcpIp(usbDevice, 5555))
+    // {
+    //     return null;
+    // }
 
     // Give the adbd daemon time to restart in tcp mode. Poll instead of a
     // single fixed sleep so we don't race it.
+    
+    
+    // DeviceData wireless = null;
+    // for (int i = 0; i < 10 && wireless == null; i++)
+    // {
+    //     Thread.Sleep(500);
+    //
+    //     try
+    //     {
+    //         adbClient.Connect($"{ip}:5555");
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         Console.WriteLine($"Connect attempt failed: {e.Message}");
+    //         continue;
+    //     }
+    //
+    //     wireless = adbClient.GetDevices()
+    //         .FirstOrDefault(d => d.State == DeviceState.Online && d.Serial == $"{ip}:5555");
+    // }
+    
+    
+    // After SwitchToTcpIp(usbDevice, 5555):
+
     DeviceData wireless = null;
-    for (int i = 0; i < 10 && wireless == null; i++)
+    int maxAttempts = 10; // 30 * 1s = 30 seconds max wait
+
+    for (int i = 0; i < maxAttempts && wireless == null; i++)
     {
-        Thread.Sleep(500);
+        Thread.Sleep(1000); // Poll once per second, not 500ms
 
         try
         {
-            adbClient.Connect($"{ip}:5555");
+            // Check if the wireless device has already appeared in the list
+            wireless = adbClient.GetDevices()
+                .FirstOrDefault(d => d.State == DeviceState.Online 
+                                     && d.Serial.Contains($"{ip}"));
+
+            if (wireless != null) break;
+
+            // If not, try to initiate the connection
+            Console.WriteLine($"Attempt {i + 1}: connecting to {ip}:5555...");
+            adbClient.Connect($"{ip}");
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Connect attempt failed: {e.Message}");
-            continue;
+            Console.WriteLine($"Attempt {i + 1} failed: {e.Message}");
+            // Don't continue immediately — the catch already falls through to the sleep
         }
-
-        wireless = adbClient.GetDevices()
-            .FirstOrDefault(d => d.State == DeviceState.Online && d.Serial == $"{ip}:5555");
     }
 
     if (wireless == null)
@@ -926,28 +1102,7 @@ private string GetDeviceIp(DeviceData targetDevice)
 
     return null;
 }
-        private bool SwitchToTcpIp(DeviceData targetDevice, int port = 5555)
-        {
-            try
-            {
-                using (IAdbSocket socket = Factories.AdbSocketFactory(adbClient.EndPoint))
-                {
-                    socket.SendAdbRequest($"tcpip:{port}");
-                    var response = socket.ReadAdbResponse(); // throws on FAIL
-                }
-         
-                Console.WriteLine($"Device acked tcpip:{port}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to switch device to tcpip mode: {ex.Message}");
-                return false;
-            }
-        }
-        
-        
-        
+     
         
         private void run()
         {
@@ -970,6 +1125,11 @@ private string GetDeviceIp(DeviceData targetDevice)
                     return;
                     
                 }
+
+
+                Console.WriteLine("Found device");
+
+                Console.WriteLine(devices.Serial);
                 
                 Console.WriteLine($"current audio is : {UISettings.Instance.AudioEnabled}");
                 
@@ -1188,8 +1348,8 @@ private string GetDeviceIp(DeviceData targetDevice)
                
                 try
                 {
-                    // _ = adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token);
-                    _ = adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token, 10);
+                    _ = adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token);
+                    // _ = adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token, 10);
                     
                     // adbClient.ExecuteRemoteCommandAsync(command, device, receiver, cts.Token).Wait(cts.Token);
                 }

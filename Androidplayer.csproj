@@ -104,7 +104,7 @@
 
         <PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
         <PackageReference Include="LiteDB" Version="6.0.0-prerelease.65" />
-        <PackageReference Include="SharpAdbClient" Version="2.2.32" />
+        <PackageReference Include="SharpAdbClient" Version="2.3.23" />
         <PackageReference Include="SharpDX" Version="4.2.0" />
         <PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
         <PackageReference Include="SharpDX.Direct2D1" Version="4.2.0" />
