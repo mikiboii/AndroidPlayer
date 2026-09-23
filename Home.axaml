@@ -19,6 +19,7 @@
         
         CanResize="True"
 
+        SystemDecorations="BorderOnly"
            
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
@@ -38,7 +39,9 @@
         
         
         >
-
+    
+    
+    
  
     
     <Grid 

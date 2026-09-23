@@ -116,7 +116,23 @@ namespace Androidplayer.Src
             try
             {
                 AdbServer server = new AdbServer();
-                StartServerResult result = server.StartServer(@"adb\adb.exe", false);
+                // StartServerResult result = server.StartServer(@"adb\adb.exe", false);
+                
+                string adbPath = "adb\adb.exe";
+
+                Console.WriteLine($"is this linux {OperatingSystem.IsLinux()}");
+
+                if (OperatingSystem.IsWindows())
+                {
+                    adbPath = Path.Combine(AppContext.BaseDirectory, "adb", "adb.exe");
+                }
+                else if (OperatingSystem.IsLinux())
+                {
+                    Console.WriteLine("im on Linux");
+                    adbPath = Path.Combine(AppContext.BaseDirectory, "adb", "adb");
+                }
+                
+                StartServerResult result = server.StartServer(adbPath ,false);
                 
                 
                 if (result != StartServerResult.Started)
@@ -571,12 +587,12 @@ var back_cmd = new List<string>
                 string adb_cmd = "cd adb && adb.exe forward tcp:1011 localabstract:scrcpy && adb.exe forward tcp:1012 localabstract:scrcpy && adb.exe forward tcp:1013 localabstract:scrcpy";
 
 
-                // adbClient.CreateForward(device, 1011, "localabstract:scrcpy");
-                // adbClient.CreateForward(device, 1012, "localabstract:scrcpy");
-                // adbClient.CreateForward(device, 1013, "localabstract:scrcpy");
+                adbClient.CreateForward(device, 1011, "localabstract:scrcpy");
+                adbClient.CreateForward(device, 1012, "localabstract:scrcpy");
+                adbClient.CreateForward(device, 1013, "localabstract:scrcpy");
                 
-                string result = ShellHelper_2.ExecuteCommand(adb_cmd);
-                Console.WriteLine(result);
+                // string result = ShellHelper_2.ExecuteCommand(adb_cmd);
+                // Console.WriteLine(result);
                 
                 ProgressChanged?.Invoke(65, $"Staging server...");
                 

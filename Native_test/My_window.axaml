@@ -15,8 +15,9 @@
         Height="720"
         
      
-        
-        
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        SystemDecorations="BorderOnly"
         
         WindowStartupLocation="CenterScreen"
 
