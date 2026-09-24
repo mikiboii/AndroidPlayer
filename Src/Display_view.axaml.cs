@@ -162,23 +162,38 @@ public partial class Display_view : UserControl
         
         
         
-        var dx = k_info.Instance.directx;
-        if (dx != null)
+        // var dx = k_info.Instance.directx;
+        // var dx = k_info.Instance.my_renderer;
+        
+#if WINDOWS
+        if (k_info.Instance.my_renderer is DirectX dx)
         {
-            // Take the SAME lock the decoder uses, so resize and decode
-            // cannot touch the D3D11 context at the same time.
-            dx.RunOnContext(_ =>
+            
+            
+            
+            if (dx != null)
             {
-                dx.ResizeToClient(MainImage.NativeHandle);
-
-                // Console.WriteLine("resizing directx handle");
-
-                if (my_info.Instance.DeveloperMode)
+                
+                
+                // Take the SAME lock the decoder uses, so resize and decode
+                // cannot touch the D3D11 context at the same time.
+                dx.RunOnContext(_ =>
                 {
-                    dx.HandleResize();
-                }
-            });
+                    dx.ResizeToClient(MainImage.NativeHandle);
+
+                    // Console.WriteLine("resizing directx handle");
+
+                    if (my_info.Instance.DeveloperMode)
+                    {
+                        dx.HandleResize();
+                    }
+                });
+            }
         }
+            
+#endif
+        
+        
         
         
         _resizeTimer.Stop();
@@ -382,11 +397,33 @@ public partial class Display_view : UserControl
             // MainImage._floatingContent.Background = Brushes.Transparent;
             
             
-            var dx = k_info.Instance.directx;
-            if (dx != null)
+            
+            
+            
+            
+            
+            
+            
+            
+            // var dx = k_info.Instance.directx;
+            // if (dx != null)
+            // {
+            //     // Take the SAME lock the decoder uses, so resize and decode
+            //     // cannot touch the D3D11 context at the same time.
+            //     dx.RunOnContext(_ =>
+            //     {
+            //         dx.ResizeToClient(MainImage.NativeHandle);
+            //
+            //         if (my_info.Instance.DeveloperMode)
+            //         {
+            //             dx.HandleResize();
+            //         }
+            //     });
+            // }
+
+#if WINDOWS
+            if (k_info.Instance.my_renderer is DirectX dx)
             {
-                // Take the SAME lock the decoder uses, so resize and decode
-                // cannot touch the D3D11 context at the same time.
                 dx.RunOnContext(_ =>
                 {
                     dx.ResizeToClient(MainImage.NativeHandle);
@@ -397,8 +434,7 @@ public partial class Display_view : UserControl
                     }
                 });
             }
-
-            
+#endif
             
              // Console.WriteLine($" Display view _resizeTimer  {MainImage.Bounds.Width}, {MainImage.Bounds.Height}");
 

@@ -449,7 +449,8 @@ public unsafe class my_AV : IDisposable
                 $"FFmpeg directory not found: {ffmpegPath}");
         }
 
-        ffmpeg.RootPath = ffmpegPath;
+        // ffmpeg.RootPath = ffmpegPath;
+        ffmpeg.RootPath = AppContext.BaseDirectory;
 
         codec = avcodec_find_decoder(
             AVCodecID.AV_CODEC_ID_H264);

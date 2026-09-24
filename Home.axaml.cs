@@ -190,8 +190,9 @@ public partial class Home : Window
             
             // Home.Instance.displayView.MainImage.IsVisible = true;
             Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
-            k_info.Instance.directx.HandleResize();
+            // k_info.Instance.directx.HandleResize();
 
+            k_info.Instance.my_renderer?.HandleResize();
 
             Console.WriteLine("native window finished");
 

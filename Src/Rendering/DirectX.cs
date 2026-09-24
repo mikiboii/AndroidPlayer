@@ -1,7 +1,10 @@
+#if WINDOWS
+
 
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Androidplayer.Src.Rendering;
 using Androidplayer.Store;
 using SharpDX.DXGI;
 using SharpDX.Direct3D11;
@@ -16,7 +19,7 @@ using SharpDX.WIC;
 
 namespace Androidplayer.Src
 {
-    public class DirectX
+    public class DirectX : IVideoRenderer
     {
         [StructLayout(LayoutKind.Sequential)]
         private struct RECT
@@ -70,11 +73,24 @@ namespace Androidplayer.Src
         // Tracks last output rect so we only log when it changes
         private RawRectangle _lastLogDest;
         private bool _lastLogValid = false;
+        
+        
+        public string BackendName => "Direct3D 11";
 
-        public DirectX(IntPtr outputHandle) { Initialize(outputHandle); }
+        // public DirectX(IntPtr outputHandle) 
+        //
+        // { Initialize(outputHandle); }
+
+        public DirectX()
+        {
+            
+            
+            
+        }
+        
         #endregion
 
-        private void Initialize(IntPtr outputHandle)
+        public void Initialize(IntPtr outputHandle , int d_width = 0 , int d_height = 0)
         {
             if (outputHandle == IntPtr.Zero)
             {
@@ -575,6 +591,8 @@ namespace Androidplayer.Src
         
         public void HandleResize()
         {
+
+            // Console.WriteLine("handling resize......");
             if (!string.IsNullOrEmpty(_currentImagePath) && _staticImageTexture != null)
             {
                 PresentStaticImage();
@@ -639,7 +657,7 @@ namespace Androidplayer.Src
             }
         }
 
-        public void PresentFrame(Texture2D textureHW)
+        public void PresentFrame(Texture2D textureHW  , int d_width = 0 , int d_height = 0)
         {
             lock (_renderLock)
             {
@@ -954,3 +972,8 @@ namespace Androidplayer.Src
         }
     }
 }
+
+
+
+
+#endif

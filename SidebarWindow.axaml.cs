@@ -11,6 +11,7 @@ namespace Androidplayer
 {
     public partial class SidebarWindow : Window
     {
+#if WINDOWS
         
         // 1. P/Invoke declarations
         [DllImport("user32.dll", SetLastError = true)]
@@ -25,7 +26,7 @@ namespace Androidplayer
         private const int GWL_EXSTYLE = -20;
         private const int WS_EX_LAYERED = 0x00080000;
         private const uint LWA_COLORKEY = 0x00000001;
-        
+#endif
         
         private Window mainWindow;
         public event Action<string>? SidebarButtonClicked;
@@ -42,8 +43,16 @@ namespace Androidplayer
             // 2. Only apply this workaround on Windows 7 (or when DWM is not available)
             // You can check the OS version or simply try to apply it and see if it works.
             // For simplicity, we'll check if it's not Windows 8 or newer.
+#if WINDOWS
+            
             if (OperatingSystem.IsWindows() && !OperatingSystem.IsWindowsVersionAtLeast(6, 2))
             {
+
+                // Background = "#FF00FF";
+                
+                Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xFF, 0x00, 0xFF));
+                
+                
                 var handle = this.TryGetPlatformHandle()?.Handle;
                 if (handle != null && handle != IntPtr.Zero)
                 {
@@ -66,6 +75,9 @@ namespace Androidplayer
                     //     <Border Background="#f0f0f0" ...>
                 }
             }
+            
+            #endif
+            
         }
         
         public SidebarWindow(Window mainWindow)

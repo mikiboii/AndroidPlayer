@@ -329,8 +329,17 @@ public unsafe class FFmpeg
             throw new DirectoryNotFoundException(
                 $"FFmpeg directory not found: {ffmpegPath}");
         }
+        
+        
+        
+        
+        
+        
 
-        ffmpeg.RootPath = ffmpegPath;
+        // ffmpeg.RootPath = ffmpegPath;
+        ffmpeg.RootPath = AppContext.BaseDirectory;
+        
+        
 
         // // var current = Environment.CurrentDirectory;
         // var current = @"c:\";

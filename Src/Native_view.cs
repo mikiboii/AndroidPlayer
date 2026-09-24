@@ -415,9 +415,20 @@ public class Native_view : NativeControlHost
                 // Apply native transparency after window is shown
                 if (_floatingContent.TryGetPlatformHandle()?.Handle is { } nativeHandle)
                 {
-                    MakeWindowTransparent(nativeHandle);
+                    if (OperatingSystem.IsWindows())
+                    {
+                        
+                        var osVersion = Environment.OSVersion.Version;
+                        if (osVersion.Major == 6 && osVersion.Minor == 1)
+                        {
+                            
+                            MakeWindowTransparent(nativeHandle);
 
-                    Console.WriteLine("making overlay  window transparent");
+                            Console.WriteLine("making overlay  window transparent");
+                            
+                        }
+                        
+                    }
                 }
                 
                 SyncWindows();

@@ -323,7 +323,8 @@ namespace Androidplayer
                 throw new DirectoryNotFoundException(
                     $"FFmpeg directory not found: {ffmpegPath}");
 
-            ffmpeg.RootPath = ffmpegPath;
+            // ffmpeg.RootPath = ffmpegPath;
+            ffmpeg.RootPath = AppContext.BaseDirectory;
             Console.WriteLine($"FFmpeg path: {ffmpeg.RootPath}");
 
             _codec = ffmpeg.avcodec_find_decoder(AVCodecID.AV_CODEC_ID_OPUS);

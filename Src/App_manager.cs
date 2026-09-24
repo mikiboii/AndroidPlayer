@@ -7,10 +7,15 @@ using Avalonia.Threading;
 // using Androidplayer.Src.Controls;
 using Androidplayer.Src.Keymap;
 using Androidplayer.Src.Keymap.K_store;
+using Androidplayer.Src.Rendering;
 using Androidplayer.Store;
 using Avalonia.Media;
+
+
+#if WINDOWS
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+#endif
 
 namespace Androidplayer.Src;
 
@@ -24,7 +29,10 @@ public class App_manager : IDisposable
 
     private bool first_frame_displayed = false;
 
-    private DirectX directX;
+    // private DirectX directX;
+    
+    // After
+    private IVideoRenderer? my_renderer;
 
     string fileToPlay = @"I:\movie\Kung.Fu.Panda.3.2016.720p.WEBRip.x264.AAC-ETRG.mp4";
     Src.FFmpeg ffmpeg; // FFmpeg Video Demuxing & HW Decoding
@@ -40,7 +48,9 @@ public class App_manager : IDisposable
 
         if (!my_info.Instance.DeveloperMode)
         {
-            k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
+            // k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
+            
+            k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
 
             my_adb_worker = new Adb_worker();
             my_adb_worker.ProgressChanged += my_app_worker_ProgressChanged;
@@ -51,7 +61,8 @@ public class App_manager : IDisposable
         }
         else
         {
-            k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
+            // k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
+            k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
 
             var w = my_image.Bounds.Width;
             var h = my_image.Bounds.Height;
@@ -81,12 +92,21 @@ public class App_manager : IDisposable
         try
         {
             ffmpeg = new Src.FFmpeg();
+            
 
-            if (!ffmpeg.InitHWAccel(directX._device))
+            // if (!ffmpeg.InitHWAccel(k_info.Instance.my_renderer._device))
+            // {
+            //     Console.WriteLine("Failed to Initialize FFmpeg's HW Acceleration");
+            //     return;
+            // }
+            
+#if WINDOWS
+            if (my_renderer is DirectX dx && !ffmpeg.InitHWAccel(dx._device))
             {
                 Console.WriteLine("Failed to Initialize FFmpeg's HW Acceleration");
                 return;
             }
+#endif
 
             if (!ffmpeg.Open(fileToPlay))
             {
@@ -120,8 +140,12 @@ public class App_manager : IDisposable
                             }
                         }
 
-                        directX.PresentFrame(textureHW);
-
+                        // directX.PresentFrame(textureHW);
+                        
+#if WINDOWS
+                        if (k_info.Instance.my_renderer is DirectX dx)
+                            dx.PresentFrame(textureHW);
+#endif
                         sw.Stop();
 
                         Thread.Sleep(16);
@@ -180,15 +204,28 @@ public class App_manager : IDisposable
 
                         if (my_image != null)
                         {
-                            k_info.Instance.directx?.ResizeSwapChain(
-                                (int)my_image.Bounds.Width,
-                                (int)my_image.Bounds.Height);
+                            // k_info.Instance.directx?.ResizeSwapChain(
+                            //     (int)my_image.Bounds.Width,
+                            //     (int)my_image.Bounds.Height);
+                        
                             
+                            // k_info.Instance.my_renderer?.ResizeSwapChain(
+                            //     (int)my_image.Bounds.Width,
+                            //     (int)my_image.Bounds.Height);
                             
+                            if (k_info.Instance.my_renderer is DirectX dx)
+                                dx.ResizeSwapChain(
+                                    (int)my_image.Bounds.Width,
+                                    (int)my_image.Bounds.Height);
 
                             if (my_info.Instance.DeveloperMode)
                             {
-                                k_info.Instance.directx?.HandleResize();
+                                // k_info.Instance.directx?.HandleResize();
+                                // k_info.Instance.my_renderer?.HandleResize();
+                                
+                                
+                                if (k_info.Instance.my_renderer is DirectX dx1)
+                                    dx1.HandleResize();
                             }
                         }
                     }, DispatcherPriority.Render);
@@ -209,7 +246,10 @@ public class App_manager : IDisposable
                 Console.WriteLine($"Surface size FIXED: {w} x {h}");
                 Console.WriteLine($"INIT DX SIZE: {w} x {h}");
                 // k_info.Instance.directx?.DisplayImage("dev_img1.jpg");
-                k_info.Instance.directx?.DisplayImage("dev_img2.jpg");
+                // k_info.Instance.directx?.DisplayImage("dev_img2.jpg");
+                
+                k_info.Instance.my_renderer?.DisplayImage("dev_img2.jpg");
+                
                 
                 // MainImage._floatingContent.Background = Brushes.Transparent;
                 Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
@@ -286,7 +326,11 @@ public class App_manager : IDisposable
 
         scrcpy_worker = new Scrcpy_worker();
 
-        scrcpy_worker.dx_Device = k_info.Instance.directx?.my_Device;
+        // scrcpy_worker.dx_Device = k_info.Instance.directx?.my_Device;
+        
+        #if WINDOWS
+        scrcpy_worker.dx_Device = (k_info.Instance.my_renderer as DirectX)?.my_Device;
+        #endif
 
         scrcpy_worker.Frame_almostready += Scrcpy_workerOnFrame_almostready;
         scrcpy_worker.videosizeReady += on_videosizeready;
@@ -375,7 +419,18 @@ public class App_manager : IDisposable
                 return;
             }
 
-            k_info.Instance.directx?.PresentFrame(frame);
+            // k_info.Instance.directx?.PresentFrame(frame);
+            
+                
+    #if WINDOWS
+                if (k_info.Instance.my_renderer is DirectX dx)
+                    dx.PresentFrame(frame);
+    #endif
+                
+            
+            
+            
+            
         }
         catch (Exception ex)
         {

@@ -1,77 +1,6 @@
-﻿<!--<Project Sdk="Microsoft.NET.Sdk">-->
-<!--  <PropertyGroup>-->
-<!--    <OutputType>Exe</OutputType>-->
-<!--    <TargetFramework>net8.0</TargetFramework>-->
-<!--    <Nullable>enable</Nullable>-->
-<!--    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>-->
-<!--    <ApplicationManifest>app.manifest</ApplicationManifest>-->
-<!--    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>-->
-<!--      <LangVersion>12.0</LangVersion>-->
-<!--      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>-->
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-<!--      -->
-<!--      <PublishAot>true</PublishAot>-->
-<!--      <IsAotCompatible>true</IsAotCompatible>-->
-<!--&lt;!&ndash;      <IlcUseEnvironmentalTools>true</IlcUseEnvironmentalTools>&ndash;&gt;-->
-<!--      <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>-->
-<!--      &lt;!&ndash; Create a self-contained deployment (no need for .NET runtime on target machine) &ndash;&gt;-->
-<!--      <SelfContained>true</SelfContained>-->
-
-<!--      &lt;!&ndash; Bundle everything into a single executable &ndash;&gt;-->
-<!--&lt;!&ndash;      <PublishSingleFile>true</PublishSingleFile>&ndash;&gt;-->
-<!--    -->
-<!--      -->
-<!--      -->
-<!--  </PropertyGroup>-->
-
-<!--  <ItemGroup>-->
-<!--    <PackageReference Include="Avalonia" Version="11.2.6" />-->
-<!--    <PackageReference Include="Avalonia.Desktop" Version="11.2.6" />-->
-<!--    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.6" />-->
-<!--    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.6" />-->
-<!--    &lt;!&ndash;Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.&ndash;&gt;-->
-<!--    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.6">-->
-<!--      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>-->
-<!--      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>-->
-<!--    </PackageReference>-->
-<!--    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />-->
-
-<!--      <PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />-->
-
-<!--      <PackageReference Include="LibMpv.Avalonia" Version="1.0.0" />-->
-
-<!--     -->
-<!--      <PackageReference Include="LiteDB" Version="6.0.0-prerelease.65" />-->
-<!--      <PackageReference Include="SharpAdbClient" Version="2.3.23" />-->
-<!--      <PackageReference Include="SharpDX" Version="4.2.0" />-->
-<!--      <PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />-->
-<!--      <PackageReference Include="SharpDX.Direct2D1" Version="4.2.0" />-->
-<!--      <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />-->
-<!--      <PackageReference Include="SharpDX.Direct3D9" Version="4.2.0" />-->
-<!--      <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />-->
-<!--      <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />-->
-<!--      <PackageReference Include="SharpDX.XAudio2" Version="4.2.0" />-->
-<!--      <PackageReference Include="Silk.NET" Version="2.23.0" />-->
-<!--      <PackageReference Include="Silk.NET.Direct3D11" Version="2.23.0" />-->
-<!--      <PackageReference Include="Silk.NET.DXVK.Native" Version="2.23.0" />-->
-<!--      <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />-->
-<!--  </ItemGroup>-->
-<!--    <ItemGroup>-->
-<!--        <TrimmerRootAssembly Include="LiteDB" />-->
-<!--        <TrimmerRootAssembly Include="System.Configuration.ConfigurationManager" />-->
-<!--    </ItemGroup>-->
-
-<!--    <ItemGroup>-->
-<!--        <AvaloniaResource Include="Icons\**" />-->
-<!--        <AvaloniaResource Include="Src\Keymap\K_icons\**" />-->
-<!--        <AvaloniaResource Include="android.png" Condition="Exists('android.png')" />-->
-<!--    </ItemGroup>-->
-<!--</Project>-->
-
-
-
-
-<Project Sdk="Microsoft.NET.Sdk">
+    <!-- 1. Main properties -->
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
@@ -82,29 +11,51 @@
         <LangVersion>12.0</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-<!--        <PublishAot>true</PublishAot>-->
-<!--        <IsAotCompatible>true</IsAotCompatible>-->
-<!--        <SelfContained>true</SelfContained>-->
-        
+        <!--
+        <PublishAot>true</PublishAot>
+        <IsAotCompatible>true</IsAotCompatible>
+        <SelfContained>true</SelfContained>
+        -->
     </PropertyGroup>
 
+    <!-- 2. DepsPlatform — MUST be before any conditional ItemGroup -->
+    <PropertyGroup>
+        <_EffectiveRid Condition="'$(RuntimeIdentifier)' != ''">$(RuntimeIdentifier)</_EffectiveRid>
+        <_EffectiveRid Condition="'$(_EffectiveRid)' == ''">$(NETCoreSdkRuntimeIdentifier)</_EffectiveRid>
+
+        <DepsPlatform Condition="$(_EffectiveRid.StartsWith('win'))">windows</DepsPlatform>
+        <DepsPlatform Condition="$(_EffectiveRid.StartsWith('linux'))">linux</DepsPlatform>
+        <DepsPlatform Condition="$(_EffectiveRid.StartsWith('osx'))">macos</DepsPlatform>
+
+        <DepsPlatform Condition="'$(DepsPlatform)' == '' AND $([MSBuild]::IsOSPlatform('Windows'))">windows</DepsPlatform>
+        <DepsPlatform Condition="'$(DepsPlatform)' == '' AND $([MSBuild]::IsOSPlatform('Linux'))">linux</DepsPlatform>
+        <DepsPlatform Condition="'$(DepsPlatform)' == '' AND $([MSBuild]::IsOSPlatform('OSX'))">macos</DepsPlatform>
+    </PropertyGroup>
+
+    <!-- 3. Define symbols for #if WINDOWS / LINUX / MACOS -->
+    <PropertyGroup>
+        <DefineConstants Condition="'$(DepsPlatform)' == 'windows'">$(DefineConstants);WINDOWS</DefineConstants>
+        <DefineConstants Condition="'$(DepsPlatform)' == 'linux'">$(DefineConstants);LINUX</DefineConstants>
+        <DefineConstants Condition="'$(DepsPlatform)' == 'macos'">$(DefineConstants);MACOS</DefineConstants>
+    </PropertyGroup>
+
+    <!-- 4. NO Compile Remove — use #if guards inside the .cs files instead -->
+
+    <!-- 5a. Cross-platform packages -->
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.2.6" />
         <PackageReference Include="Avalonia.Desktop" Version="11.2.6" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.6" />
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.6" />
-        
-<!--        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.6">-->
-<!--            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>-->
-<!--            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>-->
-<!--        </PackageReference>-->
-        
-        
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-
         <PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
         <PackageReference Include="LiteDB" Version="6.0.0-prerelease.65" />
         <PackageReference Include="SharpAdbClient" Version="2.3.23" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
+    </ItemGroup>
+
+    <!-- 5b. Windows-only packages -->
+    <ItemGroup Condition="'$(DepsPlatform)' == 'windows'">
         <PackageReference Include="SharpDX" Version="4.2.0" />
         <PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
         <PackageReference Include="SharpDX.Direct2D1" Version="4.2.0" />
@@ -113,21 +64,21 @@
         <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
         <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
         <PackageReference Include="SharpDX.XAudio2" Version="4.2.0" />
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
     </ItemGroup>
 
-    <!-- ============================================================ -->
-    <!--  Trimmer roots — required for Native AOT with reflection-    -->
-    <!--  heavy dependencies. Each of these libraries uses reflection -->
-    <!--  or Activator.CreateInstance internally, which the trimmer   -->
-    <!--  cannot statically analyze. Preserving them keeps the        -->
-    <!--  constructors and types alive at runtime.                    -->
-    <!-- ============================================================ -->
-    <ItemGroup>
-        <!-- SharpDX: uses a generic factory pattern (CppObject.FromPointer<T>) -->
-        <!-- that trims away the T constructors if not rooted. Without these, -->
-        <!-- you get MissingMethodException on Texture2D, SwapChain, Device, -->
-        <!-- VideoProcessor, etc. -->
+    <!-- 5c. Linux-only packages -->
+    <ItemGroup Condition="'$(DepsPlatform)' == 'linux'">
+        <PackageReference Include="Silk.NET.Vulkan" Version="2.23.0" />
+        <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.23.0" />
+    </ItemGroup>
+
+    <!-- 5d. macOS-only packages -->
+    <ItemGroup Condition="'$(DepsPlatform)' == 'macos'">
+        <PackageReference Include="SharpMetal" Version="1.1.0" />
+    </ItemGroup>
+
+    <!-- 6a. Windows-only trimmer roots -->
+    <ItemGroup Condition="'$(DepsPlatform)' == 'windows'">
         <TrimmerRootAssembly Include="SharpDX" />
         <TrimmerRootAssembly Include="SharpDX.Direct3D11" />
         <TrimmerRootAssembly Include="SharpDX.Direct3D9" />
@@ -136,36 +87,50 @@
         <TrimmerRootAssembly Include="SharpDX.Direct2D1" />
         <TrimmerRootAssembly Include="SharpDX.Mathematics" />
         <TrimmerRootAssembly Include="SharpDX.XAudio2" />
-
-        <!-- LiteDB: uses Reflection.Emit and dynamic LINQ expression -->
-        <!-- compilation. AOT can't support Reflection.Emit at all, so    -->
-        <!-- if you still see failures after this, LiteDB may not work    -->
-        <!-- under Native AOT and you'd need to switch to a JSON or       -->
-        <!-- SQLite-based store instead.                                  -->
-        <TrimmerRootAssembly Include="LiteDB" />
-
-        <!-- System.Configuration: uses Activator.CreateInstance with -->
-        <!-- reflection to build section handlers. Required unless you -->
-        <!-- remove the dependency entirely.                           -->
-        <TrimmerRootAssembly Include="System.Configuration.ConfigurationManager" />
-
-        <!-- SharpAdbClient: uses reflection for XML parsing of ADB -->
-        <!-- responses and for the device list.                    -->
-        <TrimmerRootAssembly Include="SharpAdbClient" />
-
-        <!-- FFmpeg.AutoGen: uses reflection to resolve native entry -->
-        <!-- points on some platforms.                              -->
-        <TrimmerRootAssembly Include="FFmpeg.AutoGen" />
-
- 
-      
-
-        
     </ItemGroup>
 
+    <!-- 6b. Linux-only trimmer roots -->
+    <ItemGroup Condition="'$(DepsPlatform)' == 'linux'">
+        <TrimmerRootAssembly Include="Silk.NET.Vulkan" />
+        <TrimmerRootAssembly Include="Silk.NET.Vulkan.Extensions.KHR" />
+    </ItemGroup>
+
+    <!-- 6c. macOS-only trimmer roots -->
+    <ItemGroup Condition="'$(DepsPlatform)' == 'macos'">
+        <TrimmerRootAssembly Include="SharpMetal" />
+    </ItemGroup>
+
+    <!-- 6d. Cross-platform trimmer roots -->
+    <ItemGroup>
+        <TrimmerRootAssembly Include="LiteDB" />
+        <TrimmerRootAssembly Include="System.Configuration.ConfigurationManager" />
+        <TrimmerRootAssembly Include="SharpAdbClient" />
+        <TrimmerRootAssembly Include="FFmpeg.AutoGen" />
+    </ItemGroup>
+
+    <!-- 7. Native deps copy -->
+    <ItemGroup>
+        <Content Remove="deps\**\*" />
+        <None Remove="deps\**\*" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="deps\$(DepsPlatform)\adb\**\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <TargetPath>%(Filename)%(Extension)</TargetPath>
+        </Content>
+        <Content Include="deps\$(DepsPlatform)\ffmpeg\**\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <TargetPath>%(Filename)%(Extension)</TargetPath>
+        </Content>
+    </ItemGroup>
+
+    <!-- 8. Avalonia resources -->
     <ItemGroup>
         <AvaloniaResource Include="Icons\**" />
         <AvaloniaResource Include="Src\Keymap\K_icons\**" />
         <AvaloniaResource Include="android.png" Condition="Exists('android.png')" />
     </ItemGroup>
+
 </Project>

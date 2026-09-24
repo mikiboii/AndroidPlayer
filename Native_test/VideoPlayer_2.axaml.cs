@@ -399,7 +399,8 @@ public partial class VideoPlayer_2 : UserControl
         try
         {
             ffmpeg = new Src.FFmpeg();
-            directX = new DirectX(handle.Handle);
+            directX = new DirectX();
+            directX.Initialize(handle.Handle);
         
             if (!ffmpeg.InitHWAccel(directX._device))
             {
