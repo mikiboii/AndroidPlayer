@@ -1,3 +1,7 @@
+#if WINDOWS
+
+#endif
+
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -9,7 +13,13 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 
+#if WINDOWS
 using SharpDX.Direct3D11;
+
+#endif
+
+
+
 
 namespace Androidplayer.Native_test;
 
@@ -24,7 +34,11 @@ public partial class VideoPlayer : UserControl
     // string fileToPlay = @"M:\movie\demo_h264_opus.mp4";
 
     Src.FFmpeg ffmpeg; // FFmpeg Video Demuxing & HW Decoding
+#if WINDOWS
+
+
     public DirectX directX; // DirectX Video Processing & Rendering
+#endif
     // public static DirectX directX { get; set; }
     Thread threadPlay; // Simulates FPS  
 

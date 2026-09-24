@@ -9,17 +9,23 @@ using System.Text;
 using System.Threading;
 using Avalonia.Threading;
 
+#if WINDOWS
 
 using SharpDX.Direct3D11;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
+using SharpDX;
+
+#endif
+
+
+
 using Buffer = System.Buffer;
 using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Store;
 using Androidplayer.windows;
 using Androidplayer.Src.Keymap;
 using Avalonia.Media;
-using SharpDX;
 
 namespace Androidplayer.Src
 {
@@ -34,6 +40,11 @@ namespace Androidplayer.Src
 
         // Track DataStreams so they aren't GC'd while XAudio2 is using them
         private readonly Queue<DataStream> _pendingStreams = new Queue<DataStream>();
+        
+        
+        
+        
+        
         private bool _xaudioStarted = false;
 
         ///////////////////
@@ -80,7 +91,7 @@ namespace Androidplayer.Src
         private static readonly ArrayPool<byte> pool = ArrayPool<byte>.Shared;
 
         public event Action Frame_almostready;
-        public event Action<Texture2D> FrameReady;
+        // public event Action<Texture2D> FrameReady;
         public event Action<string> ErrorOccurred;
         public event Action scrcpy_desposed;
 
@@ -88,13 +99,16 @@ namespace Androidplayer.Src
         public event Action<(int Width, int Height)> videosizeReady;
         public event Action<TcpClient> ControlSocketReady;
 
-        private Texture2D _previousFrame = null;
 
         private Stopwatch _frameTimer;
         private long _lastFrameTime;
         private int _framesDropped;
         private const double TARGET_FRAME_TIME_MS = 30;
         private const double MAX_FRAME_TIME_MS = 16.67;
+        
+        
+        
+        private Texture2D _previousFrame = null;
         private Texture2D _pendingFrame;
 
         private sealed class ScrcpyVideoPacket

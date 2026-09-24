@@ -294,8 +294,12 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using FFmpeg.AutoGen;
+
+#if  WINDOWS
+
 using SharpDX.XAudio2;
 
+#endif
 namespace Androidplayer
 {
     public unsafe class my_audio : IDisposable

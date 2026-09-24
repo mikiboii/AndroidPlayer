@@ -54,12 +54,17 @@ namespace Androidplayer.Src.Keymap.K_store
             set => SetProperty(ref _overlayManager, value);
         }
 
+        
+#if WINDOWS
+
+        
         private DirectX? _directx;
         public DirectX? directx
         {
             get => _directx;
             set => SetProperty(ref _directx, value);
         }
+#endif
         
         private IVideoRenderer? _myRenderer;
         public IVideoRenderer? my_renderer

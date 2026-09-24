@@ -87,6 +87,10 @@ public class App_manager : IDisposable
         }
     }
 
+    
+    #if WINDOWS
+    
+    
     private void play_video()
     {
         try
@@ -168,6 +172,11 @@ public class App_manager : IDisposable
         }
     }
 
+
+    
+    #endif
+    
+    
     private void my_info_propertychanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
@@ -213,19 +222,26 @@ public class App_manager : IDisposable
                             //     (int)my_image.Bounds.Width,
                             //     (int)my_image.Bounds.Height);
                             
+#if WINDOWS
+
+                            
                             if (k_info.Instance.my_renderer is DirectX dx)
                                 dx.ResizeSwapChain(
                                     (int)my_image.Bounds.Width,
                                     (int)my_image.Bounds.Height);
+#endif
 
                             if (my_info.Instance.DeveloperMode)
                             {
                                 // k_info.Instance.directx?.HandleResize();
                                 // k_info.Instance.my_renderer?.HandleResize();
                                 
+                                #if WINDOWS
+                                
                                 
                                 if (k_info.Instance.my_renderer is DirectX dx1)
                                     dx1.HandleResize();
+                                #endif
                             }
                         }
                     }, DispatcherPriority.Render);
@@ -337,7 +353,7 @@ public class App_manager : IDisposable
         scrcpy_worker.ControlSocketReady += on_ControlSocketReady;
         scrcpy_worker.DeviceResolutionReady += on_DeviceResolutionReady;
 
-        scrcpy_worker.FrameReady += del_display_frame;
+        // scrcpy_worker.FrameReady += del_display_frame;
         scrcpy_worker.scrcpy_desposed += My_adb_workerOnCountingCompleted;
 
         scrcpy_worker.Start();
@@ -390,83 +406,7 @@ public class App_manager : IDisposable
         Console.WriteLine("video size ready #######");
     }
 
-    private void del_display_frame(Texture2D frame)
-    {
-        try
-        {
-            if (My_Store.Instance.DisplayHeight == 0 ||
-                My_Store.Instance.DisplayHeight != (int)my_image.Bounds.Width)
-            {
-                My_Store.Instance.SetDisplayResolution(
-                    (int)my_image.Bounds.Width,
-                    (int)my_image.Bounds.Height);
-            }
-
-            if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoHeight == 0)
-            {
-                My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
-            }
-
-            if (My_Store.Instance?.DeviceHeight == 0 ||
-                My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
-            {
-                My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
-            }
-
-            if (frame == null || frame.IsDisposed)
-            {
-                Console.WriteLine("del_display_frame: Frame is null or disposed");
-                return;
-            }
-
-            // k_info.Instance.directx?.PresentFrame(frame);
-            
-                
-    #if WINDOWS
-                if (k_info.Instance.my_renderer is DirectX dx)
-                    dx.PresentFrame(frame);
-    #endif
-                
-            
-            
-            
-            
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"del_display_frame error: {ex.Message}");
-        }
-    }
-
-    private void onframe_ready(Texture2D frame)
-    {
-        try
-        {
-            if (My_Store.Instance.DisplayHeight == 0 ||
-                My_Store.Instance.DisplayHeight != (int)my_image.Bounds.Width)
-            {
-                My_Store.Instance.SetDisplayResolution(
-                    (int)my_image.Bounds.Width,
-                    (int)my_image.Bounds.Height);
-            }
-
-            if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoHeight == 0)
-            {
-                My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
-            }
-
-            if (My_Store.Instance?.DeviceHeight == 0 ||
-                My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
-            {
-                My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"VideoLoop error: {ex.Message}");
-        }
-    }
-
+    
     public void Dispose()
     {
         is_running = false;
