@@ -41,7 +41,7 @@ public partial class My_window : Window
         // MyView.IsVisible = true;
       
         
-        my_adb_worker = new Adb_worker_test();
+        // my_adb_worker = new Adb_worker_test();
         // my_adb_worker.ProgressChanged += my_app_worker_ProgressChanged;
         // my_adb_worker.CountingCompleted += My_adb_workerOnCountingCompleted;
         // my_adb_worker.devicedisconnected += My_adb_workerOndevicedisconnected;

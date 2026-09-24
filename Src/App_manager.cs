@@ -35,7 +35,13 @@ public class App_manager : IDisposable
     private IVideoRenderer? my_renderer;
 
     string fileToPlay = @"I:\movie\Kung.Fu.Panda.3.2016.720p.WEBRip.x264.AAC-ETRG.mp4";
+
+#if WINDOWS
+    
     Src.FFmpeg ffmpeg; // FFmpeg Video Demuxing & HW Decoding
+    
+#endif
+    
     Thread threadPlay; // Simulates FPS
 
     private bool is_running = true;

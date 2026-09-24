@@ -124,12 +124,12 @@ namespace Androidplayer.Src
 
                 if (OperatingSystem.IsWindows())
                 {
-                    adbPath = Path.Combine(AppContext.BaseDirectory, "adb", "adb.exe");
+                    adbPath = Path.Combine(AppContext.BaseDirectory, "adb.exe");
                 }
                 else if (OperatingSystem.IsLinux())
                 {
                     Console.WriteLine("im on Linux");
-                    adbPath = Path.Combine(AppContext.BaseDirectory, "adb", "adb");
+                    adbPath = Path.Combine(AppContext.BaseDirectory, "adb");
                 }
                 
                 StartServerResult result = server.StartServer(adbPath ,false);

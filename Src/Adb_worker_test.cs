@@ -117,18 +117,18 @@ namespace Androidplayer.Src
                 AdbServer server = new AdbServer();
                 
                 
-                string adbPath = "adb\adb.exe";
+                string adbPath = "adb.exe";
 
                 Console.WriteLine($"is this linux {OperatingSystem.IsLinux()}");
 
                 if (OperatingSystem.IsWindows())
                 {
-                    adbPath = Path.Combine(Directory.GetCurrentDirectory(), "adb", "adb.exe");
+                    adbPath = Path.Combine(AppContext.BaseDirectory,  "adb.exe");
                 }
                 else if (OperatingSystem.IsLinux())
                 {
                     Console.WriteLine("im on Linux");
-                    adbPath = Path.Combine(Directory.GetCurrentDirectory(), "adb", "adb");
+                    adbPath = Path.Combine(AppContext.BaseDirectory,  "adb");
                 }
                 
                 StartServerResult result = server.StartServer(adbPath ,false);

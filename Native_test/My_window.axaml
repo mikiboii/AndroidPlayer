@@ -16,8 +16,9 @@
         
      
         ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="32"
         ExtendClientAreaChromeHints="NoChrome"
-        SystemDecorations="BorderOnly"
+        SystemDecorations="None"
         
         WindowStartupLocation="CenterScreen"
 
@@ -28,6 +29,7 @@
     <!-- ExtendClientAreaToDecorationsHint="True" -->
     <!-- ExtendClientAreaChromeHints="NoChrome" -->
 
+    <!-- SystemDecorations="BorderOnly" -->
     
     
     <Grid Margin="4"

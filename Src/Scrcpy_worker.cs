@@ -20,6 +20,8 @@ using SharpDX;
 
 
 
+
+
 using Buffer = System.Buffer;
 using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Store;
@@ -31,6 +33,7 @@ namespace Androidplayer.Src
 {
     public class Scrcpy_worker : IDisposable
     {
+#if WINDOWS
         // XAudio2 fields
         private XAudio2 _xaudio;
         private MasteringVoice _masteringVoice;
@@ -42,7 +45,8 @@ namespace Androidplayer.Src
         private readonly Queue<DataStream> _pendingStreams = new Queue<DataStream>();
         
         
-        
+           
+#endif
         
         
         private bool _xaudioStarted = false;
@@ -83,10 +87,18 @@ namespace Androidplayer.Src
         private int device_width = 0;
         private int device_height = 0;
 
-        private my_AV? _decoder;
+        // private my_AV? _decoder;
+#if WINDOWS          
+        private my_AV_win? _decoder;
+        public Device dx_Device { get; set; }
+        
+                    
+                    PollXAudioAndCleanup();
+#endif
+        
+        
         private my_audio? _audio_decoder;
 
-        public Device dx_Device { get; set; }
 
         private static readonly ArrayPool<byte> pool = ArrayPool<byte>.Shared;
 
@@ -107,9 +119,11 @@ namespace Androidplayer.Src
         private const double MAX_FRAME_TIME_MS = 16.67;
         
         
-        
+#if WINDOWS
+           
         private Texture2D _previousFrame = null;
         private Texture2D _pendingFrame;
+#endif
 
         private sealed class ScrcpyVideoPacket
         {
@@ -126,7 +140,9 @@ namespace Androidplayer.Src
 
             _audio_decoder = new my_audio();
 
+            #if WINDOWS
             InitAudio();
+            #endif
         }
 
         public void Start()
@@ -183,6 +199,10 @@ namespace Androidplayer.Src
 
         #region Audio Player
 
+        
+        #if WINDOWS
+        
+        
         private void InitAudio()
         {
             lock (_audioLock)
@@ -279,6 +299,8 @@ namespace Androidplayer.Src
             }
         }
 
+#endif
+
         private void start_audio()
         {
             const long PACKET_FLAG_CONFIG = 1L << 62;
@@ -360,8 +382,12 @@ namespace Androidplayer.Src
                         }
 
                         byte[]? pcm = _audio_decoder?.Decode(payload);
+                        
+#if WINDOWS
+           
                         if (pcm != null && pcm.Length > 0)
                             SubmitPcmToXAudio(pcm);
+#endif
                     }
                 }
                 catch (IOException ioEx) when (ioEx.InnerException is SocketException sockEx)
@@ -369,14 +395,20 @@ namespace Androidplayer.Src
                     Console.WriteLine($"Audio socket error: {sockEx.SocketErrorCode}");
                     ErrorOccurred?.Invoke(sockEx.Message);
                     audioReadyEvent.Reset();
+#if WINDOWS          
+                    
                     PollXAudioAndCleanup();
+#endif
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Audio receive error: {ex.Message}");
                     ErrorOccurred?.Invoke(ex.Message);
                     audioReadyEvent.Reset();
+#if WINDOWS
+           
                     PollXAudioAndCleanup();
+#endif
                 }
                 finally
                 {
@@ -512,7 +544,7 @@ namespace Androidplayer.Src
 
             return BitConverter.ToInt16(buffer, offset);
         }
-
+#if WINDOWS
         private void RenderTexture(Texture2D frame)
         {
             if (_frameTimer == null)
@@ -580,6 +612,13 @@ namespace Androidplayer.Src
             }
         }
 
+        
+
+           
+#endif
+        
+        
+        
         private bool ShouldSkipFrame()
         {
             if (_lastFrameTime == 0) return false;
@@ -603,7 +642,10 @@ namespace Androidplayer.Src
 
             Console.WriteLine("Starting to receive H264 video data...");
 
-            _decoder = new my_AV(dx_Device);
+            #if WINDOWS
+            
+            _decoder = new my_AV_win(dx_Device);
+            #endif
 
             Frame_almostready.Invoke();
 
@@ -632,6 +674,10 @@ namespace Androidplayer.Src
                     try
                     {
                         sw.Restart();
+                        
+                              
+#if WINDOWS
+
 
                         Texture2D frame = null;
                         
@@ -687,6 +733,12 @@ namespace Androidplayer.Src
                         
 
                         RenderTexture(frame);
+                        
+                        
+                        
+                        
+#endif
+                        
 
                         sw.Stop();
 
@@ -805,6 +857,9 @@ namespace Androidplayer.Src
 
             _audio_decoder.Dispose();
 
+                  
+#if WINDOWS
+
             lock (_audioLock)
             {
                 try
@@ -851,6 +906,12 @@ namespace Androidplayer.Src
                     Console.WriteLine($"Error disposing audio: {ex.Message}");
                 }
             }
+      
+#endif
+            
+            
+            
+            
         }
     }
 }

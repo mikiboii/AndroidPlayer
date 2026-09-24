@@ -135,9 +135,12 @@ public partial class Home : Window
         // Background = new SolidColorBrush(Color.FromRgb(0xFF, 0x00, 0xFF));
         Instance = this;
 
+        #if WINDOWS
+        
         
         rawInputHandler = new handle_rawinput(this);
         StartupTimer.Mark("  rawInputHandler done");
+        #endif
 
         if (_settingsWindow == null)
             _settingsWindow = new settings();

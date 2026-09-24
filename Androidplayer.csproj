@@ -51,6 +51,7 @@
         <PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
         <PackageReference Include="LiteDB" Version="6.0.0-prerelease.65" />
         <PackageReference Include="SharpAdbClient" Version="2.3.23" />
+        
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
     </ItemGroup>
 
@@ -70,6 +71,7 @@
     <ItemGroup Condition="'$(DepsPlatform)' == 'linux'">
         <PackageReference Include="Silk.NET.Vulkan" Version="2.23.0" />
         <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.23.0" />
+        <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.23.0" />
     </ItemGroup>
 
     <!-- 5d. macOS-only packages -->

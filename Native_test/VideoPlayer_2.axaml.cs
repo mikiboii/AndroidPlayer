@@ -24,8 +24,8 @@ public partial class VideoPlayer_2 : UserControl
 {
     string fileToPlay = @"M:\movie\Kung.Fu.Panda.3.2016.720p.WEBRip.x264.AAC-ETRG.mp4";
 
-    Src.FFmpeg ffmpeg;  
 #if WINDOWS
+    Src.FFmpeg ffmpeg;  
 
     // FFmpeg Video Demuxing & HW Decoding
     public DirectX directX;   // DirectX Video Processing & Rendering

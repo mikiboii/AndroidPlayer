@@ -168,9 +168,12 @@ public class Native_view : NativeControlHost
             _floatingContent = new Window
             {
                 TransparencyLevelHint = new[] { WindowTransparencyLevel.Transparent },
-                // Background = Brushes.Transparent,
+                Background = Brushes.Transparent,
                 
-                Background = Brushes.Black,
+
+
+
+                // Background = Brushes.Black,
                 
                 
                 TransparencyBackgroundFallback = KeyColorBrush,

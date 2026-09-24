@@ -1,3 +1,6 @@
+#if WINDOWS
+
+
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -365,3 +368,5 @@ public unsafe class FFmpeg
     private void Log(string msg) { Console.WriteLine($"[FFMPEG] {msg}"); }
     #endregion
 }
+
+#endif

@@ -1,5 +1,5 @@
 
-
+#if WINDOWS
 
 using System;
 using System.IO;
@@ -21,7 +21,7 @@ using static FFmpeg.AutoGen.ffmpeg;
 
 namespace Androidplayer;
 
-public unsafe class my_AV : IDisposable
+public unsafe class my_AV_win : IDisposable
 {
     private AVCodec* codec;
     private AVCodecContext* codecCtx;
@@ -53,7 +53,7 @@ public unsafe class my_AV : IDisposable
     public int Width { get; private set; }
     public int Height { get; private set; }
 
-    public my_AV(Device device)
+    public my_AV_win(Device device)
     {
         this.device = device ?? throw new ArgumentNullException(nameof(device));
 
@@ -881,7 +881,7 @@ public unsafe class my_AV : IDisposable
             hwTexture.Description.Height != videoHeight ||
             hwTexture.Description.Format != ffmpegTexture.Description.Format)
         {
-            Console.WriteLine($"[my_AV] Recreate hwTexture: {videoWidth}x{videoHeight}");
+            Console.WriteLine($"[my_AV_win] Recreate hwTexture: {videoWidth}x{videoHeight}");
 
             hwTexture?.Dispose();
 
@@ -1175,3 +1175,6 @@ public unsafe class my_AV : IDisposable
         codec = null;
     }
 }
+
+
+#endif
