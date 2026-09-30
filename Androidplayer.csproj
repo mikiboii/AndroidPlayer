@@ -136,7 +136,7 @@
     <ItemGroup>
         <AvaloniaResource Include="Icons\**" />
         <AvaloniaResource Include="Src\Keymap\K_icons\**" />
-        <AvaloniaResource Include="android.png" Condition="Exists('android.png')" />
+       
     </ItemGroup>
 
 </Project>

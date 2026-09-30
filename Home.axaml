@@ -57,12 +57,13 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- <pages1:TitleBar x:Name="CustomTitleBar" -->
-        <!--                 Grid.Row="0" -->
-        <!--                 Title="Android Player" -->
-        <!-- -->
-        <!--                 PointerPressed="CustomTitleBar_OnPointerPressed" -->
-        <!--                /> -->
+        <pages1:TitleBar x:Name="CustomTitleBar"
+                        Grid.Row="0"
+                        Title="Android Player"
+        
+                        IsVisible="False"
+                       
+                       />
 
 
         <!-- <src:Display_view x:Name="displayView" -->
@@ -70,7 +71,7 @@
         <!--                   Grid.Row="1"/> -->
        
         <pages:Loading_page x:Name="loadingpage"
-                            IsVisible="False"
+                            IsVisible="True"
                             Grid.Row="1"/>
 
     </Grid>

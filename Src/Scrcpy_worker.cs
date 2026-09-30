@@ -165,24 +165,56 @@ namespace Androidplayer.Src
             audio_thread.Start();
         }
 
+        // public void Stop()
+        // {
+        //     isrunning = false;
+        //
+        //     if (scrcpy_thread != null && scrcpy_thread.IsAlive)
+        //     {
+        //         scrcpy_thread.Join(1000);
+        //         scrcpy_thread = null;
+        //     }
+        //
+        //     audioReadyEvent.Set();
+        //
+        //     if (audio_thread != null && audio_thread.IsAlive)
+        //     {
+        //         audio_thread.Join(1000);
+        //         audio_thread = null;
+        //     }
+        // }
+        
+        
+        
+        
         public void Stop()
         {
             isrunning = false;
 
-            if (scrcpy_thread != null && scrcpy_thread.IsAlive)
-            {
-                scrcpy_thread.Join(1000);
-                scrcpy_thread = null;
-            }
+            // Close sockets first to unblock Read()
+            try { videoClient?.Close(); }   catch { }
+            try { audioClient?.Close(); }   catch { }
+            try { controlClient?.Close(); } catch { }
+            videoClient = null;
+            audioClient = null;
+            controlClient = null;
 
             audioReadyEvent.Set();
 
+            if (scrcpy_thread != null && scrcpy_thread.IsAlive)
+            {
+                scrcpy_thread.Join(200);   // give it a bit more time now that Read throws
+                scrcpy_thread = null;
+            }
+
             if (audio_thread != null && audio_thread.IsAlive)
             {
-                audio_thread.Join(1000);
+                audio_thread.Join(200);
                 audio_thread = null;
             }
         }
+        
+        
 
         public void SetFrameSize(int width, int height)
         {
@@ -464,14 +496,14 @@ namespace Androidplayer.Src
                         ErrorOccurred?.Invoke($"Expected to read dummy byte (1 byte), but got {dummyRead} bytes.");
                     }
 
-                    Thread.Sleep(500);
+                    // Thread.Sleep(500);
 
                     if (UISettings.Instance.AudioEnabled)
                     {
                         audioReadyEvent.Set();
                     }
 
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
 
                     controlClient = new TcpClient();
                     if (!controlClient.ConnectAsync(host, 1013).Wait(timeoutMs))
@@ -532,6 +564,8 @@ namespace Androidplayer.Src
             device_width = Width;
             device_height = Height;
 
+            
+            
             DeviceResolutionReady?.Invoke((Width, Height));
         }
 
@@ -601,17 +635,21 @@ namespace Androidplayer.Src
                 {
 
                     my_directx = k_info.Instance.directx;
+                    my_directx?.PresentFrame(_pendingFrame);
                 }
                 else
                 {
                     my_directx = D11InteropRenderer.Instance;
+                    
+                    long decodeTimestamp = my_directx.NowTicks;
+
+                    if (_pendingFrame != null)
+                        my_directx.PresentFrame(_pendingFrame, decodeTimestamp);
 
                 }
 
 
-                my_directx?.PresentFrame(_pendingFrame);
-                
-                
+
                 
              
                 

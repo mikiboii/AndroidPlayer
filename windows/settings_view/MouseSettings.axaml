@@ -1,17 +1,186 @@
-﻿<UserControl x:Class="Androidplayer.windows.settings_view.MouseSettings"
+﻿<!-- <UserControl x:Class="Androidplayer.windows.settings_view.MouseSettings" -->
+<!--              xmlns="https://github.com/avaloniaui" -->
+<!--              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" -->
+<!--              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" -->
+<!--              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" -->
+<!--              xmlns:local="clr-namespace:Androidplayer.windows.settings_view" -->
+<!--              mc:Ignorable="d" -->
+<!--              d:DesignHeight="600" d:DesignWidth="500"> -->
+<!-- -->
+<!--   ~1~ Scrollable content card @1@ -->
+<!--   <Border Background="White" -->
+<!--           CornerRadius="8" -->
+<!--           Padding="24" -->
+<!--           Margin="0,0,0,12" -->
+<!--           BorderBrush="#E8EBF0" -->
+<!--           BorderThickness="1"> -->
+<!--     <ScrollViewer VerticalScrollBarVisibility="Auto"> -->
+<!--       <StackPanel> -->
+<!-- -->
+<!--         ~1~ Key mouse unlock @1@ -->
+<!--         <Border CornerRadius="6" -->
+<!--                 Background="#FFFFFF" -->
+<!--                 Padding="14" -->
+<!--                 Margin="0,0,0,16" -->
+<!--                 BorderBrush="#EEF1F4" -->
+<!--                 BorderThickness="1"> -->
+<!--           <StackPanel> -->
+<!--             <TextBlock Foreground="{DynamicResource PrimaryBrush}" -->
+<!--                        Text="Key mouse unlock" -->
+<!--                        FontWeight="Bold" -->
+<!--                        FontSize="15" -->
+<!--                        Margin="0,0,0,4"/> -->
+<!--             <TextBlock Text="Global Settings" -->
+<!--                        FontSize="12" -->
+<!--                        Foreground="#6B6F77" -->
+<!--                        Margin="0,0,0,12"/> -->
+<!--             <CheckBox Content="Whether to turn on screen center unlock" -->
+<!--                       IsChecked="True" -->
+<!--                       Margin="0,0,0,8"/> -->
+<!--             <TextBlock Text="* After checking, the position of the mouse after unlocking will always be displayed centered relative to the screen" -->
+<!--                        Foreground="#E36C60" -->
+<!--                        FontSize="12" -->
+<!--                        TextWrapping="Wrap"/> -->
+<!--           </StackPanel> -->
+<!--         </Border> -->
+<!-- -->
+<!--         ~1~ Windows System Settings @1@ -->
+<!--         <Border CornerRadius="6" -->
+<!--                 Background="#FFFFFF" -->
+<!--                 Padding="14" -->
+<!--                 Margin="0,0,0,16" -->
+<!--                 BorderBrush="#EEF1F4" -->
+<!--                 BorderThickness="1"> -->
+<!--           <StackPanel> -->
+<!--             <TextBlock Text="Windows System Settings" -->
+<!--                        FontWeight="Bold" -->
+<!--                        FontSize="15" -->
+<!--                        Margin="0,0,0,4"/> -->
+<!--             <TextBlock Text="Global Settings" -->
+<!--                        FontSize="12" -->
+<!--                        Foreground="#6B6F77" -->
+<!--                        Margin="0,0,0,12"/> -->
+<!--             <CheckBox Content="Mouse acceleration (improve pointer accuracy)" -->
+<!--                       IsChecked="False" -->
+<!--                       Margin="0,0,0,8"/> -->
+<!--             <TextBlock Text="* After checking, it will take effect globally in Windows" -->
+<!--                        Foreground="#E36C60" -->
+<!--                        FontSize="12" -->
+<!--                        TextWrapping="Wrap"/> -->
+<!--           </StackPanel> -->
+<!--         </Border> -->
+<!-- -->
+<!--         ~1~ Mouse speed @1@ -->
+<!--         <Border CornerRadius="6" -->
+<!--                 Background="#FFFFFF" -->
+<!--                 Padding="14" -->
+<!--                 Margin="0,0,0,8" -->
+<!--                 BorderBrush="#EEF1F4" -->
+<!--                 BorderThickness="1"> -->
+<!--           <StackPanel> -->
+<!--             <TextBlock Text="Mouse speed" -->
+<!--                        FontWeight="Bold" -->
+<!--                        FontSize="15" -->
+<!--                        Margin="0,0,0,4"/> -->
+<!--             <TextBlock Text="Global Settings" -->
+<!--                        FontSize="12" -->
+<!--                        Foreground="#6B6F77" -->
+<!--                        Margin="0,0,0,12"/> -->
+<!--             <RadioButton Content="Default" -->
+<!--                          IsChecked="True" -->
+<!--                          GroupName="MouseSpeed"/> -->
+<!--           </StackPanel> -->
+<!--         </Border> -->
+<!-- -->
+<!--       </StackPanel> -->
+<!--     </ScrollViewer> -->
+<!--   </Border> -->
+<!-- </UserControl> -->
+
+
+<UserControl x:Class="Androidplayer.windows.settings_view.MouseSettings"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Androidplayer.windows.settings_view"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="500">
+             d:DesignHeight="480" d:DesignWidth="420">
 
-  <!-- Scrollable content card -->
+  <UserControl.Styles>
+
+    <!-- Base tile -->
+    <Style Selector="Border.cursorCard">
+      <Setter Property="Width" Value="86"/>
+      <Setter Property="Margin" Value="0,0,8,8"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="#EEF1F4"/>
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="Padding" Value="8"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.15"/>
+          <BrushTransition Property="Background" Duration="0:0:0.15"/>
+        </Transitions>
+      </Setter>
+    </Style>
+
+    <Style Selector="Border.cursorCard:pointerover">
+      <Setter Property="BorderBrush" Value="#C9D2DE"/>
+      <Setter Property="Background" Value="#F8FAFC"/>
+    </Style>
+
+    <!-- Selected glow -->
+    <Style Selector="Border.cursorCard.selected">
+      <Setter Property="BorderBrush" Value="#5B9BFF"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Background" Value="#EAF2FF"/>
+    </Style>
+
+    <Style Selector="Border.cursorCard.selected:pointerover">
+      <Setter Property="BorderBrush" Value="#5B9BFF"/>
+      <Setter Property="Background" Value="#EAF2FF"/>
+    </Style>
+
+    <!-- Image inside tile -->
+    <Style Selector="Border.cursorCard Image">
+      <Setter Property="Width" Value="36"/>
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Stretch" Value="Uniform"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Margin" Value="0,8,0,0"/>
+    </Style>
+
+    <!-- Label under the image -->
+    <Style Selector="Border.cursorCard TextBlock.label">
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="Foreground" Value="#6B6F77"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+      <Setter Property="Margin" Value="0,6,0,0"/>
+    </Style>
+
+    <!-- Radio dot in the corner -->
+    <Style Selector="Border.cursorCard RadioButton.indicator">
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+      <Setter Property="VerticalAlignment" Value="Top"/>
+      <Setter Property="ZIndex" Value="3"/>
+      <Setter Property="Margin" Value="0,-9,-13,0"/>
+      <Setter Property="RenderTransform">
+        <ScaleTransform ScaleX="0.7" ScaleY="0.7"/>
+      </Setter>
+      <Setter Property="RenderTransformOrigin" Value="50%,50%"/>
+    </Style>
+
+  </UserControl.Styles>
+
   <Border Background="White"
           CornerRadius="8"
-          Padding="24"
-          Margin="0,0,0,12"
+          Padding="18"
+          Margin="0,0,0,10"
           BorderBrush="#E8EBF0"
           BorderThickness="1">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -20,26 +189,27 @@
         <!-- Key mouse unlock -->
         <Border CornerRadius="6"
                 Background="#FFFFFF"
-                Padding="14"
-                Margin="0,0,0,16"
+                Padding="12"
+                Margin="0,0,0,12"
                 BorderBrush="#EEF1F4"
                 BorderThickness="1">
           <StackPanel>
             <TextBlock Foreground="{DynamicResource PrimaryBrush}"
                        Text="Key mouse unlock"
                        FontWeight="Bold"
-                       FontSize="15"
+                       FontSize="14"
                        Margin="0,0,0,4"/>
             <TextBlock Text="Global Settings"
-                       FontSize="12"
+                       FontSize="11"
                        Foreground="#6B6F77"
-                       Margin="0,0,0,12"/>
+                       Margin="0,0,0,10"/>
             <CheckBox Content="Whether to turn on screen center unlock"
                       IsChecked="True"
-                      Margin="0,0,0,8"/>
+                      FontSize="12"
+                      Margin="0,0,0,6"/>
             <TextBlock Text="* After checking, the position of the mouse after unlocking will always be displayed centered relative to the screen"
                        Foreground="#E36C60"
-                       FontSize="12"
+                       FontSize="11"
                        TextWrapping="Wrap"/>
           </StackPanel>
         </Border>
@@ -47,48 +217,185 @@
         <!-- Windows System Settings -->
         <Border CornerRadius="6"
                 Background="#FFFFFF"
-                Padding="14"
-                Margin="0,0,0,16"
+                Padding="12"
+                Margin="0,0,0,12"
                 BorderBrush="#EEF1F4"
                 BorderThickness="1">
           <StackPanel>
             <TextBlock Text="Windows System Settings"
                        FontWeight="Bold"
-                       FontSize="15"
+                       FontSize="14"
                        Margin="0,0,0,4"/>
             <TextBlock Text="Global Settings"
-                       FontSize="12"
+                       FontSize="11"
                        Foreground="#6B6F77"
-                       Margin="0,0,0,12"/>
+                       Margin="0,0,0,10"/>
             <CheckBox Content="Mouse acceleration (improve pointer accuracy)"
                       IsChecked="False"
-                      Margin="0,0,0,8"/>
+                      FontSize="12"
+                      Margin="0,0,0,6"/>
             <TextBlock Text="* After checking, it will take effect globally in Windows"
                        Foreground="#E36C60"
-                       FontSize="12"
+                       FontSize="11"
                        TextWrapping="Wrap"/>
           </StackPanel>
         </Border>
 
-        <!-- Mouse speed -->
+        <!-- Mouse cursor picker -->
         <Border CornerRadius="6"
                 Background="#FFFFFF"
-                Padding="14"
-                Margin="0,0,0,8"
+                Padding="12"
+                Margin="0,0,0,6"
                 BorderBrush="#EEF1F4"
                 BorderThickness="1">
           <StackPanel>
-            <TextBlock Text="Mouse speed"
+            <TextBlock Text="Mouse cursor"
                        FontWeight="Bold"
-                       FontSize="15"
+                       FontSize="14"
                        Margin="0,0,0,4"/>
-            <TextBlock Text="Global Settings"
-                       FontSize="12"
+            <TextBlock Text="Choose a pointer style"
+                       FontSize="11"
                        Foreground="#6B6F77"
-                       Margin="0,0,0,12"/>
-            <RadioButton Content="Default"
-                         IsChecked="True"
-                         GroupName="MouseSpeed"/>
+                       Margin="0,0,0,10"/>
+
+            <WrapPanel Orientation="Horizontal">
+
+              <!-- Default -->
+              <Border Classes="cursorCard"
+                      PointerPressed="CursorCard_PointerPressed">
+                <Grid>
+                  <RadioButton x:Name="Cursor_Default"
+                               Classes="indicator"
+                               GroupName="CursorChoice"
+                               Tag="default"
+                               Checked="Cursor_Checked"/>
+                  <StackPanel>
+                    <Image Source="avares://Androidplayer/Icons/cursor/black_sword.png"
+                           Opacity="0.15"/>
+                    <TextBlock Classes="label" Text="Default"/>
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+              <!-- Sword -->
+              <Border Classes="cursorCard"
+                      PointerPressed="CursorCard_PointerPressed">
+                <Grid>
+                  <RadioButton x:Name="Cursor_Sword"
+                               Classes="indicator"
+                               GroupName="CursorChoice"
+                               Tag="sword"
+                               Checked="Cursor_Checked"/>
+                  <StackPanel>
+                    <Image Source="avares://Androidplayer/Icons/cursor/black_sword.png"/>
+                    <TextBlock Classes="label" Text="Sword"/>
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+              <!-- Cookie -->
+              <Border Classes="cursorCard"
+                      PointerPressed="CursorCard_PointerPressed">
+                <Grid>
+                  <RadioButton x:Name="Cursor_Cookie"
+                               Classes="indicator"
+                               GroupName="CursorChoice"
+                               Tag="cookie"
+                               Checked="Cursor_Checked"/>
+                  <StackPanel>
+                    <Image Source="avares://Androidplayer/Icons/cursor/cookie_2.png"/>
+                    <TextBlock Classes="label" Text="Cookie"/>
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+              <!-- Raccoon -->
+              <Border Classes="cursorCard"
+                      PointerPressed="CursorCard_PointerPressed">
+                <Grid>
+                  <RadioButton x:Name="Cursor_Raccoon"
+                               Classes="indicator"
+                               GroupName="CursorChoice"
+                               Tag="raccoon"
+                               Checked="Cursor_Checked"/>
+                  <StackPanel>
+                    <Image Source="avares://Androidplayer/Icons/cursor/cute-happy-raccoon-pointer.png"/>
+                    <TextBlock Classes="label" Text="Raccoon"/>
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+              <!-- AKM -->
+              <Border Classes="cursorCard"
+                      PointerPressed="CursorCard_PointerPressed">
+                <Grid>
+                  <RadioButton x:Name="Cursor_AKM"
+                               Classes="indicator"
+                               GroupName="CursorChoice"
+                               Tag="akm"
+                               Checked="Cursor_Checked"/>
+                  <StackPanel>
+                    <Image Source="avares://Androidplayer/Icons/cursor/PUBG_AKM_Cursor.png"/>
+                    <TextBlock Classes="label" Text="AKM"/>
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+              <!-- Space -->
+              <Border Classes="cursorCard"
+                      PointerPressed="CursorCard_PointerPressed">
+                <Grid>
+                  <RadioButton x:Name="Cursor_Space"
+                               Classes="indicator"
+                               GroupName="CursorChoice"
+                               Tag="space"
+                               Checked="Cursor_Checked"/>
+                  <StackPanel>
+                    <Image Source="avares://Androidplayer/Icons/cursor/starter-space-pointer.png"/>
+                    <TextBlock Classes="label" Text="Space"/>
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+              <!-- Paint -->
+              <Border Classes="cursorCard"
+                      PointerPressed="CursorCard_PointerPressed">
+                <Grid>
+                  <RadioButton x:Name="Cursor_Paint"
+                               Classes="indicator"
+                               GroupName="CursorChoice"
+                               Tag="paint"
+                               Checked="Cursor_Checked"/>
+                  <StackPanel>
+                    <Image Source="avares://Androidplayer/Icons/cursor/starter-stain-of-paint-logo-pointer.png"/>
+                    <TextBlock Classes="label" Text="Paint"/>
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+              <!-- Daybreak -->
+              <Border Classes="cursorCard"
+                      PointerPressed="CursorCard_PointerPressed">
+                <Grid>
+                  <RadioButton x:Name="Cursor_Daybreak"
+                               Classes="indicator"
+                               GroupName="CursorChoice"
+                               Tag="daybreak"
+                               Checked="Cursor_Checked"/>
+                  <StackPanel>
+                    <Image Source="avares://Androidplayer/Icons/cursor/terraria-solstice-claymore-daybroken-debuff-cursor.png"/>
+                    <TextBlock Classes="label" Text="Daybreak"/>
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+            </WrapPanel>
+
+            <TextBlock Text="* Cursors are applied to the app window."
+                       Foreground="#E36C60"
+                       FontSize="11"
+                       TextWrapping="Wrap"
+                       Margin="0,4,0,0"/>
           </StackPanel>
         </Border>
 

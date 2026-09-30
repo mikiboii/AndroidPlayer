@@ -63,6 +63,8 @@ public partial class Home : Window
     private Keymap_Window keymapWindow;
 
     private settings _settingsWindow;
+    
+    public SplashScreen splashScreen;
 
     private keymap_worker my_keymap_worker;
 
@@ -132,6 +134,8 @@ public partial class Home : Window
 
         InitializeComponent();
         StartupTimer.Mark("  InitializeComponent done");
+        
+       // show_splashscreen();
 
         // Background = "#FF00FF";
 
@@ -250,7 +254,14 @@ public partial class Home : Window
                     
                     // Home.Instance.displayView.MainImage.IsVisible = false;
                     var mainImage = displayView?.FindControl<Native_view>("MainImage");
-                    mainImage._floatingContent.Background = Brushes.Black;
+                    if (mainImage != null)
+                    {
+                        if (mainImage._floatingContent != null)
+                        {
+                                
+                            mainImage._floatingContent.Background = Brushes.Black;
+                        }
+                    }
                     // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Black;
                     break;
 
@@ -748,6 +759,99 @@ public partial class Home : Window
         }
     }
 
+
+    private async void show_splashscreen()
+    {
+        splashScreen = new SplashScreen();
+        splashScreen.Show();
+        
+        
+        
+    }
+    
+
+    public void restore_Home()
+    {
+        
+        // splashScreen?.Close();
+
+        Console.WriteLine("restore home called");
+        
+        this.Opacity = 1;
+        this.IsVisible = true;
+        this.ShowInTaskbar = true;
+        this.WindowState = WindowState.Normal;
+        
+        scale_mainwindow();
+
+        my_info.Instance.Restored_window = true;
+
+    }
+    
+    public void scale_mainwindow()
+    {
+        var screen = TopLevel.GetTopLevel(this)?.Screens.Primary;
+        if (screen == null) return;
+
+        // Screen size in DIPs
+        double screenWidth  = screen.Bounds.Width  / screen.Scaling;
+        double screenHeight = screen.Bounds.Height / screen.Scaling;
+
+        double videoWidth  = My_Store.Instance.VideoWidth;
+        double videoHeight = My_Store.Instance.VideoHeight;
+        if (videoWidth <= 0 || videoHeight <= 0) return;
+
+        const double scaleFactor = 0.8;
+        const double titleBarHeight = 30;
+
+        double aspect = videoWidth / videoHeight;
+
+        double targetWidth, targetHeight;
+
+        if (videoWidth > videoHeight)
+        {
+            targetWidth  = screenWidth * scaleFactor;
+            targetHeight = targetWidth / aspect;
+
+            if (targetHeight > screenHeight * scaleFactor)
+            {
+                targetHeight = screenHeight * scaleFactor;
+                targetWidth  = targetHeight * aspect;
+            }
+        }
+        else
+        {
+            targetHeight = screenHeight * scaleFactor;
+            targetWidth  = targetHeight * aspect;
+
+            if (targetWidth > screenWidth * scaleFactor)
+            {
+                targetWidth  = screenWidth * scaleFactor;
+                targetHeight = targetWidth / aspect;
+            }
+        }
+
+        if (Home.Instance != null)
+        {
+            double windowWidth  = targetWidth;
+            double windowHeight = targetHeight + titleBarHeight;
+
+            Home.Instance.Width  = windowWidth;
+            Home.Instance.Height = windowHeight;
+
+            // Center using the ACTUAL window dimensions, in DIPs
+            double dipX = (screenWidth  - windowWidth)  / 2.0;
+            double dipY = (screenHeight - windowHeight) / 2.0;
+
+            // Convert to physical pixels for PixelPoint
+            int pxX = (int)Math.Round(dipX * screen.Scaling);
+            int pxY = (int)Math.Round(dipY * screen.Scaling);
+
+            Home.Instance.Position = new PixelPoint(pxX, pxY);
+        }
+
+        my_info.Instance.Auto_resizing = false;
+    }
     private void Home_OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (k_info.Instance.KeymapMode)

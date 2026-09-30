@@ -87,7 +87,26 @@ namespace Androidplayer
             this.mainWindow = mainWindow;
 
             this.Owner = this.mainWindow;
+            
+            // 1. Point to your converted PNG resource
+            var cursorUri = new Uri("avares://Androidplayer/Icons/cursor/black_sword.png");
 
+// 2. Open the asset stream
+            using var cursorStream = AssetLoader.Open(cursorUri);
+
+// 3. Load the image into an Avalonia Bitmap
+            var cursorBitmap = new Avalonia.Media.Imaging.Bitmap(cursorStream);
+
+// 4. Set the Hotspot (X, Y in pixels). 
+// For a sword tip, it's typically the top-left corner (0, 0)
+            var hotSpot = new PixelPoint(0, 0);
+
+// 5. Instantiate the cursor correctly
+            Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
+
+            this.Cursor = customCursor;
+
+            this.ShowInTaskbar = false;
             Loaded += SidebarWindow_Loaded;
 
             // this.Activated += OnActivated;

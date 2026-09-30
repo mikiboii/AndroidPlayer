@@ -583,7 +583,7 @@ public partial class Display_view : UserControl
         }
     }
 
-    private void scale_mainwindow()
+    public void scale_mainwindow()
     {
         // var screen = Screens.Primary;
         var screen = TopLevel.GetTopLevel(this)?.Screens.Primary;

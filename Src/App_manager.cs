@@ -301,6 +301,16 @@ public class App_manager : IDisposable
                     Console.WriteLine($"INIT DX SIZE: {w} x {h}");
                     
                     k_info.Instance.my_renderer?.DisplayImage("dev_img2.jpg");
+                    
+                    
+                    // Home.Instance.Opacity = 1;
+                    // Home.Instance.WindowState = WindowState.Normal;
+                    // Home.Instance.ShowInTaskbar = true;
+                    // Home.Instance.IsVisible = true;
+                    Home.Instance.restore_Home();
+                    
+                    
+                    
                     // if (UISettings.Instance.Nativeview_mode)
                     // {
                     //
@@ -330,6 +340,10 @@ public class App_manager : IDisposable
                     
                     
                 D11InteropRenderer.Instance?.DisplayImage("dev_img1.jpg");
+                
+                Home.Instance.restore_Home();
+
+
             }
 
         }, DispatcherPriority.Loaded);
@@ -337,11 +351,15 @@ public class App_manager : IDisposable
 
     private void My_adb_workerOndevicedisconnected()
     {
+
+        Console.WriteLine("device disconnected event $$$$$$$$$");
+        
         if (scrcpy_worker != null)
         {
             scrcpy_worker.Dispose();
             scrcpy_worker = null;
         }
+        Console.WriteLine("device disconnected event $$$$$$$$$ 2");
         my_app_worker_ProgressChanged(0, "No device found. please reconnect your device");
 
         Dispatcher.UIThread.Post(() =>
@@ -349,6 +367,8 @@ public class App_manager : IDisposable
             if (Home.Instance != null)
             {
                 Home.Instance.loadingpage.IsVisible = true;
+                Home.Instance.CustomTitleBar.IsVisible = true;
+                
                 Home.Instance.displayView.IsVisible = false;
             }
         });
@@ -363,6 +383,7 @@ public class App_manager : IDisposable
             if (Home.Instance != null)
             {
                 Home.Instance.loadingpage.IsVisible = false;
+                Home.Instance.CustomTitleBar.IsVisible = false;
                 Home.Instance.displayView.IsVisible = true;
             }
 
@@ -435,6 +456,8 @@ public class App_manager : IDisposable
             if (Home.Instance != null)
             {
                 Home.Instance.loadingpage.IsVisible = false;
+                Home.Instance.CustomTitleBar.IsVisible = false;
+                
                 Home.Instance.displayView.IsVisible = true;
             }
 
@@ -445,6 +468,15 @@ public class App_manager : IDisposable
     private void on_DeviceResolutionReady((int Width, int Height) div)
     {
         My_Store.Instance.SetDeviceResolution(div.Width, div.Height);
+        
+        //
+        // Dispatcher.UIThread.Post(() =>
+        // {
+        //
+        //     Console.WriteLine("try restoring home");
+        //     Home.Instance.restore_Home();
+        //     
+        // });
 
         if (UISettings.Instance.Nativeview_mode)
         {
@@ -469,6 +501,14 @@ public class App_manager : IDisposable
     private void on_videosizeready((int Width, int Height) vid)
     {
         My_Store.Instance.SetVideoResolution(vid.Width, vid.Height);
+        Dispatcher.UIThread.Post(() =>
+        {
+        
+            Console.WriteLine("try restoring home");
+            Home.Instance.restore_Home();
+            
+        });
+
 
         if (vid.Width > vid.Height)
         {

@@ -1,4 +1,114 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+﻿<!-- <UserControl xmlns="https://github.com/avaloniaui" -->
+<!--              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" -->
+<!--              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" -->
+<!--              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" -->
+<!--              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="30" -->
+<!--              x:Class="Androidplayer.Pages.TitleBar" -->
+<!--              x:CompileBindings="False" -->
+<!--              Background="#2D2D30"> -->
+<!--      -->
+<!--     <Border Background="#2D2D30" Height="30"> -->
+<!--         <Grid> -->
+<!--             <Grid.ColumnDefinitions> -->
+<!--                 <ColumnDefinition Width="Auto"/> -->
+<!--                 <ColumnDefinition Width="*"/> -->
+<!--                 <ColumnDefinition Width="Auto"/> -->
+<!--             </Grid.ColumnDefinitions> -->
+<!--              -->
+<!--             ~1~ App Icon and Title @1@ -->
+<!--             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0"> -->
+<!--                 ~1~ <Image Source="avares://Androidplayer/Icons/android.png" @1@ -->
+<!--                 ~1~        Height="25" @1@ -->
+<!--                 ~1~        Margin="0,0,10,0" @1@ -->
+<!--                 ~1~        RenderOptions.BitmapInterpolationMode="HighQuality"/> @1@ -->
+<!--                  -->
+<!--                 <Image -->
+<!--                    -->
+<!--                     Source="/Icons/android.png" -->
+<!--                        Height="25" -->
+<!--                        Margin="0,0,10,0" -->
+<!--                        RenderOptions.BitmapInterpolationMode="HighQuality"/> -->
+<!--                  -->
+<!--                 <TextBlock Name="app_name"  -->
+<!--                            Text="{Binding Title}"  -->
+<!--                            Foreground="White"  -->
+<!--                            FontSize="12"  -->
+<!--                            VerticalAlignment="Center"/> -->
+<!--             </StackPanel> -->
+<!--              -->
+<!--             ~1~ Drag Region @1@ -->
+<!--             <Border Grid.Column="1"  -->
+<!--                     Background="Transparent"  -->
+<!--                     PointerPressed="DragRegion_OnPointerPressed"/> -->
+<!--              -->
+<!--             ~1~ Window Controls @1@ -->
+<!--             <StackPanel Grid.Column="2" Orientation="Horizontal"> -->
+<!--                 ~1~ Minimize Button @1@ -->
+<!--                 <Button x:Name="MinimizeBtn"  -->
+<!--                         HorizontalContentAlignment="Center" -->
+<!--                         VerticalContentAlignment="Center" -->
+<!--                         Content="─"  -->
+<!--                         Width="46" Height="30"  -->
+<!--                         Background="Transparent"  -->
+<!--                         Foreground="White"  -->
+<!--                         BorderThickness="0" -->
+<!--                         Click="MinimizeBtn_OnClick"  -->
+<!--                         FontSize="12"  -->
+<!--                         FontWeight="Bold"> -->
+<!--                     <Button.Styles> -->
+<!--                         <Style Selector="Button:pointerover"> -->
+<!--                             <Setter Property="Background" Value="#3E3E42"/> -->
+<!--                         </Style> -->
+<!--                     </Button.Styles> -->
+<!--                 </Button> -->
+<!--                  -->
+<!--                 ~1~ Maximize/Restore Button @1@ -->
+<!--                 <Button x:Name="MaximizeBtn"  -->
+<!--                         HorizontalContentAlignment="Center" -->
+<!--                         VerticalContentAlignment="Center" -->
+<!--                         Content="☐"  -->
+<!--                         Width="46" Height="30"  -->
+<!--                         Background="Transparent"  -->
+<!--                         Foreground="White"  -->
+<!--                         BorderThickness="0" -->
+<!--                         Click="MaximizeBtn_OnClick"  -->
+<!--                         FontSize="12"> -->
+<!--                     <Button.Styles> -->
+<!--                         <Style Selector="Button:pointerover"> -->
+<!--                             <Setter Property="Background" Value="#3E3E42"/> -->
+<!--                         </Style> -->
+<!--                     </Button.Styles> -->
+<!--                 </Button> -->
+<!-- -->
+<!--                 ~1~ Close Button @1@ -->
+<!--                 <Button x:Name="CloseBtn"  -->
+<!--                         HorizontalContentAlignment="Center" -->
+<!--                         VerticalContentAlignment="Center" -->
+<!--                         Content="✕"  -->
+<!--                         Width="46" Height="30" -->
+<!--                         Background="Transparent"  -->
+<!--                         Foreground="White"  -->
+<!--                         BorderThickness="0" -->
+<!--                         Click="CloseBtn_OnClick"  -->
+<!--                         FontSize="14"  -->
+<!--                         FontWeight="Bold"> -->
+<!--                     <Button.Styles> -->
+<!--                         <Style Selector="Button:pointerover"> -->
+<!--                             <Setter Property="Background" Value="#E81123"/> -->
+<!--                             <Setter Property="Foreground" Value="White"/> -->
+<!--                         </Style> -->
+<!--                     </Button.Styles> -->
+<!--                 </Button> -->
+<!--             </StackPanel> -->
+<!--         </Grid> -->
+<!--     </Border> -->
+<!-- </UserControl> -->
+
+
+
+
+
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,7 +116,45 @@
              x:Class="Androidplayer.Pages.TitleBar"
              x:CompileBindings="False"
              Background="#2D2D30">
-    
+
+    <UserControl.Styles>
+        <!-- Shared button base: no chrome, hover state -->
+        <Style Selector="Button.titlebarBtn">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+
+        <!-- Hover: light grey background, keep white foreground -->
+        <Style Selector="Button.titlebarBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3E3E42"/>
+            <Setter Property="TextElement.Foreground" Value="White"/>
+        </Style>
+
+        <!-- Pressed: slightly darker -->
+        <Style Selector="Button.titlebarBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2A2A2C"/>
+            <Setter Property="TextElement.Foreground" Value="White"/>
+        </Style>
+
+        <!-- Close button hover: red -->
+        <Style Selector="Button.titlebarClose:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#E81123"/>
+            <Setter Property="TextElement.Foreground" Value="White"/>
+        </Style>
+
+        <Style Selector="Button.titlebarClose:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#C50F1F"/>
+            <Setter Property="TextElement.Foreground" Value="White"/>
+        </Style>
+    </UserControl.Styles>
+
     <Border Background="#2D2D30" Height="30">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -14,91 +162,51 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            
+
             <!-- App Icon and Title -->
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
-                <!-- <Image Source="avares://Androidplayer/Icons/android.png" -->
-                <!--        Height="25" -->
-                <!--        Margin="0,0,10,0" -->
-                <!--        RenderOptions.BitmapInterpolationMode="HighQuality"/> -->
-                
-                <Image
-                  
-                    Source="/Icons/android.png"
+                <Image Source="/Icons/android.png"
                        Height="25"
                        Margin="0,0,10,0"
                        RenderOptions.BitmapInterpolationMode="HighQuality"/>
-                
-                <TextBlock Name="app_name" 
-                           Text="{Binding Title}" 
-                           Foreground="White" 
-                           FontSize="12" 
+
+                <TextBlock Name="app_name"
+                           Text="{Binding Title}"
+                           Foreground="White"
+                           FontSize="12"
                            VerticalAlignment="Center"/>
             </StackPanel>
-            
+
             <!-- Drag Region -->
-            <Border Grid.Column="1" 
-                    Background="Transparent" 
+            <Border Grid.Column="1"
+                    Background="Transparent"
                     PointerPressed="DragRegion_OnPointerPressed"/>
-            
+
             <!-- Window Controls -->
             <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <!-- Minimize Button -->
-                <Button x:Name="MinimizeBtn" 
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        Content="─" 
-                        Width="46" Height="30" 
-                        Background="Transparent" 
-                        Foreground="White" 
-                        BorderThickness="0"
-                        Click="MinimizeBtn_OnClick" 
-                        FontSize="12" 
-                        FontWeight="Bold">
-                    <Button.Styles>
-                        <Style Selector="Button:pointerover">
-                            <Setter Property="Background" Value="#3E3E42"/>
-                        </Style>
-                    </Button.Styles>
-                </Button>
-                
-                <!-- Maximize/Restore Button -->
-                <Button x:Name="MaximizeBtn" 
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        Content="☐" 
-                        Width="46" Height="30" 
-                        Background="Transparent" 
-                        Foreground="White" 
-                        BorderThickness="0"
-                        Click="MaximizeBtn_OnClick" 
-                        FontSize="12">
-                    <Button.Styles>
-                        <Style Selector="Button:pointerover">
-                            <Setter Property="Background" Value="#3E3E42"/>
-                        </Style>
-                    </Button.Styles>
-                </Button>
 
-                <!-- Close Button -->
-                <Button x:Name="CloseBtn" 
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        Content="✕" 
-                        Width="46" Height="30"
-                        Background="Transparent" 
-                        Foreground="White" 
-                        BorderThickness="0"
-                        Click="CloseBtn_OnClick" 
-                        FontSize="14" 
-                        FontWeight="Bold">
-                    <Button.Styles>
-                        <Style Selector="Button:pointerover">
-                            <Setter Property="Background" Value="#E81123"/>
-                            <Setter Property="Foreground" Value="White"/>
-                        </Style>
-                    </Button.Styles>
-                </Button>
+                <!-- Minimize -->
+                <Button x:Name="MinimizeBtn"
+                        Classes="titlebarBtn"
+                        Content="─"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Click="MinimizeBtn_OnClick"/>
+
+                <!-- Maximize / Restore -->
+                <Button x:Name="MaximizeBtn"
+                        Classes="titlebarBtn"
+                        Content="☐"
+                        FontSize="12"
+                        Click="MaximizeBtn_OnClick"/>
+
+                <!-- Close -->
+                <Button x:Name="CloseBtn"
+                        Classes="titlebarBtn titlebarClose"
+                        Content="✕"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Click="CloseBtn_OnClick"/>
             </StackPanel>
         </Grid>
     </Border>

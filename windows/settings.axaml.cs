@@ -1,8 +1,13 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Androidplayer.windows.settings_view;
+using Avalonia;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using Avalonia.Threading;
 
 namespace Androidplayer.windows;
 
@@ -16,8 +21,8 @@ public partial class settings : Window
 
         this.Loaded += OnLoaded;
         SettingsListBox.SelectionChanged += SettingsListBox_SelectionChanged;
-        SettingsListBox.SelectedIndex = 0;
-        SettingsContent.Content = new ScreenSettings();
+        SettingsListBox.SelectedIndex = 2;
+        SettingsContent.Content = new MouseSettings();
 
         this.DataContext = UISettings.Instance;
     }
@@ -63,6 +68,53 @@ public partial class settings : Window
 
     private void save_btn_click(object? sender, RoutedEventArgs e)
     {
+        
         UISettings.Instance.Save();
+        ShowToast("done", "Saved successfully!");
+        
+        
+
     }
+    
+    
+  
+    
+    
+    public void ShowToast(string mode, string message)
+    {
+        // Uses the settings window's own children instead of a canvas
+        var toastBorder = this.FindControl<Border>("ToastMessage");
+        var toastText   = this.FindControl<TextBlock>("ToastText");
+        var toasticon   = this.FindControl<Image>("Toasticon");
+
+        if (toastBorder == null || toastText == null || toasticon == null)
+        {
+            Console.WriteLine("⚠️ Toast elements not found.");
+            return;
+        }
+
+        toasticon.Source = new Bitmap(AssetLoader.Open(new Uri(
+            mode.Equals("warning", StringComparison.OrdinalIgnoreCase)
+                ? "avares://Androidplayer/Icons/warning.png"
+                : "avares://Androidplayer/Icons/checkmark.png"
+        )));
+
+        toastText.Text = message;
+
+        // The settings window uses a Grid, so no Canvas.SetLeft/Top.
+        // The toast Border already has HorizontalAlignment="Center" VerticalAlignment="Top"
+        // and Margin="0,20,0,0" in XAML, which positions it correctly.
+        toastBorder.ZIndex = 9999;
+
+        toastBorder.Opacity = 1;
+        toastBorder.IsVisible = true;
+
+        DispatcherTimer.RunOnce(() =>
+        {
+            toastBorder.IsVisible = false;
+        }, TimeSpan.FromSeconds(2.5));
+    }
+    
+    
+    
 }
