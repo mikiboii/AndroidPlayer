@@ -1,0 +1,157 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:androidplayer="clr-namespace:Androidplayer"
+             xmlns:pages="clr-namespace:Androidplayer.Pages"
+             xmlns:keymap="clr-namespace:Androidplayer.Src.Keymap"
+             xmlns:win="clr-namespace:Androidplayer.Rendering.win"
+             x:Class="Androidplayer.Gpuintrop_view">
+    
+      <Grid x:Name="MainImages_parent" Background="Black" RowDefinitions="Auto, *, Auto" Margin="0" >
+    
+
+
+    
+    <!-- Custom Flyleaf replacement: embeds a native HWND for DirectX -->
+    
+    <!-- HorizontalAlignment="Center" -->
+    <!-- VerticalAlignment="Center" -->
+   
+   
+     
+    <pages:TitleBar Grid.Row="0" ClipToBounds="True"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar>
+        <win:D11InteropRenderer Grid.Row="1" x:Name="my_render" /> 
+
+      <Canvas  Grid.Row="1" x:Name="ImageContainer"
+               Background="Transparent"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               DragDrop.AllowDrop="True"
+               ZIndex="1" 
+               
+          
+               
+               
+               ClipToBounds="True"
+              
+               Focusable="True">
+
+        <!-- Toast notification -->
+        <Border x:Name="ToastMessage"
+                IsHitTestVisible="False"
+                Background="#DD333333"
+                CornerRadius="8"
+                Padding="10,8"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Margin="0,20,0,0"
+                Opacity="0"
+                MaxWidth="400">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Image x:Name="Toasticon"
+                   Source="/Icons/warning.png"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   Width="30" Height="30"
+                   VerticalAlignment="Top"
+                   Margin="0,0,8,0"/>
+
+            <TextBlock x:Name="ToastText"
+                       Grid.Column="1"
+                       Text="Saved successfully!"
+                       Foreground="White"
+                       FontWeight="SemiBold"
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Top"/>
+          </Grid>
+        </Border>
+
+        <!-- Mode overlay (keyboard / controller icon animation) -->
+        
+        <!-- -->
+        <!-- HorizontalAlignment="Stretch" -->
+        <!-- VerticalAlignment="Stretch" -->
+        
+        <Border x:Name="ModeOverlay"
+                
+                
+                Background="Transparent"
+                CornerRadius="12"
+                BorderBrush="#40FFFFFF"
+                BorderThickness="1"
+                Opacity="0"
+                IsHitTestVisible="False"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                
+                IsVisible="False">
+          
+          
+          <Border.Transitions>
+            <Transitions>
+              <DoubleTransition Property="Opacity" Duration="0:0:0.25"/>
+            </Transitions>
+          </Border.Transitions>
+          
+          <Grid>
+            <Image x:Name="ModeOverlayImage"
+                   Stretch="Uniform"
+                   Margin="20"
+                   Source="/Icons/Keyboard.png"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   RenderTransformOrigin="0.5,0.5">
+              <!-- <Image.RenderTransform> -->
+              <!--   <ScaleTransform x:Name="OverlayScale" ScaleX="0.2" ScaleY="0.2"/> -->
+    
+              <!-- </Image.RenderTransform> -->
+              
+              <Image.RenderTransform>
+                <ScaleTransform 
+                 
+                  ScaleX="0.2"
+                                ScaleY="0.2"/>
+                
+                <!-- <ScaleTransform ScaleX="1" -->
+                <!--                 ScaleY="1"/> -->
+              </Image.RenderTransform>
+              
+              
+              
+             
+
+             
+              
+              
+              
+            </Image>
+          </Grid>
+        </Border>
+
+      </Canvas>
+      
+      
+      <keymap:keymap_menu Grid.Row="1"  ZIndex="3"  HorizontalAlignment="Left" VerticalAlignment="Stretch" IsVisible="False"/>
+      
+   
+ 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </Grid>
+    
+    
+</UserControl>

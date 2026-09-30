@@ -7,7 +7,10 @@
         xmlns:pages="using:Androidplayer.Pages"
       
         xmlns:local="using:Androidplayer"
-        xmlns:nativeTest="clr-namespace:Androidplayer.Native_test"
+        
+        xmlns:nativeTest="using:Androidplayer.Native_test"
+        xmlns:win="clr-namespace:Androidplayer.Rendering.win"
+
 
         CanResize="True"
 
@@ -16,9 +19,9 @@
         
      
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaTitleBarHeightHint="32"
+   
         ExtendClientAreaChromeHints="NoChrome"
-        SystemDecorations="None"
+        SystemDecorations="BorderOnly"
         
         WindowStartupLocation="CenterScreen"
 
@@ -46,8 +49,38 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <pages:TitleBar Grid.Row="0" ClipToBounds="True"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar>
+        <!-- <pages:TitleBar Grid.Row="0" ClipToBounds="True"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar> -->
+        <pages:TitleBar ClipToBounds="True"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar>
 
+        
+        <!-- <win:D11InteropRenderer Grid.Row="1" x:Name="my_render" /> -->
+        <!-- <win:D11InteropRenderer x:Name="my_render" /> -->
+        
+        
+        <!-- <local:Native_view x:Name="my_view" Grid.Row="1"   ></local:Native_view> -->
+        
+        
+        
+        <!-- <ContentControl x:Name="ShowFirstView" -->
+        <!--                  -->
+        <!--                 IsVisible="True"> -->
+        <!--     <TextBlock Text="Viewing Page One" /> -->
+        <!-- </ContentControl> -->
+        <!-- -->
+        <!-- <ContentControl x:Name="ShowSecondView" -->
+        <!--                 IsInitialized="False" -->
+        <!--                 IsVisible="False"> -->
+        <!--     <TextBlock x:Name="my_txt" Text="Viewing Page Two" /> -->
+        <!-- </ContentControl> -->
+        <!-- -->
+        
+        
+        
+    
+        
+        
+        
+        
 
      <!--  <local:FlyleafHost  x:Name="AndroidVideo"  d:DesignWidth="500" d:DesignHeight="500"  > -->
                  <!-- -->
@@ -115,7 +148,7 @@
         
      
      
-     <!-- <local:Native_view x:Name="my_view" Grid.Row="1"   ></local:Native_view> -->
+     
         
 
     </Grid>

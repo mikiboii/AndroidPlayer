@@ -10,7 +10,7 @@ using System.Threading;
 using Avalonia.Threading;
 
 #if WINDOWS
-
+using Androidplayer.Rendering.win;
 using SharpDX.Direct3D11;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
@@ -27,6 +27,7 @@ using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Store;
 using Androidplayer.windows;
 using Androidplayer.Src.Keymap;
+using Avalonia;
 using Avalonia.Media;
 
 namespace Androidplayer.Src
@@ -93,7 +94,6 @@ namespace Androidplayer.Src
         public Device dx_Device { get; set; }
         
                     
-                    PollXAudioAndCleanup();
 #endif
         
         
@@ -594,8 +594,27 @@ namespace Androidplayer.Src
                     Console.WriteLine($"from scrcpy worker : {VideoWidth} , {VideoHeight}");
                     videosizeReady?.Invoke((VideoWidth, VideoHeight));
                 }
+                
+                dynamic  my_directx = null ;
+                  
+                if (UISettings.Instance.Nativeview_mode)
+                {
 
-                k_info.Instance.directx?.PresentFrame(_pendingFrame);
+                    my_directx = k_info.Instance.directx;
+                }
+                else
+                {
+                    my_directx = D11InteropRenderer.Instance;
+
+                }
+
+
+                my_directx?.PresentFrame(_pendingFrame);
+                
+                
+                
+             
+                
                 
                 
                 _lastFrameTime = currentTime;
@@ -680,8 +699,21 @@ namespace Androidplayer.Src
 
 
                         Texture2D frame = null;
+                        dynamic  my_directx = null ;
+                  
+                        if (UISettings.Instance.Nativeview_mode)
+                        {
+
+                           my_directx = k_info.Instance.directx;
+                        }
+                        else
+                        {
+                            my_directx = D11InteropRenderer.Instance;
+
+                        }
+                            
                         
-                        k_info.Instance.directx?.RunOnContext(_ =>
+                        my_directx?.RunOnContext(new Action<object>(_ =>
                         {
                             
                         frame = _decoder.DecodePacket(
@@ -727,7 +759,7 @@ namespace Androidplayer.Src
 
                         _previousFrame = frame;
                             
-                        });
+                        }));
                         
                         
                         

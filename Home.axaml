@@ -65,9 +65,9 @@
         <!--                /> -->
 
 
-        <src:Display_view x:Name="displayView"
-                         
-                          Grid.Row="1"/>
+        <!-- <src:Display_view x:Name="displayView" -->
+        <!--                   -->
+        <!--                   Grid.Row="1"/> -->
        
         <pages:Loading_page x:Name="loadingpage"
                             IsVisible="False"

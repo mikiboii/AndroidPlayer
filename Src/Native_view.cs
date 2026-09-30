@@ -616,6 +616,8 @@ public class Native_view : NativeControlHost
         Attach();
         HandleCreated?.Invoke(this, _platformHandle);
 
+        Console.WriteLine("Nativeview handle created");
+
         // _floatingContent.Background = Brushes.Transparent;
         // if (_floatingContent.TryGetPlatformHandle()?.Handle is { } nativeHandle)
         // {

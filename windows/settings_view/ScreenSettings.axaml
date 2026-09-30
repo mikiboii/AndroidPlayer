@@ -7,7 +7,7 @@
              xmlns:windows="clr-namespace:Androidplayer.windows"
 
              x:DataType="windows:UISettings"   
-             d:DataContext="{d:DesignInstance Type=windows:UISettings, IsDesignTimeCreatable=True}"
+             
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="500">
 
@@ -73,8 +73,14 @@
                        Margin="0,0,0,12"
                        TextWrapping="Wrap"/>
 
+            <!-- <ComboBox x:Name="fps_combo" -->
+            <!--           Width="60" -->
+            <!--           SelectedItem="{Binding FPS, Mode=TwoWay}" -->
+            <!--           Margin="0,0,0,8" -->
+            <!--           HorizontalAlignment="Left"/> -->
+            
             <ComboBox x:Name="fps_combo"
-                      Width="60"
+                      MinWidth="80"
                       SelectedItem="{Binding FPS, Mode=TwoWay}"
                       Margin="0,0,0,8"
                       HorizontalAlignment="Left"/>

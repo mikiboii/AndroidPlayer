@@ -21,6 +21,9 @@ using Size = Avalonia.Size;
 
 namespace Androidplayer.Src;
 
+
+
+
 public partial class Display_view : UserControl
 {
     private App_manager my_app_manager;
@@ -32,36 +35,19 @@ public partial class Display_view : UserControl
     [DllImport("user32.dll")]
     static extern bool SetCursorPos(int X, int Y);
 
+    
+    
+    
+    
+    
     public Display_view()
     {
         InitializeComponent();
-
-        // if (MainImage != null)
-        // {
-        //     
-        //     // Wire up surface events — using the Avalonia host's Surface control
+      
         //
-        //     if (ImageContainer != null)
-        //     {
+        // DataContext = new { CurrentDisplay = true ? new NativeDisplay() : new FallbackDisplay() };
         //
-        //         Console.WriteLine("serring mainimage events");
-        //         
-        //         ImageContainer.PointerPressed += ImageContainer_OnMouseDown;
-        //         ImageContainer.PointerReleased += ImageContainer_OnMouseUp;
-        //         ImageContainer.PointerMoved += ImageContainer_OnMouseMove;
-        //         ImageContainer.PointerWheelChanged += ImageContainer_OnMouseWheel;
         //
-        //         ImageContainer.AddHandler(DragDrop.DragEnterEvent, ImageContainer_DragEnter);
-        //         ImageContainer.AddHandler(DragDrop.DropEvent, ImageContainer_Drop);
-        //
-        //         ImageContainer.Focusable = true;
-        //         MainImage.Focusable = true;
-        //     }
-        //     ImageContainer.Focusable = true;
-        //     MainImage.Focusable = true;
-        //     
-        // }
-
         
         ModeOverlay.ZIndex = 999;
         
@@ -133,6 +119,17 @@ public partial class Display_view : UserControl
         _resizeTimer.Tick += ResizeTimer_Tick;
     }
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     private void MainImageOnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
         int v_width = My_Store.Instance.VideoWidth;
@@ -761,7 +758,7 @@ public partial class Display_view : UserControl
     {
         var pos = e.GetPosition(ImageContainer);
 
-        Console.WriteLine("clicking image");
+        // Console.WriteLine("clicking image");
         
         
         

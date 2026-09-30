@@ -15,8 +15,11 @@
         WindowStartupLocation="CenterScreen"
         CanResize="False"
         Background="#F6F7F9"
+        
+ 
         Icon="/Icons/android.png"
 
+        CornerRadius="8"
         SystemDecorations="None"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"

@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using Androidplayer.Src.Keymap.Keymap_items;
 using Avalonia;
 using Avalonia.Controls;
@@ -16,6 +18,9 @@ using Avalonia.VisualTree;
 using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Src.Keymap.Keymap_items;
 using Androidplayer.Store;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
+using Avalonia.Styling;
 using LiteDB;
 
 namespace Androidplayer.Src.Keymap
@@ -585,34 +590,165 @@ namespace Androidplayer.Src.Keymap
         // }
         
         
-        public void AnimateModeOverlay(string mode)
+        // public void AnimateModeOverlay(string mode)
+        // {
+        //     var overlay = display_view.FindControl<Border>("ModeOverlay");
+        //     var image = display_view.FindControl<Image>("ModeOverlayImage");
+        //
+        //     if (overlay == null || image == null)
+        //     {
+        //         Console.WriteLine("⚠️ ModeOverlay elements not found.");
+        //         return;
+        //     }
+        //
+        //     image.Source = new Bitmap(AssetLoader.Open(new Uri(
+        //         mode.Equals("keyboard", StringComparison.OrdinalIgnoreCase)
+        //             ? "avares://Androidplayer/Icons/Keyboard_2.png"
+        //             : "avares://Androidplayer/Icons/Controller_2.png"
+        //     )));
+        //
+        //     overlay.IsVisible = true;
+        //     overlay.Opacity = 1;
+        //
+        //     if (overlay.RenderTransform is ScaleTransform scale)
+        //     {
+        //         scale.ScaleX = 0.4;
+        //         scale.ScaleY = 0.4;
+        //     }
+        //
+        //     Console.WriteLine("Mode overlay shown.");
+        // }
+        
+        
+        
+    // Add near the other fields:
+private int _overlayAnimToken;
+private CancellationTokenSource? _overlayCts;
+
+public async void AnimateModeOverlay(string mode)
+{
+    try
+    {
+        if (!_canvas.IsInitialized)
         {
-            var overlay = display_view.FindControl<Border>("ModeOverlay");
-            var image = display_view.FindControl<Image>("ModeOverlayImage");
-        
-            if (overlay == null || image == null)
-            {
-                Console.WriteLine("⚠️ ModeOverlay elements not found.");
-                return;
-            }
-        
-            image.Source = new Bitmap(AssetLoader.Open(new Uri(
-                mode.Equals("keyboard", StringComparison.OrdinalIgnoreCase)
-                    ? "avares://Androidplayer/Icons/Keyboard_2.png"
-                    : "avares://Androidplayer/Icons/Controller_2.png"
-            )));
-        
-            overlay.IsVisible = true;
-            overlay.Opacity = 1;
-        
-            if (overlay.RenderTransform is ScaleTransform scale)
-            {
-                scale.ScaleX = 0.4;
-                scale.ScaleY = 0.4;
-            }
-        
-            Console.WriteLine("Mode overlay shown.");
+            Console.WriteLine("canvas not initialized");
+            return;
         }
+
+        var overlay = display_view.FindControl<Border>("ModeOverlay");
+        var image   = display_view.FindControl<Image>("ModeOverlayImage");
+
+        if (overlay is null || image is null)
+        {
+            Console.WriteLine("⚠️ ModeOverlay elements not found.");
+            return;
+        }
+
+        // ---- Tunable timing / scale ----
+        const double startScale  = 0.1;   // slightly smaller than final
+        const double endScale    = 0.18;   // resting size
+        const int    popMs       = 180;    // scale pop-in
+        const int    fadeInMs    = 100;
+        const int    holdMs      = 400;
+        const int    fadeOutMs   = 200;
+        int totalMs = fadeInMs + holdMs + fadeOutMs;
+
+        // Cancel any animation still running from a previous call
+        _overlayCts?.Cancel();
+        _overlayCts = new CancellationTokenSource();
+        var ct = _overlayCts.Token;
+        int myToken = ++_overlayAnimToken;
+
+        // ---- 1. Icon ----
+        image.Source = new Bitmap(AssetLoader.Open(new Uri(
+            mode.Equals("keyboard", StringComparison.OrdinalIgnoreCase)
+                ? "avares://Androidplayer/Icons/Keyboard_2.png"
+                : "avares://Androidplayer/Icons/Controller_2.png")));
+
+        // ---- 2. Fill the canvas ----
+        double cw = _canvas.Bounds.Width;
+        double ch = _canvas.Bounds.Height;
+        if (cw > 0 && ch > 0)
+        {
+            overlay.Width  = cw;
+            overlay.Height = ch;
+            Canvas.SetLeft(overlay, 0);
+            Canvas.SetTop(overlay, 0);
+        }
+
+        // ---- 3. Reset state. Opacity is animated directly, so no Transitions needed ----
+        overlay.Transitions = null;
+        overlay.Opacity = 0;
+        image.RenderTransformOrigin = RelativePoint.Center;
+        image.RenderTransform = new ScaleTransform(endScale, endScale); // base value = resting size
+
+        overlay.IsVisible = true;
+
+        // ---- 4. Opacity: quick fade in, hold, fade out (one animation) ----
+        double cueFadeInEnd  = (double)fadeInMs / totalMs;
+        double cueHoldEnd    = (double)(fadeInMs + holdMs) / totalMs;
+
+        var opacityAnim = new Animation
+        {
+            Duration = TimeSpan.FromMilliseconds(totalMs),
+            Children =
+            {
+                new KeyFrame { Cue = new Cue(0d),           Setters = { new Setter(Visual.OpacityProperty, 0d) } },
+                new KeyFrame { Cue = new Cue(cueFadeInEnd), Setters = { new Setter(Visual.OpacityProperty, 1d) } },
+                new KeyFrame { Cue = new Cue(cueHoldEnd),   Setters = { new Setter(Visual.OpacityProperty, 1d) } },
+                new KeyFrame { Cue = new Cue(1d),           Setters = { new Setter(Visual.OpacityProperty, 0d) } },
+            }
+        };
+
+        // ---- 5. Scale: fast pop that settles (EaseOut) ----
+        var popAnim = new Animation
+        {
+            Duration = TimeSpan.FromMilliseconds(popMs),
+            Easing   = new CubicEaseOut(),
+            Children =
+            {
+                new KeyFrame
+                {
+                    Cue = new Cue(0d),
+                    Setters =
+                    {
+                        new Setter(ScaleTransform.ScaleXProperty, startScale),
+                        new Setter(ScaleTransform.ScaleYProperty, startScale)
+                    }
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(1d),
+                    Setters =
+                    {
+                        new Setter(ScaleTransform.ScaleXProperty, endScale),
+                        new Setter(ScaleTransform.ScaleYProperty, endScale)
+                    }
+                }
+            }
+        };
+
+        Console.WriteLine($"[Overlay] mode={mode} shown");
+
+        // Run both on the CONTROLS (not the transform) and wait for the fade to finish
+        await Task.WhenAll(
+            opacityAnim.RunAsync(overlay, ct),
+            popAnim.RunAsync(image, ct));
+
+        if (myToken != _overlayAnimToken) return;
+
+        // ---- 6. Done: hide (opacity already back to its base value of 0) ----
+        overlay.IsVisible = false;
+    }
+    catch (OperationCanceledException)
+    {
+        // A newer call cancelled this one. Expected.
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Overlay] animation error: {ex}");
+    }
+}
 
         #endregion
 

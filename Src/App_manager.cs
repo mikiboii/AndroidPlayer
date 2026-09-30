@@ -3,12 +3,15 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
+using Androidplayer.Rendering.win;
 using Avalonia.Threading;
 // using Androidplayer.Src.Controls;
 using Androidplayer.Src.Keymap;
 using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Src.Rendering;
 using Androidplayer.Store;
+using Androidplayer.windows;
+using Avalonia.Controls;
 using Avalonia.Media;
 
 
@@ -46,7 +49,7 @@ public class App_manager : IDisposable
 
     private bool is_running = true;
 
-    public App_manager(Native_view image)
+    public App_manager(Native_view image = null)
     {
         my_image = image;
 
@@ -55,8 +58,16 @@ public class App_manager : IDisposable
         if (!my_info.Instance.DeveloperMode)
         {
             // k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
+
+            if (UISettings.Instance.Nativeview_mode)
+            {
+                
             
             k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
+            }else{
+                
+                // D11InteropRenderer.Instance.Initialize();
+            }
 
             my_adb_worker = new Adb_worker();
             my_adb_worker.ProgressChanged += my_app_worker_ProgressChanged;
@@ -68,13 +79,23 @@ public class App_manager : IDisposable
         else
         {
             // k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
-            k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
+            // k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
+            if (UISettings.Instance.Nativeview_mode)
+            {
+                
+            
+                k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
+                var w = my_image.Bounds.Width;
+                var h = my_image.Bounds.Height;
 
-            var w = my_image.Bounds.Width;
-            var h = my_image.Bounds.Height;
+                Console.WriteLine($"Surface size FIXED after init: {w} x {h}");
+                Console.WriteLine(my_image.PlatformHandle.Handle);
+            }else{
+                
+                // D11InteropRenderer.Instance.Initialize();
+            }
+                Console.WriteLine("devmode called from app manager");
 
-            Console.WriteLine($"Surface size FIXED after init: {w} x {h}");
-            Console.WriteLine(my_image.PlatformHandle.Handle);
 
             // my_app_worker = new app_worker();
             //
@@ -230,11 +251,15 @@ public class App_manager : IDisposable
                             
 #if WINDOWS
 
+                            if (UISettings.Instance.Nativeview_mode)
+                            {
+            
+                                if (k_info.Instance.my_renderer is DirectX dx)
+                                    dx.ResizeSwapChain(
+                                        (int)my_image.Bounds.Width,
+                                        (int)my_image.Bounds.Height);
+                            }
                             
-                            if (k_info.Instance.my_renderer is DirectX dx)
-                                dx.ResizeSwapChain(
-                                    (int)my_image.Bounds.Width,
-                                    (int)my_image.Bounds.Height);
 #endif
 
                             if (my_info.Instance.DeveloperMode)
@@ -243,10 +268,14 @@ public class App_manager : IDisposable
                                 // k_info.Instance.my_renderer?.HandleResize();
                                 
                                 #if WINDOWS
+                                if (UISettings.Instance.Nativeview_mode)
+                                {
+            
+                                    if (k_info.Instance.my_renderer is DirectX dx1)
+                                        dx1.HandleResize();
+                                    
+                                }
                                 
-                                
-                                if (k_info.Instance.my_renderer is DirectX dx1)
-                                    dx1.HandleResize();
                                 #endif
                             }
                         }
@@ -258,29 +287,51 @@ public class App_manager : IDisposable
 
     private void del_mm()
     {
+        
         Dispatcher.UIThread.Post(() =>
         {
-            if (my_image != null)
+            if (UISettings.Instance.Nativeview_mode)
             {
-                var w = my_image.Bounds.Width;
-                var h = my_image.Bounds.Height;
+                if (my_image != null)
+                {
+                    var w = my_image.Bounds.Width;
+                    var h = my_image.Bounds.Height;
 
-                Console.WriteLine($"Surface size FIXED: {w} x {h}");
-                Console.WriteLine($"INIT DX SIZE: {w} x {h}");
-                // k_info.Instance.directx?.DisplayImage("dev_img1.jpg");
-                // k_info.Instance.directx?.DisplayImage("dev_img2.jpg");
-                
-                k_info.Instance.my_renderer?.DisplayImage("dev_img2.jpg");
-                
-                
-                // MainImage._floatingContent.Background = Brushes.Transparent;
-                Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+                    Console.WriteLine($"Surface size FIXED: {w} x {h}");
+                    Console.WriteLine($"INIT DX SIZE: {w} x {h}");
+                    
+                    k_info.Instance.my_renderer?.DisplayImage("dev_img2.jpg");
+                    // if (UISettings.Instance.Nativeview_mode)
+                    // {
+                    //
+                    //
+                    //     
+                    // }else{
+                    //
+                    //     
+                    // }
+                    
+                    
+                    var mainImage = Home.Instance.displayView?.FindControl<Native_view>("MainImage");
+                    mainImage._floatingContent.Background =  Brushes.Transparent;
+                    // MainImage._floatingContent.Background = Brushes.Transparent;
+                    // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
 
-                // Home.Instance.displayView.MainImage.IsVisible = true;
+                    // Home.Instance.displayView.MainImage.IsVisible = true;
+                    
+                    // Home.Instance.Show();
+                    // Home.Instance.IsVisible = true;
+                }
                 
-                // Home.Instance.Show();
-                // Home.Instance.IsVisible = true;
+                
+                
+            }else
+            {
+                    
+                    
+                D11InteropRenderer.Instance?.DisplayImage("dev_img1.jpg");
             }
+
         }, DispatcherPriority.Loaded);
     }
 
@@ -351,7 +402,19 @@ public class App_manager : IDisposable
         // scrcpy_worker.dx_Device = k_info.Instance.directx?.my_Device;
         
         #if WINDOWS
+
+        if (UISettings.Instance.Nativeview_mode)
+        {
+            
         scrcpy_worker.dx_Device = (k_info.Instance.my_renderer as DirectX)?.my_Device;
+        }
+        else
+        {
+        scrcpy_worker.dx_Device = D11InteropRenderer.Instance?.my_Device;
+            
+            
+            
+        }
         #endif
 
         scrcpy_worker.Frame_almostready += Scrcpy_workerOnFrame_almostready;
@@ -382,13 +445,20 @@ public class App_manager : IDisposable
     private void on_DeviceResolutionReady((int Width, int Height) div)
     {
         My_Store.Instance.SetDeviceResolution(div.Width, div.Height);
-        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+
+        if (UISettings.Instance.Nativeview_mode)
         {
-        
-            Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
             
-        });
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+            
+                var mainImage = Home.Instance.displayView?.FindControl<Native_view>("MainImage");
+                mainImage._floatingContent.Background =  Brushes.Transparent;
+                // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+                
+            });
         
+        }
     }
 
     private void on_ControlSocketReady(TcpClient control_socket)

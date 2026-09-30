@@ -1,5 +1,6 @@
 ﻿using System;
 using Androidplayer.Src;
+using Androidplayer.windows;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -7,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Color = System.Drawing.Color;
 
 namespace Androidplayer.Native_test;
@@ -15,6 +17,10 @@ public partial class My_window : Window
 {
     
     private Adb_worker_test my_adb_worker;
+    
+
+
+  
     public My_window()
     {
       
@@ -28,7 +34,40 @@ public partial class My_window : Window
 
         Console.WriteLine("my constructor");
         Loaded += OnLoaded;
+        // my_render.Initialized += My_renderOnInitialized;
+        //
+        // Console.WriteLine(my_txt);
         
+        if (this.Content is Grid rootGrid)
+        {
+            var text = new TextBlock
+            {
+                Text = "Viewing Page One",
+                Name = "my_txt"
+                
+            };
+
+            // Sibling of the TitleBar, sitting in row 1.
+            Grid.SetRow(text, 1);
+            rootGrid.Children.Add(text);
+        }
+        
+        
+        
+        
+        
+        
+    }
+
+    // In OnLoaded or wherever mode is known:
+    // ApplyNativeMode();
+
+  
+    
+    
+    private void My_renderOnInitialized(object? sender, EventArgs e)
+    {
+        // my_render.DisplayImage("dev_img2.jpg");
     }
 
     private void My_viewOnHandleCreated(object? sender, IPlatformHandle e)

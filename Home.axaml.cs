@@ -79,6 +79,9 @@ public partial class Home : Window
     
     private  String currently_active = null;
     
+    public Control? displayView; 
+    
+    
 //
 //     public Home()
 //     {
@@ -159,6 +162,30 @@ public partial class Home : Window
         
         
         this.PropertyChanged += Home_PropertyChanged;
+        
+        
+        if (UISettings.Instance.Nativeview_mode)
+        {
+            // Native overlay path
+            displayView = new Display_view
+            {
+                
+            };
+        }
+        else
+        {
+            
+            displayView = new Gpuintrop_view
+            {
+                
+            };
+            
+        }
+        
+        Grid.SetRow(displayView, 1);
+        int insertAt = RootGrid.Children.IndexOf(loadingpage);
+        if (insertAt < 0) insertAt = RootGrid.Children.Count;
+        RootGrid.Children.Insert(insertAt, displayView);
 
         Loaded += MainImageOnLoaded;
         k_info.Instance.PropertyChanged += K_info_changed;
@@ -192,7 +219,9 @@ public partial class Home : Window
 
             
             // Home.Instance.displayView.MainImage.IsVisible = true;
-            Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+            var mainImage = displayView?.FindControl<Native_view>("MainImage");
+            mainImage._floatingContent.Background =  Brushes.Transparent;
+            // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
             // k_info.Instance.directx.HandleResize();
 
             k_info.Instance.my_renderer?.HandleResize();
@@ -220,7 +249,9 @@ public partial class Home : Window
                     Console.WriteLine("got minimized");
                     
                     // Home.Instance.displayView.MainImage.IsVisible = false;
-                    Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Black;
+                    var mainImage = displayView?.FindControl<Native_view>("MainImage");
+                    mainImage._floatingContent.Background = Brushes.Black;
+                    // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Black;
                     break;
 
                 case WindowState.Maximized:
@@ -713,6 +744,7 @@ public partial class Home : Window
             _isFullscreen = false;
 
             // CustomTitleBar.IsVisible = true;
+            
         }
     }
 

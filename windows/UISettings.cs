@@ -303,6 +303,25 @@ namespace Androidplayer.windows
                 OnPropertyChanged(nameof(AudioEnabled));
             }
         }
+        
+         
+        
+        
+        private bool _nativeview_mode = false;
+        public bool Nativeview_mode
+        {
+            get => _nativeview_mode;
+            set
+            {
+                if (_nativeview_mode == value) return;
+                _nativeview_mode = value;
+                OnPropertyChanged(nameof(Nativeview_mode));
+            }
+        }
+
+        
+        
+        
 
         private string _selectedConnectionType = "USB";
         public string SelectedConnectionType

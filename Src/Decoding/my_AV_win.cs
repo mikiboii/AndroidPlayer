@@ -62,11 +62,7 @@ public unsafe class my_AV_win : IDisposable
             "deps",
             Environment.Is64BitProcess ? "x64" : "x32");
 
-        if (!Directory.Exists(ffmpegPath))
-        {
-            throw new DirectoryNotFoundException(
-                $"FFmpeg directory not found: {ffmpegPath}");
-        }
+      
 
         // ffmpeg.RootPath = ffmpegPath;
         ffmpeg.RootPath = AppContext.BaseDirectory;

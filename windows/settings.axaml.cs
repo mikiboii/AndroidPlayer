@@ -17,6 +17,7 @@ public partial class settings : Window
         this.Loaded += OnLoaded;
         SettingsListBox.SelectionChanged += SettingsListBox_SelectionChanged;
         SettingsListBox.SelectedIndex = 0;
+        SettingsContent.Content = new ScreenSettings();
 
         this.DataContext = UISettings.Instance;
     }
@@ -35,7 +36,7 @@ public partial class settings : Window
                 SettingsContent.Content = new MouseSettings();
                 break;
             default:
-                SettingsContent.Content = null;
+                SettingsContent.Content = new ScreenSettings();
                 break;
         }
     }
