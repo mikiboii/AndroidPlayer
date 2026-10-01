@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Androidplayer.Native_test;
+
 using Androidplayer.windows;
 using Avalonia;
 using Avalonia.Controls;
@@ -31,19 +31,7 @@ public partial class App : Application
             //     IsVisible = false // Keeps the window loaded but hidden
             // };
             
-            // desktop.MainWindow = new Home();
-            
-            // demo();
-            //
-            // desktop.MainWindow = new Home
-            // {
-            //     
-            //     Opacity = 0,
-            //     ShowInTaskbar = false,
-            //     IsVisible = false,
-            //     WindowState = WindowState.Minimized
-            // };
-            
+           
             
             
             // desktop.MainWindow.Hide();
@@ -55,21 +43,7 @@ public partial class App : Application
             // settings.Show();
             
 
-            // Thread.Sleep(3000);
-            //
-            //
-            // desktop.MainWindow = new Home();
-            
-            // StartAsync();
-            
-            // var mainWindow = new My_window();
-            // mainWindow.Opacity = 0;
-            // mainWindow.ShowInTaskbar = false;
-            // mainWindow.ShowActivated = false;
-            //
-            // mainWindow.Show();
-            //     
-            // mainWindow.Hide();  
+    
 
             
             StartupTimer.Mark("Home created");
@@ -114,14 +88,6 @@ public partial class App : Application
         // 4. Show it so the handle exists and Loaded can fire
         home.Show();
 
-        // 5. Reveal it once it's actually loaded and laid out
-        // home.Loaded += (_, _) =>
-        // {
-        //     home.WindowState = WindowState.Normal;   // only now is this safe
-        //     home.ShowInTaskbar = true;
-        //     home.Opacity = 1;
-        //     home.Activate();
-        // };
 
         // 6. Now that Home is the main window, hook up the shutdown policy
         desktop.MainWindow = home;

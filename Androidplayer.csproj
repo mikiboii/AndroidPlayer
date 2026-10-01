@@ -138,5 +138,11 @@
         <AvaloniaResource Include="Src\Keymap\K_icons\**" />
        
     </ItemGroup>
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Native_test\my_view.axaml" />
+      <UpToDateCheckInput Remove="Native_test\My_window.axaml" />
+      <UpToDateCheckInput Remove="Native_test\VideoPlayer.axaml" />
+      <UpToDateCheckInput Remove="Native_test\VideoPlayer_2.axaml" />
+    </ItemGroup>
 
 </Project>

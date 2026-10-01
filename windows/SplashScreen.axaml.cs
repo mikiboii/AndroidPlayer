@@ -1,21 +1,3 @@
-// using Avalonia;
-// using Avalonia.Controls;
-// using Avalonia.Markup.Xaml;
-//
-// namespace Androidplayer.windows;
-//
-// public partial class SplashScreen : Window
-// {
-//     public SplashScreen()
-//     {
-//         InitializeComponent();
-//     }
-// }
-
-
-
-
-
 
 using System;
 using Avalonia;

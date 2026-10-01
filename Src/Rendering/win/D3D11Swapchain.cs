@@ -1,10 +1,3 @@
-// namespace Androidplayer.Rendering;
-//
-// public class D3D11Swapchain
-// {
-//     
-// }
-
 
 
 
@@ -22,11 +15,7 @@ using DxgiResource = SharpDX.DXGI.Resource;
 
 namespace Androidplayer.Rendering;
 
-/// <summary>
-/// Standalone D3D11 -> Avalonia composition swapchain. Does not inherit
-/// from SwapchainBase&lt;T&gt; and does not require ISwapchainImage; the
-/// image-pooling / lifetime logic is implemented inline.
-/// </summary>
+
 class D3D11Swapchain : IAsyncDisposable
 {
     private readonly D3DDevice _device;

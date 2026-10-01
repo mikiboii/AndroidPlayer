@@ -29,6 +29,7 @@
         <entry key="windows/settings.axaml" value="Androidplayer.csproj" />
         <entry key="windows/settings_view/MouseSettings.axaml" value="Androidplayer.csproj" />
         <entry key="windows/settings_view/ScreenSettings.axaml" value="Androidplayer.csproj" />
+        <entry key="windows/settings_view/WindowSettings.axaml" value="Androidplayer.csproj" />
       </map>
     </option>
   </component>
