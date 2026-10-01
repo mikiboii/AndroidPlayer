@@ -1,102 +1,4 @@
-﻿<!-- <UserControl x:Class="Androidplayer.windows.settings_view.MouseSettings" -->
-<!--              xmlns="https://github.com/avaloniaui" -->
-<!--              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" -->
-<!--              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" -->
-<!--              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" -->
-<!--              xmlns:local="clr-namespace:Androidplayer.windows.settings_view" -->
-<!--              mc:Ignorable="d" -->
-<!--              d:DesignHeight="600" d:DesignWidth="500"> -->
-<!-- -->
-<!--   ~1~ Scrollable content card @1@ -->
-<!--   <Border Background="White" -->
-<!--           CornerRadius="8" -->
-<!--           Padding="24" -->
-<!--           Margin="0,0,0,12" -->
-<!--           BorderBrush="#E8EBF0" -->
-<!--           BorderThickness="1"> -->
-<!--     <ScrollViewer VerticalScrollBarVisibility="Auto"> -->
-<!--       <StackPanel> -->
-<!-- -->
-<!--         ~1~ Key mouse unlock @1@ -->
-<!--         <Border CornerRadius="6" -->
-<!--                 Background="#FFFFFF" -->
-<!--                 Padding="14" -->
-<!--                 Margin="0,0,0,16" -->
-<!--                 BorderBrush="#EEF1F4" -->
-<!--                 BorderThickness="1"> -->
-<!--           <StackPanel> -->
-<!--             <TextBlock Foreground="{DynamicResource PrimaryBrush}" -->
-<!--                        Text="Key mouse unlock" -->
-<!--                        FontWeight="Bold" -->
-<!--                        FontSize="15" -->
-<!--                        Margin="0,0,0,4"/> -->
-<!--             <TextBlock Text="Global Settings" -->
-<!--                        FontSize="12" -->
-<!--                        Foreground="#6B6F77" -->
-<!--                        Margin="0,0,0,12"/> -->
-<!--             <CheckBox Content="Whether to turn on screen center unlock" -->
-<!--                       IsChecked="True" -->
-<!--                       Margin="0,0,0,8"/> -->
-<!--             <TextBlock Text="* After checking, the position of the mouse after unlocking will always be displayed centered relative to the screen" -->
-<!--                        Foreground="#E36C60" -->
-<!--                        FontSize="12" -->
-<!--                        TextWrapping="Wrap"/> -->
-<!--           </StackPanel> -->
-<!--         </Border> -->
-<!-- -->
-<!--         ~1~ Windows System Settings @1@ -->
-<!--         <Border CornerRadius="6" -->
-<!--                 Background="#FFFFFF" -->
-<!--                 Padding="14" -->
-<!--                 Margin="0,0,0,16" -->
-<!--                 BorderBrush="#EEF1F4" -->
-<!--                 BorderThickness="1"> -->
-<!--           <StackPanel> -->
-<!--             <TextBlock Text="Windows System Settings" -->
-<!--                        FontWeight="Bold" -->
-<!--                        FontSize="15" -->
-<!--                        Margin="0,0,0,4"/> -->
-<!--             <TextBlock Text="Global Settings" -->
-<!--                        FontSize="12" -->
-<!--                        Foreground="#6B6F77" -->
-<!--                        Margin="0,0,0,12"/> -->
-<!--             <CheckBox Content="Mouse acceleration (improve pointer accuracy)" -->
-<!--                       IsChecked="False" -->
-<!--                       Margin="0,0,0,8"/> -->
-<!--             <TextBlock Text="* After checking, it will take effect globally in Windows" -->
-<!--                        Foreground="#E36C60" -->
-<!--                        FontSize="12" -->
-<!--                        TextWrapping="Wrap"/> -->
-<!--           </StackPanel> -->
-<!--         </Border> -->
-<!-- -->
-<!--         ~1~ Mouse speed @1@ -->
-<!--         <Border CornerRadius="6" -->
-<!--                 Background="#FFFFFF" -->
-<!--                 Padding="14" -->
-<!--                 Margin="0,0,0,8" -->
-<!--                 BorderBrush="#EEF1F4" -->
-<!--                 BorderThickness="1"> -->
-<!--           <StackPanel> -->
-<!--             <TextBlock Text="Mouse speed" -->
-<!--                        FontWeight="Bold" -->
-<!--                        FontSize="15" -->
-<!--                        Margin="0,0,0,4"/> -->
-<!--             <TextBlock Text="Global Settings" -->
-<!--                        FontSize="12" -->
-<!--                        Foreground="#6B6F77" -->
-<!--                        Margin="0,0,0,12"/> -->
-<!--             <RadioButton Content="Default" -->
-<!--                          IsChecked="True" -->
-<!--                          GroupName="MouseSpeed"/> -->
-<!--           </StackPanel> -->
-<!--         </Border> -->
-<!-- -->
-<!--       </StackPanel> -->
-<!--     </ScrollViewer> -->
-<!--   </Border> -->
-<!-- </UserControl> -->
-
+﻿
 
 <UserControl x:Class="Androidplayer.windows.settings_view.MouseSettings"
              xmlns="https://github.com/avaloniaui"
@@ -267,10 +169,10 @@
                   <RadioButton x:Name="Cursor_Default"
                                Classes="indicator"
                                GroupName="CursorChoice"
-                               Tag="default"
+                               Tag="Default"
                                Checked="Cursor_Checked"/>
                   <StackPanel>
-                    <Image Source="avares://Androidplayer/Icons/cursor/black_sword.png"
+                    <Image Source="avares://Androidplayer/Icons/cursor/Default_cursor.png"
                            Opacity="0.15"/>
                     <TextBlock Classes="label" Text="Default"/>
                   </StackPanel>
@@ -284,7 +186,7 @@
                   <RadioButton x:Name="Cursor_Sword"
                                Classes="indicator"
                                GroupName="CursorChoice"
-                               Tag="sword"
+                               Tag="avares://Androidplayer/Icons/cursor/black_sword.png"
                                Checked="Cursor_Checked"/>
                   <StackPanel>
                     <Image Source="avares://Androidplayer/Icons/cursor/black_sword.png"/>
@@ -300,7 +202,7 @@
                   <RadioButton x:Name="Cursor_Cookie"
                                Classes="indicator"
                                GroupName="CursorChoice"
-                               Tag="cookie"
+                               Tag="avares://Androidplayer/Icons/cursor/cookie_2.png"
                                Checked="Cursor_Checked"/>
                   <StackPanel>
                     <Image Source="avares://Androidplayer/Icons/cursor/cookie_2.png"/>
@@ -316,7 +218,7 @@
                   <RadioButton x:Name="Cursor_Raccoon"
                                Classes="indicator"
                                GroupName="CursorChoice"
-                               Tag="raccoon"
+                               Tag="avares://Androidplayer/Icons/cursor/cute-happy-raccoon-pointer.png"
                                Checked="Cursor_Checked"/>
                   <StackPanel>
                     <Image Source="avares://Androidplayer/Icons/cursor/cute-happy-raccoon-pointer.png"/>
@@ -332,7 +234,7 @@
                   <RadioButton x:Name="Cursor_AKM"
                                Classes="indicator"
                                GroupName="CursorChoice"
-                               Tag="akm"
+                               Tag="avares://Androidplayer/Icons/cursor/PUBG_AKM_Cursor.png"
                                Checked="Cursor_Checked"/>
                   <StackPanel>
                     <Image Source="avares://Androidplayer/Icons/cursor/PUBG_AKM_Cursor.png"/>
@@ -348,7 +250,7 @@
                   <RadioButton x:Name="Cursor_Space"
                                Classes="indicator"
                                GroupName="CursorChoice"
-                               Tag="space"
+                               Tag="avares://Androidplayer/Icons/cursor/starter-space-pointer.png"
                                Checked="Cursor_Checked"/>
                   <StackPanel>
                     <Image Source="avares://Androidplayer/Icons/cursor/starter-space-pointer.png"/>
@@ -364,7 +266,7 @@
                   <RadioButton x:Name="Cursor_Paint"
                                Classes="indicator"
                                GroupName="CursorChoice"
-                               Tag="paint"
+                               Tag="avares://Androidplayer/Icons/cursor/starter-stain-of-paint-logo-pointer.png"
                                Checked="Cursor_Checked"/>
                   <StackPanel>
                     <Image Source="avares://Androidplayer/Icons/cursor/starter-stain-of-paint-logo-pointer.png"/>
@@ -380,7 +282,7 @@
                   <RadioButton x:Name="Cursor_Daybreak"
                                Classes="indicator"
                                GroupName="CursorChoice"
-                               Tag="daybreak"
+                               Tag="avares://Androidplayer/Icons/cursor/terraria-solstice-claymore-daybroken-debuff-cursor.png"
                                Checked="Cursor_Checked"/>
                   <StackPanel>
                     <Image Source="avares://Androidplayer/Icons/cursor/terraria-solstice-claymore-daybroken-debuff-cursor.png"/>

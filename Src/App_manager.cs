@@ -54,6 +54,17 @@ public class App_manager : IDisposable
         my_image = image;
 
         my_info.Instance.PropertyChanged += my_info_propertychanged;
+        
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (Home.Instance != null)
+            {
+                Home.Instance.loadingpage.IsVisible = true;
+                Home.Instance.CustomTitleBar.IsVisible = true;
+                
+                Home.Instance.displayView.IsVisible = false;
+            }
+        });
 
         if (!my_info.Instance.DeveloperMode)
         {
@@ -427,7 +438,11 @@ public class App_manager : IDisposable
         if (UISettings.Instance.Nativeview_mode)
         {
             
+        // scrcpy_worker.dx_Device = (k_info.Instance.my_renderer as DirectX)?.my_Device;
         scrcpy_worker.dx_Device = (k_info.Instance.my_renderer as DirectX)?.my_Device;
+
+        Console.WriteLine((k_info.Instance.my_renderer as DirectX)?.my_Device);
+        
         }
         else
         {
@@ -508,6 +523,20 @@ public class App_manager : IDisposable
             Home.Instance.restore_Home();
             
         });
+        
+        if (UISettings.Instance.Nativeview_mode)
+        {
+            
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+            
+                var mainImage = Home.Instance.displayView?.FindControl<Native_view>("MainImage");
+                mainImage._floatingContent.Background =  Brushes.Transparent;
+                // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+                
+            });
+        
+        }
 
 
         if (vid.Width > vid.Height)

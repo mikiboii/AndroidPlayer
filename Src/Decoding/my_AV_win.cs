@@ -214,6 +214,11 @@ public unsafe class my_AV_win : IDisposable
         long pts,
         bool isConfig)
     {
+        //
+        // Console.WriteLine($"[DecodePacket] entry: size={h264Data?.Length ?? 0} " +
+        //                       $"pts={pts} config={isConfig}");
+        //
+        
         if (h264Data == null ||
             h264Data.Length == 0)
         {

@@ -12,6 +12,8 @@ namespace Androidplayer.Store
         public static my_info Instance => _instance.Value;
 
         private bool _developerMode = false;
+        
+        
         private bool _restored_window = false;
         
         

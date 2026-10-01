@@ -630,12 +630,14 @@ namespace Androidplayer.Src
                 }
                 
                 dynamic  my_directx = null ;
+                // Console.WriteLine("presenting frames");
                   
                 if (UISettings.Instance.Nativeview_mode)
                 {
 
-                    my_directx = k_info.Instance.directx;
-                    my_directx?.PresentFrame(_pendingFrame);
+                    var renderer = k_info.Instance.my_renderer as DirectX;
+                    // my_directx = k_info.Instance.directx;
+                    renderer?.PresentFrame(_pendingFrame);
                 }
                 else
                 {
@@ -710,8 +712,8 @@ namespace Androidplayer.Src
             string mm = null;
 
             Console.WriteLine("im reciving data");
-            Console.WriteLine(isrunning);
-            Console.WriteLine(videoClient.Connected);
+            // Console.WriteLine(isrunning);
+            // Console.WriteLine(videoClient.Connected);
 
             while (isrunning && videoClient.Connected)
             {
@@ -738,67 +740,139 @@ namespace Androidplayer.Src
 
                         Texture2D frame = null;
                         dynamic  my_directx = null ;
+                        
+                        
                   
                         if (UISettings.Instance.Nativeview_mode)
                         {
 
-                           my_directx = k_info.Instance.directx;
+                           // my_directx = k_info.Instance.directx;
+                           
+                           var renderer = k_info.Instance.my_renderer as DirectX;
+
+                           // Console.WriteLine($"[decode] native renderer={(renderer is null ? "NULL" : "ok")} " +
+                           //                   $"device={(renderer?.my_Device is null ? "NULL" : renderer.my_Device.NativePointer.ToString("X"))}");
+                           
+                           renderer?.RunOnContext(_ =>
+                                                   {
+                                                       
+                                                   frame = _decoder.DecodePacket(
+                                                       packet.Data,
+                                                       packet.Pts,
+                                                       packet.IsConfig);
+                           
+                                                   if (frame == null)
+                                                   {
+                                                       Console.WriteLine("frame is null");
+                                                       return;
+                                                       // continue;
+                                                   }
+                           
+                                                   // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
+                                                   // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
+                                                   if (k_info.Instance.ImageContainer is { } container)
+                                                   {
+                                                       double cw = container.Bounds.Width;
+                                                       double ch = container.Bounds.Height;
+                           
+                                                       if (My_Store.Instance.DisplayHeight == 0 ||
+                                                           My_Store.Instance.DisplayHeight != (int)cw)
+                                                       {
+                                                           My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
+                                                       }
+                                                   }
+                           
+                                                   if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
+                                                   {
+                                                       My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
+                                                   }
+                           
+                                                   if (My_Store.Instance?.DeviceHeight == 0 ||
+                                                       My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
+                                                   {
+                                                       My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
+                                                   }
+                           
+                                                   if (_previousFrame != null && !_previousFrame.IsDisposed)
+                                                   {
+                                                       _previousFrame.Dispose();
+                                                   }
+                           
+                                                   _previousFrame = frame;
+                                                       
+                                                   });
+                                                   
                         }
                         else
                         {
                             my_directx = D11InteropRenderer.Instance;
 
-                        }
-                            
-                        
-                        my_directx?.RunOnContext(new Action<object>(_ =>
-                        {
-                            
-                        frame = _decoder.DecodePacket(
-                            packet.Data,
-                            packet.Pts,
-                            packet.IsConfig);
-
-                        if (frame == null)
-                        {
-                            return;
-                            // continue;
-                        }
-
-                        // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
-                        // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
-                        if (k_info.Instance.ImageContainer is { } container)
-                        {
-                            double cw = container.Bounds.Width;
-                            double ch = container.Bounds.Height;
-
-                            if (My_Store.Instance.DisplayHeight == 0 ||
-                                My_Store.Instance.DisplayHeight != (int)cw)
+                            my_directx?.RunOnContext(new Action<object>(_ =>
                             {
-                                My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
+                                
+                            frame = _decoder.DecodePacket(
+                                packet.Data,
+                                packet.Pts,
+                                packet.IsConfig);
+
+                            if (frame == null)
+                            {
+                                return;
+                                // continue;
                             }
-                        }
 
-                        if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
-                        {
-                            My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
-                        }
+                            // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
+                            // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
+                            if (k_info.Instance.ImageContainer is { } container)
+                            {
+                                double cw = container.Bounds.Width;
+                                double ch = container.Bounds.Height;
 
-                        if (My_Store.Instance?.DeviceHeight == 0 ||
-                            My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
-                        {
-                            My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
-                        }
+                                if (My_Store.Instance.DisplayHeight == 0 ||
+                                    My_Store.Instance.DisplayHeight != (int)cw)
+                                {
+                                    My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
+                                }
+                            }
 
-                        if (_previousFrame != null && !_previousFrame.IsDisposed)
-                        {
-                            _previousFrame.Dispose();
-                        }
+                            if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
+                            {
+                                My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
+                            }
 
-                        _previousFrame = frame;
+                            if (My_Store.Instance?.DeviceHeight == 0 ||
+                                My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
+                            {
+                                My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
+                            }
+
+                            if (_previousFrame != null && !_previousFrame.IsDisposed)
+                            {
+                                _previousFrame.Dispose();
+                            }
+
+                            _previousFrame = frame;
+                                
+                            }));
                             
-                        }));
+                        }
+
+
+                        // if (k_info.Instance.directx._device == null)
+                        // {
+                        //     Console.WriteLine("device is null $$$$$$$$");
+                        // }
+                        //
                         
+                        // Console.WriteLine($"decoding finished {frame}");
+                        
+                        // Console.WriteLine($"decoding finished ok: {frame.NativePointer:X}");
+                        
+                        // Console.WriteLine(frame is null
+                        //     ? "[frame] NULL"
+                        //     : $"[frame] ptr=0x{frame.NativePointer:X} {frame.Description.Width}x{frame.Description.Height}");
+                        //
+                        //
                         
                         
 
@@ -816,7 +890,8 @@ namespace Androidplayer.Src
                     }
                     catch (Exception decodeEx)
                     {
-                        Console.WriteLine($"Decoder error (non-fatal): {decodeEx.Message}");
+                        // Console.WriteLine($"Decoder error (non-fatal): {decodeEx.StackTrace}");
+                        Console.WriteLine($"[decode] EXCEPTION: {decodeEx}");
                         continue;
                     }
                 }

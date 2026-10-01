@@ -204,15 +204,27 @@
 
       <!-- Left Navigation Panel -->
       <Border Grid.Column="0"
+            
               Background="White"
               CornerRadius="8"
               Padding="12"
-              Margin="12,12,0,0">
+              Margin="12,2,0,0">
         <StackPanel>
-          <TextBlock Text="Settings"
-                     FontWeight="Bold"
-                     FontSize="18"
-                     Margin="6,4,0,18"/>
+          
+          <Border
+            BorderThickness="2"
+            BorderBrush="Transparent"
+            Background="Transparent"
+            Margin="-10,-10,-10,0"
+            Padding="0,13,0,5"
+            PointerPressed="TopBar_MouseLeftButtonDown"
+            >
+            
+            <TextBlock Text="Settings"
+                       FontWeight="Bold"
+                       FontSize="18"
+                       Margin="6,4,0,18"/>
+          </Border>
           <ListBox x:Name="SettingsListBox"
                    BorderThickness="0"
                    Background="Transparent"

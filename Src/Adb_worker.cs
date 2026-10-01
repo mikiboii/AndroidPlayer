@@ -371,17 +371,17 @@ namespace Androidplayer.Src
                         // Console.WriteLine("device disconnected event is working");
                         if (cts != null && !cts.IsCancellationRequested)
                         {
-                
+                        
                             cts.Cancel();
                         }
-
-
+                        
+                        
                         Console.WriteLine($"is_deviceconnected {is_deviceconnected}");
                         
                         is_deviceconnected =  false;
-            
+                        
                         ErrorOccurred?.Invoke("server exited");
-            
+                        
                         devicedisconnected?.Invoke();
                     }
                     else

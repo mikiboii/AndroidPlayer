@@ -168,7 +168,7 @@ public partial class Home : Window
         this.PropertyChanged += Home_PropertyChanged;
         
         
-        if (UISettings.Instance.Nativeview_mode)
+        if (UISettings.Instance.Nativeview_mode && OperatingSystem.IsWindows())
         {
             // Native overlay path
             displayView = new Display_view
@@ -272,7 +272,15 @@ public partial class Home : Window
                 case WindowState.Normal:
                     Console.WriteLine("got Normal");
                     
-                    
+                    var mainImage2 = displayView?.FindControl<Native_view>("MainImage");
+                    if (mainImage2 != null)
+                    {
+                        if (mainImage2._floatingContent != null)
+                        {
+                                
+                            mainImage2._floatingContent.Background = Brushes.Black;
+                        }
+                    }
                     // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
                     
                     _NativeTimer.Stop();
@@ -338,12 +346,53 @@ public partial class Home : Window
         //
         // _NativeTimer.Stop();
         // _NativeTimer.Start();
+        UISettings.Instance.PropertyChanged += UISettingsOnPropertyChanged;
         
-        
-        
+        UISettings.Instance.RefreshCurrentCursor();
         StartupTimer.Mark("Sidebar shown");
     }
 
+    private void UISettingsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(UISettings.CurrentCursor))
+        {
+            // WPF: Application.Current.Dispatcher.Invoke(...)
+            // Avalonia: Dispatcher.UIThread.Post(...) — fire-and-forget on UI thread
+            Dispatcher.UIThread.Post(() =>
+            {
+
+
+                if (UISettings.Instance.CurrentCursor == "Default")
+                {
+                    this.Cursor = new Cursor(StandardCursorType.Arrow);
+                }
+                else
+                {
+                 
+                    var cursorUri = new Uri(UISettings.Instance.CurrentCursor);
+
+                    using var cursorStream = AssetLoader.Open(cursorUri);
+
+                    var cursorBitmap = new Avalonia.Media.Imaging.Bitmap(cursorStream);
+
+                    var hotSpot = new PixelPoint(0, 0);
+
+                    Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
+
+                    this.Cursor = customCursor;
+                    
+                }
+                
+               
+            });
+        }
+    }
+
+
+    
+    
+    
+    
     private void my_store_propertychanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)

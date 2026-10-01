@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Configuration;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -21,11 +22,79 @@ public partial class settings : Window
 
         this.Loaded += OnLoaded;
         SettingsListBox.SelectionChanged += SettingsListBox_SelectionChanged;
-        SettingsListBox.SelectedIndex = 2;
-        SettingsContent.Content = new MouseSettings();
+        SettingsListBox.SelectedIndex = 0;
+        SettingsContent.Content = new ScreenSettings();
 
         this.DataContext = UISettings.Instance;
+        
+        UISettings.Instance.PropertyChanged += UISettingsOnPropertyChanged;
+        
+        
+        
+        // // 1. Point to your converted PNG resource
+        // var cursorUri = new Uri(UISettings.Instance.CurrentCursor);
+        //
+        // using var cursorStream = AssetLoader.Open(cursorUri);
+        // var cursorBitmap = new Avalonia.Media.Imaging.Bitmap(cursorStream);
+        //
+        // var hotSpot = new PixelPoint(0, 0);
+        //
+        // Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
+        //
+        // this.Cursor = customCursor;
+        
     }
+
+    private void UISettingsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(UISettings.CurrentCursor))
+        {
+            // WPF: Application.Current.Dispatcher.Invoke(...)
+            // Avalonia: Dispatcher.UIThread.Post(...) — fire-and-forget on UI thread
+            Dispatcher.UIThread.Post(() =>
+            {
+
+
+                if (UISettings.Instance.CurrentCursor == "Default")
+                {
+                    this.Cursor = new Cursor(StandardCursorType.Arrow);
+                }
+                else
+                {
+                    // 1. Point to your converted PNG resource
+                    var cursorUri = new Uri(UISettings.Instance.CurrentCursor);
+
+// 2. Open the asset stream
+                    using var cursorStream = AssetLoader.Open(cursorUri);
+
+// 3. Load the image into an Avalonia Bitmap
+                    var cursorBitmap = new Avalonia.Media.Imaging.Bitmap(cursorStream);
+
+// 4. Set the Hotspot (X, Y in pixels). 
+// For a sword tip, it's typically the top-left corner (0, 0)
+                    var hotSpot = new PixelPoint(0, 0);
+
+// 5. Instantiate the cursor correctly
+                    Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
+
+                    this.Cursor = customCursor;
+                    
+                }
+                
+                // bool isLocked = my_info.Instance.IsMouseLocked;
+                //
+                // if (my_info.Instance.IsMouseLocked)
+                // {
+                //     PressMouse_demo();
+                // }
+                // else
+                // {
+                //     UnPressMouse_demo();
+                // }
+            });
+        }
+    }
+
 
     private void SettingsListBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {

@@ -61,6 +61,8 @@
                         Grid.Row="0"
                         Title="Android Player"
         
+                  
+                        ZIndex="4"
                         IsVisible="False"
                        
                        />
@@ -72,6 +74,8 @@
        
         <pages:Loading_page x:Name="loadingpage"
                             IsVisible="True"
+                            Margin="0,30,0,0"
+                            ClipToBounds="True"
                             Grid.Row="1"/>
 
     </Grid>
