@@ -34,15 +34,15 @@ jobs:
           - os: windows-latest
             rid: win-x64
             artifact: Androidplayer-win-x64
-#          - os: ubuntu-22.04
-#            rid: linux-x64
-#            artifact: Androidplayer-linux-x64
-#          - os: macos-14
-#            rid: osx-arm64
-#            artifact: Androidplayer-osx-arm64
-#          - os: macos-15-intel
-#            rid: osx-x64
-#            artifact: Androidplayer-osx-x64
+    #          - os: ubuntu-22.04
+    #            rid: linux-x64
+    #            artifact: Androidplayer-linux-x64
+    #          - os: macos-14
+    #            rid: osx-arm64
+    #            artifact: Androidplayer-osx-arm64
+    #          - os: macos-15-intel
+    #            rid: osx-x64
+    #            artifact: Androidplayer-osx-x64
 
     steps:
       - name: Checkout
@@ -61,7 +61,13 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Normalize .NET version
+      # Native AOT on Linux requires clang + zlib headers.
+      # No-op on Windows/macOS, harmless to keep in place for later.
+      - name: Install Native AOT prerequisites (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      - name: Normalize version
         shell: bash
         run: |
           APP_VERSION="${RELEASE_TAG#v}"
@@ -76,17 +82,19 @@ jobs:
           -p:AssemblyVersion=${{ env.APP_VERSION }}
           -p:FileVersion=${{ env.APP_VERSION }}
 
-      - name: Build & Publish
+      - name: Build & Publish (Native AOT)
         run: >
           dotnet publish Androidplayer.csproj
           -c Release
           -r ${{ matrix.rid }}
-          --self-contained true
+          -p:PublishAot=true
+          -p:IsAotCompatible=true
+          -p:BuiltInComInteropSupport=false
+          -p:SelfContained=true
           -p:Version=${{ env.APP_VERSION }}
           -p:PackageVersion=${{ env.APP_VERSION }}
           -p:AssemblyVersion=${{ env.APP_VERSION }}
           -p:FileVersion=${{ env.APP_VERSION }}
-          -p:PublishSingleFile=false
           -p:DebugType=none
           -p:DebugSymbols=false
           -o publish/
