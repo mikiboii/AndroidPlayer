@@ -184,7 +184,7 @@ namespace Androidplayer.windows
          
 #if DEBUG
         
-        private bool _nativeview_mode = false;
+        private bool _nativeview_mode = true;
 #else
 
         
@@ -241,7 +241,7 @@ namespace Androidplayer.windows
         
         
         
-        private string _currentCursor = "avares://Androidplayer/Icons/cursor/black_sword.png";
+        private string _currentCursor = "Default";
         public string CurrentCursor
         {
             get => _currentCursor;

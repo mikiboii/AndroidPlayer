@@ -16,6 +16,7 @@ using System.Net;
 using SharpAdbClient;
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using Androidplayer.Store;
 using Androidplayer.windows;
@@ -166,6 +167,8 @@ namespace Androidplayer.Src
                 _devicePollTimer.AutoReset = true;
                 _devicePollTimer.Start();
                 
+                
+                UISettings.Instance.PropertyChanged += UISettingsOnPropertyChanged;
 
                 // SwitchToTcpIp();
 
@@ -179,9 +182,21 @@ namespace Androidplayer.Src
             
             
         }
-        
-        
-        
+
+        private void UISettingsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(UISettings.SelectedConnectionType))
+            {
+
+                if (UISettings.Instance.SelectedConnectionType == "USB")
+                {
+                    StartCounting();
+                }
+                
+                
+            }
+        }
+
 
         private void OnDeviceConnected(object? sender, DeviceDataEventArgs e)
         {

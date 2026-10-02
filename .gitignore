@@ -9,4 +9,5 @@
 bin/linux/
 bin/
 publish-test/
+publish/
 run_linux.ps1

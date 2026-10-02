@@ -715,6 +715,7 @@ public partial class Home : Window
             case "Settings":
                 if (_settingsWindow == null)
                     _settingsWindow = new settings();
+              
 
                 if (_settingsWindow.IsVisible)
                 {

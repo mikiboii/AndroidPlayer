@@ -29,6 +29,20 @@ namespace Androidplayer
         private const int GWL_EXSTYLE = -20;
         private const int WS_EX_LAYERED = 0x00080000;
         private const uint LWA_COLORKEY = 0x00000001;
+        
+        
+        
+        
+        private const int WS_EX_TOOLWINDOW = 0x00000080;
+        private const int WS_EX_APPWINDOW  = 0x00040000;
+
+       
+
+            
+            
+            
+            
+            
 #endif
         
         private Window mainWindow;
@@ -47,6 +61,8 @@ namespace Androidplayer
             // You can check the OS version or simply try to apply it and see if it works.
             // For simplicity, we'll check if it's not Windows 8 or newer.
 #if WINDOWS
+            this.Owner = this.mainWindow;
+            
             
             if (OperatingSystem.IsWindows() && !OperatingSystem.IsWindowsVersionAtLeast(6, 2))
             {
@@ -89,7 +105,7 @@ namespace Androidplayer
 
             this.mainWindow = mainWindow;
 
-            this.Owner = this.mainWindow;
+            // this.Owner = this.mainWindow;
             
 //             // 1. Point to your converted PNG resource
 //             var cursorUri = new Uri("avares://Androidplayer/Icons/cursor/black_sword.png");

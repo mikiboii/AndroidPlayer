@@ -494,6 +494,11 @@ namespace Androidplayer.Src
                     if (dummyRead != 1)
                     {
                         ErrorOccurred?.Invoke($"Expected to read dummy byte (1 byte), but got {dummyRead} bytes.");
+                        
+                       
+                        Thread.Sleep(1000);
+                        
+                        continue;
                     }
 
                     // Thread.Sleep(500);
@@ -641,12 +646,12 @@ namespace Androidplayer.Src
                 }
                 else
                 {
-                    my_directx = D11InteropRenderer.Instance;
+                    // my_directx = D11InteropRenderer.Instance;
                     
-                    long decodeTimestamp = my_directx.NowTicks;
+                    long decodeTimestamp = D11InteropRenderer.Instance.NowTicks;
 
                     if (_pendingFrame != null)
-                        my_directx.PresentFrame(_pendingFrame, decodeTimestamp);
+                        D11InteropRenderer.Instance?.PresentFrame(_pendingFrame, decodeTimestamp);
 
                 }
 
@@ -805,9 +810,10 @@ namespace Androidplayer.Src
                         }
                         else
                         {
-                            my_directx = D11InteropRenderer.Instance;
+                            // my_directx = D11InteropRenderer.Instance;
 
-                            my_directx?.RunOnContext(new Action<object>(_ =>
+                            // D11InteropRenderer.Instance?.RunOnContext(new Action<object>(_ =>
+                                D11InteropRenderer.Instance?.RunOnContext(new Action<DeviceContext>(_ =>
                             {
                                 
                             frame = _decoder.DecodePacket(
