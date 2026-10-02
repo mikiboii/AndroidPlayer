@@ -84,6 +84,17 @@ namespace Androidplayer.Store
             set => SetProperty(ref _isTakeScreenshot, value);
         }
         
+        private bool _isRecording;
+        
+        public bool Recording
+        {
+            get => _isRecording;
+            set => SetProperty(ref _isRecording, value);
+        }
+
+        
+        public void Toggle_Recording_mode() => Recording = !Recording;
+        
         
         public bool IsLandscapemode
         {
