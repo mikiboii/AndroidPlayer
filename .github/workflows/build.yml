@@ -1,0 +1,120 @@
+name: Build and Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to rebuild (e.g. v1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  VERSION: ${{ github.event.inputs.tag || github.ref_name }}
+  DOTNET_VERSION: "8.0.x"
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+
+jobs:
+  build:
+    name: Build ${{ matrix.rid }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            artifact: Androidplayer-win-x64
+          - os: ubuntu-22.04
+            rid: linux-x64
+            artifact: Androidplayer-linux-x64
+          - os: macos-14
+            rid: osx-arm64
+            artifact: Androidplayer-osx-arm64
+          - os: macos-13
+            rid: osx-x64
+            artifact: Androidplayer-osx-x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore Androidplayer.csproj -r ${{ matrix.rid }}
+
+      - name: Build & Publish
+        run: >
+          dotnet publish Androidplayer.csproj
+          -c Release
+          -r ${{ matrix.rid }}
+          --self-contained true
+          -p:PublishSingleFile=false
+          -p:DebugType=none
+          -p:DebugSymbols=false
+          -o publish/
+
+      - name: Package (Windows)
+        if: startsWith(matrix.rid, 'win')
+        shell: pwsh
+        run: |
+          Compress-Archive -Path publish/* -DestinationPath ${{ matrix.artifact }}.zip
+
+      - name: Package (Linux/macOS)
+        if: "!startsWith(matrix.rid, 'win')"
+        run: |
+          chmod +x publish/*
+          tar -czf ${{ matrix.artifact }}.tar.gz -C publish .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.*
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Publish release ${{ env.VERSION }}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: List what we got
+        run: find artifacts -type f | sort
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: ${{ env.VERSION }}
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(env.VERSION, '-') }}
+          files: |
+            artifacts/**/*.zip
+            artifacts/**/*.tar.gz

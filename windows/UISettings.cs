@@ -182,9 +182,16 @@ namespace Androidplayer.windows
             set => AudioEnabled = !value;
         }
          
-        
+#if DEBUG
         
         private bool _nativeview_mode = false;
+#else
+
+        
+        private bool _nativeview_mode = false;
+#endif
+        
+        
         public bool Nativeview_mode
         {
             get => _nativeview_mode;

@@ -2,7 +2,9 @@
 
     <!-- 1. Main properties -->
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+<!--        <OutputType>Exe</OutputType>-->
+        <OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>
+        <OutputType Condition="'$(Configuration)' != 'Debug'">WinExe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -120,6 +122,7 @@
         <None Remove="deps\**\*" />
     </ItemGroup>
     <ItemGroup>
+        <Content Include=".github\workflows\build.yml" />
         <Content Include="deps\$(DepsPlatform)\adb\**\*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -132,6 +135,22 @@
         </Content>
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="user\**\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <Content Include="scrcpy-server.jar">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <TargetPath>scrcpy-server.jar</TargetPath>
+        </Content>
+    </ItemGroup>
+    
     <!-- 8. Avalonia resources -->
     <ItemGroup>
         <AvaloniaResource Include="Icons\**" />

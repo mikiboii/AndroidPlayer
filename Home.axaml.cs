@@ -127,7 +127,9 @@ public partial class Home : Window
     {
         StartupTimer.Mark("Home ctor start");
 
-        string _filePath = Path.Combine(Environment.CurrentDirectory, "user", "data.db");
+        // string _filePath = Path.Combine(Environment.CurrentDirectory, "user", "data.db");
+        
+        string _filePath = Path.Combine(AppContext.BaseDirectory, "user", "data.db");
 
         my_info.Instance.Dataeditor = new LiteDbEditor(_filePath, new LiteDbEditorOptions { Autosave = true });
         StartupTimer.Mark("  LiteDbEditor done");
