@@ -16,6 +16,7 @@ permissions:
 env:
   # Human-readable version for release name/tag. Works for both triggers.
   VERSION: ${{ github.event.inputs.tag || github.ref_name }}
+  RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
   # The git ref to check out. Tag push → refs/tags/vX.Y.Z; manual → the tag you typed.
   REF: ${{ github.event.inputs.tag || github.ref }}
   DOTNET_VERSION: "8.0.x"
@@ -60,8 +61,20 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Normalize .NET version
+        shell: bash
+        run: |
+          APP_VERSION="${RELEASE_TAG#v}"
+          echo "APP_VERSION=${APP_VERSION}" >> "$GITHUB_ENV"
+
       - name: Restore
-        run: dotnet restore Androidplayer.csproj -r ${{ matrix.rid }}
+        run: >
+          dotnet restore Androidplayer.csproj
+          -r ${{ matrix.rid }}
+          -p:Version=${{ env.APP_VERSION }}
+          -p:PackageVersion=${{ env.APP_VERSION }}
+          -p:AssemblyVersion=${{ env.APP_VERSION }}
+          -p:FileVersion=${{ env.APP_VERSION }}
 
       - name: Build & Publish
         run: >
@@ -69,6 +82,10 @@ jobs:
           -c Release
           -r ${{ matrix.rid }}
           --self-contained true
+          -p:Version=${{ env.APP_VERSION }}
+          -p:PackageVersion=${{ env.APP_VERSION }}
+          -p:AssemblyVersion=${{ env.APP_VERSION }}
+          -p:FileVersion=${{ env.APP_VERSION }}
           -p:PublishSingleFile=false
           -p:DebugType=none
           -p:DebugSymbols=false

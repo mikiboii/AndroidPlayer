@@ -2,6 +2,7 @@
 
     <!-- 1. Main properties -->
     <PropertyGroup>
+        <Version>1.0.0</Version>
 <!--        <OutputType>Exe</OutputType>-->
         <OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>
         <OutputType Condition="'$(Configuration)' != 'Debug'">WinExe</OutputType>
