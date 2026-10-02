@@ -854,10 +854,22 @@ namespace Androidplayer.Src
         
         public void RunOnContext(Action<DeviceContext> action)
         {
-            lock (_renderLock)
+            
+            // lock (_renderLock)
+            // {
+            //     
+            //     
+            //     action(_device.ImmediateContext);
+            // }
+            
+            
+            if (_device == null)
             {
-                action(_device.ImmediateContext);
+
+                Console.WriteLine("device is null");
+                return;
             }
+            lock (_renderLock) action(_device.ImmediateContext);
         }
         
         public void ResizeToClient(IntPtr hwnd)

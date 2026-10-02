@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using LiteDB;
 
@@ -13,6 +14,7 @@ namespace Androidplayer.Src.Keymap.K_store
 
         public LiteDbEditor(string filePath, LiteDbEditorOptions options = null)
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
             _filePath = filePath;
             _options = options ?? new LiteDbEditorOptions();
             _db = new LiteDatabase(_filePath);

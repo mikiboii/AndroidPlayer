@@ -8,4 +8,5 @@
 /bin/Debug
 bin/linux/
 bin/
+publish-test/
 run_linux.ps1

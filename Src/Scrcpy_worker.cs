@@ -9,22 +9,32 @@ using System.Text;
 using System.Threading;
 using Avalonia.Threading;
 
-
+#if WINDOWS
+using Androidplayer.Rendering.win;
 using SharpDX.Direct3D11;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
+using SharpDX;
+
+#endif
+
+
+
+
+
 using Buffer = System.Buffer;
 using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Store;
 using Androidplayer.windows;
 using Androidplayer.Src.Keymap;
+using Avalonia;
 using Avalonia.Media;
-using SharpDX;
 
 namespace Androidplayer.Src
 {
     public class Scrcpy_worker : IDisposable
     {
+#if WINDOWS
         // XAudio2 fields
         private XAudio2 _xaudio;
         private MasteringVoice _masteringVoice;
@@ -34,6 +44,12 @@ namespace Androidplayer.Src
 
         // Track DataStreams so they aren't GC'd while XAudio2 is using them
         private readonly Queue<DataStream> _pendingStreams = new Queue<DataStream>();
+        
+        
+           
+#endif
+        
+        
         private bool _xaudioStarted = false;
 
         ///////////////////
@@ -72,15 +88,22 @@ namespace Androidplayer.Src
         private int device_width = 0;
         private int device_height = 0;
 
-        private my_AV? _decoder;
+        // private my_AV? _decoder;
+#if WINDOWS          
+        private my_AV_win? _decoder;
+        public Device dx_Device { get; set; }
+        
+                    
+#endif
+        
+        
         private my_audio? _audio_decoder;
 
-        public Device dx_Device { get; set; }
 
         private static readonly ArrayPool<byte> pool = ArrayPool<byte>.Shared;
 
         public event Action Frame_almostready;
-        public event Action<Texture2D> FrameReady;
+        // public event Action<Texture2D> FrameReady;
         public event Action<string> ErrorOccurred;
         public event Action scrcpy_desposed;
 
@@ -88,14 +111,19 @@ namespace Androidplayer.Src
         public event Action<(int Width, int Height)> videosizeReady;
         public event Action<TcpClient> ControlSocketReady;
 
-        private Texture2D _previousFrame = null;
 
         private Stopwatch _frameTimer;
         private long _lastFrameTime;
         private int _framesDropped;
         private const double TARGET_FRAME_TIME_MS = 30;
         private const double MAX_FRAME_TIME_MS = 16.67;
+        
+        
+#if WINDOWS
+           
+        private Texture2D _previousFrame = null;
         private Texture2D _pendingFrame;
+#endif
 
         private sealed class ScrcpyVideoPacket
         {
@@ -112,7 +140,9 @@ namespace Androidplayer.Src
 
             _audio_decoder = new my_audio();
 
+            #if WINDOWS
             InitAudio();
+            #endif
         }
 
         public void Start()
@@ -135,24 +165,56 @@ namespace Androidplayer.Src
             audio_thread.Start();
         }
 
+        // public void Stop()
+        // {
+        //     isrunning = false;
+        //
+        //     if (scrcpy_thread != null && scrcpy_thread.IsAlive)
+        //     {
+        //         scrcpy_thread.Join(1000);
+        //         scrcpy_thread = null;
+        //     }
+        //
+        //     audioReadyEvent.Set();
+        //
+        //     if (audio_thread != null && audio_thread.IsAlive)
+        //     {
+        //         audio_thread.Join(1000);
+        //         audio_thread = null;
+        //     }
+        // }
+        
+        
+        
+        
         public void Stop()
         {
             isrunning = false;
 
-            if (scrcpy_thread != null && scrcpy_thread.IsAlive)
-            {
-                scrcpy_thread.Join(1000);
-                scrcpy_thread = null;
-            }
+            // Close sockets first to unblock Read()
+            try { videoClient?.Close(); }   catch { }
+            try { audioClient?.Close(); }   catch { }
+            try { controlClient?.Close(); } catch { }
+            videoClient = null;
+            audioClient = null;
+            controlClient = null;
 
             audioReadyEvent.Set();
 
+            if (scrcpy_thread != null && scrcpy_thread.IsAlive)
+            {
+                scrcpy_thread.Join(200);   // give it a bit more time now that Read throws
+                scrcpy_thread = null;
+            }
+
             if (audio_thread != null && audio_thread.IsAlive)
             {
-                audio_thread.Join(1000);
+                audio_thread.Join(200);
                 audio_thread = null;
             }
         }
+        
+        
 
         public void SetFrameSize(int width, int height)
         {
@@ -169,6 +231,10 @@ namespace Androidplayer.Src
 
         #region Audio Player
 
+        
+        #if WINDOWS
+        
+        
         private void InitAudio()
         {
             lock (_audioLock)
@@ -265,6 +331,8 @@ namespace Androidplayer.Src
             }
         }
 
+#endif
+
         private void start_audio()
         {
             const long PACKET_FLAG_CONFIG = 1L << 62;
@@ -346,8 +414,12 @@ namespace Androidplayer.Src
                         }
 
                         byte[]? pcm = _audio_decoder?.Decode(payload);
+                        
+#if WINDOWS
+           
                         if (pcm != null && pcm.Length > 0)
                             SubmitPcmToXAudio(pcm);
+#endif
                     }
                 }
                 catch (IOException ioEx) when (ioEx.InnerException is SocketException sockEx)
@@ -355,14 +427,20 @@ namespace Androidplayer.Src
                     Console.WriteLine($"Audio socket error: {sockEx.SocketErrorCode}");
                     ErrorOccurred?.Invoke(sockEx.Message);
                     audioReadyEvent.Reset();
+#if WINDOWS          
+                    
                     PollXAudioAndCleanup();
+#endif
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Audio receive error: {ex.Message}");
                     ErrorOccurred?.Invoke(ex.Message);
                     audioReadyEvent.Reset();
+#if WINDOWS
+           
                     PollXAudioAndCleanup();
+#endif
                 }
                 finally
                 {
@@ -418,14 +496,14 @@ namespace Androidplayer.Src
                         ErrorOccurred?.Invoke($"Expected to read dummy byte (1 byte), but got {dummyRead} bytes.");
                     }
 
-                    Thread.Sleep(500);
+                    // Thread.Sleep(500);
 
                     if (UISettings.Instance.AudioEnabled)
                     {
                         audioReadyEvent.Set();
                     }
 
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
 
                     controlClient = new TcpClient();
                     if (!controlClient.ConnectAsync(host, 1013).Wait(timeoutMs))
@@ -486,6 +564,8 @@ namespace Androidplayer.Src
             device_width = Width;
             device_height = Height;
 
+            
+            
             DeviceResolutionReady?.Invoke((Width, Height));
         }
 
@@ -498,7 +578,7 @@ namespace Androidplayer.Src
 
             return BitConverter.ToInt16(buffer, offset);
         }
-
+#if WINDOWS
         private void RenderTexture(Texture2D frame)
         {
             if (_frameTimer == null)
@@ -548,8 +628,33 @@ namespace Androidplayer.Src
                     Console.WriteLine($"from scrcpy worker : {VideoWidth} , {VideoHeight}");
                     videosizeReady?.Invoke((VideoWidth, VideoHeight));
                 }
+                
+                dynamic  my_directx = null ;
+                // Console.WriteLine("presenting frames");
+                  
+                if (UISettings.Instance.Nativeview_mode)
+                {
 
-                k_info.Instance.directx?.PresentFrame(_pendingFrame);
+                    var renderer = k_info.Instance.my_renderer as DirectX;
+                    // my_directx = k_info.Instance.directx;
+                    renderer?.PresentFrame(_pendingFrame);
+                }
+                else
+                {
+                    my_directx = D11InteropRenderer.Instance;
+                    
+                    long decodeTimestamp = my_directx.NowTicks;
+
+                    if (_pendingFrame != null)
+                        my_directx.PresentFrame(_pendingFrame, decodeTimestamp);
+
+                }
+
+
+
+                
+             
+                
                 
                 
                 _lastFrameTime = currentTime;
@@ -566,6 +671,13 @@ namespace Androidplayer.Src
             }
         }
 
+        
+
+           
+#endif
+        
+        
+        
         private bool ShouldSkipFrame()
         {
             if (_lastFrameTime == 0) return false;
@@ -589,7 +701,10 @@ namespace Androidplayer.Src
 
             Console.WriteLine("Starting to receive H264 video data...");
 
-            _decoder = new my_AV(dx_Device);
+            #if WINDOWS
+            
+            _decoder = new my_AV_win(dx_Device);
+            #endif
 
             Frame_almostready.Invoke();
 
@@ -597,8 +712,8 @@ namespace Androidplayer.Src
             string mm = null;
 
             Console.WriteLine("im reciving data");
-            Console.WriteLine(isrunning);
-            Console.WriteLine(videoClient.Connected);
+            // Console.WriteLine(isrunning);
+            // Console.WriteLine(videoClient.Connected);
 
             while (isrunning && videoClient.Connected)
             {
@@ -618,61 +733,156 @@ namespace Androidplayer.Src
                     try
                     {
                         sw.Restart();
+                        
+                              
+#if WINDOWS
+
 
                         Texture2D frame = null;
+                        dynamic  my_directx = null ;
                         
-                        k_info.Instance.directx?.RunOnContext(_ =>
+                        
+                  
+                        if (UISettings.Instance.Nativeview_mode)
                         {
-                            
-                        frame = _decoder.DecodePacket(
-                            packet.Data,
-                            packet.Pts,
-                            packet.IsConfig);
 
-                        if (frame == null)
-                        {
-                            return;
-                            // continue;
+                           // my_directx = k_info.Instance.directx;
+                           
+                           var renderer = k_info.Instance.my_renderer as DirectX;
+
+                           // Console.WriteLine($"[decode] native renderer={(renderer is null ? "NULL" : "ok")} " +
+                           //                   $"device={(renderer?.my_Device is null ? "NULL" : renderer.my_Device.NativePointer.ToString("X"))}");
+                           
+                           renderer?.RunOnContext(_ =>
+                                                   {
+                                                       
+                                                   frame = _decoder.DecodePacket(
+                                                       packet.Data,
+                                                       packet.Pts,
+                                                       packet.IsConfig);
+                           
+                                                   if (frame == null)
+                                                   {
+                                                       Console.WriteLine("frame is null");
+                                                       return;
+                                                       // continue;
+                                                   }
+                           
+                                                   // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
+                                                   // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
+                                                   if (k_info.Instance.ImageContainer is { } container)
+                                                   {
+                                                       double cw = container.Bounds.Width;
+                                                       double ch = container.Bounds.Height;
+                           
+                                                       if (My_Store.Instance.DisplayHeight == 0 ||
+                                                           My_Store.Instance.DisplayHeight != (int)cw)
+                                                       {
+                                                           My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
+                                                       }
+                                                   }
+                           
+                                                   if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
+                                                   {
+                                                       My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
+                                                   }
+                           
+                                                   if (My_Store.Instance?.DeviceHeight == 0 ||
+                                                       My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
+                                                   {
+                                                       My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
+                                                   }
+                           
+                                                   if (_previousFrame != null && !_previousFrame.IsDisposed)
+                                                   {
+                                                       _previousFrame.Dispose();
+                                                   }
+                           
+                                                   _previousFrame = frame;
+                                                       
+                                                   });
+                                                   
                         }
-
-                        // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
-                        // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
-                        if (k_info.Instance.ImageContainer is { } container)
+                        else
                         {
-                            double cw = container.Bounds.Width;
-                            double ch = container.Bounds.Height;
+                            my_directx = D11InteropRenderer.Instance;
 
-                            if (My_Store.Instance.DisplayHeight == 0 ||
-                                My_Store.Instance.DisplayHeight != (int)cw)
+                            my_directx?.RunOnContext(new Action<object>(_ =>
                             {
-                                My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
+                                
+                            frame = _decoder.DecodePacket(
+                                packet.Data,
+                                packet.Pts,
+                                packet.IsConfig);
+
+                            if (frame == null)
+                            {
+                                return;
+                                // continue;
                             }
-                        }
 
-                        if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
-                        {
-                            My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
-                        }
+                            // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
+                            // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
+                            if (k_info.Instance.ImageContainer is { } container)
+                            {
+                                double cw = container.Bounds.Width;
+                                double ch = container.Bounds.Height;
 
-                        if (My_Store.Instance?.DeviceHeight == 0 ||
-                            My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
-                        {
-                            My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
-                        }
+                                if (My_Store.Instance.DisplayHeight == 0 ||
+                                    My_Store.Instance.DisplayHeight != (int)cw)
+                                {
+                                    My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
+                                }
+                            }
 
-                        if (_previousFrame != null && !_previousFrame.IsDisposed)
-                        {
-                            _previousFrame.Dispose();
-                        }
+                            if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
+                            {
+                                My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
+                            }
 
-                        _previousFrame = frame;
+                            if (My_Store.Instance?.DeviceHeight == 0 ||
+                                My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
+                            {
+                                My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
+                            }
+
+                            if (_previousFrame != null && !_previousFrame.IsDisposed)
+                            {
+                                _previousFrame.Dispose();
+                            }
+
+                            _previousFrame = frame;
+                                
+                            }));
                             
-                        });
+                        }
+
+
+                        // if (k_info.Instance.directx._device == null)
+                        // {
+                        //     Console.WriteLine("device is null $$$$$$$$");
+                        // }
+                        //
                         
+                        // Console.WriteLine($"decoding finished {frame}");
+                        
+                        // Console.WriteLine($"decoding finished ok: {frame.NativePointer:X}");
+                        
+                        // Console.WriteLine(frame is null
+                        //     ? "[frame] NULL"
+                        //     : $"[frame] ptr=0x{frame.NativePointer:X} {frame.Description.Width}x{frame.Description.Height}");
+                        //
+                        //
                         
                         
 
                         RenderTexture(frame);
+                        
+                        
+                        
+                        
+#endif
+                        
 
                         sw.Stop();
 
@@ -680,7 +890,8 @@ namespace Androidplayer.Src
                     }
                     catch (Exception decodeEx)
                     {
-                        Console.WriteLine($"Decoder error (non-fatal): {decodeEx.Message}");
+                        // Console.WriteLine($"Decoder error (non-fatal): {decodeEx.StackTrace}");
+                        Console.WriteLine($"[decode] EXCEPTION: {decodeEx}");
                         continue;
                     }
                 }
@@ -791,6 +1002,9 @@ namespace Androidplayer.Src
 
             _audio_decoder.Dispose();
 
+                  
+#if WINDOWS
+
             lock (_audioLock)
             {
                 try
@@ -837,6 +1051,12 @@ namespace Androidplayer.Src
                     Console.WriteLine($"Error disposing audio: {ex.Message}");
                 }
             }
+      
+#endif
+            
+            
+            
+            
         }
     }
 }

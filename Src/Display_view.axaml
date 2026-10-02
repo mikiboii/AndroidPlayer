@@ -30,12 +30,13 @@
     <!-- HorizontalAlignment="Center" -->
     <!-- VerticalAlignment="Center" -->
    
-    
-    <androidplayer:Native_view x:Name="MainImage"
+   
+     <androidplayer:Native_view x:Name="MainImage"
                      
                        
                        Grid.Row="1"
                     
+                       
                       
                        >
       
@@ -136,5 +137,16 @@
       </Grid>
       
     </androidplayer:Native_view>
+    
+ 
+    
+    
+    
+    
+    
+    
+    
+    
+    
   </Grid>
 </UserControl>

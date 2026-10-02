@@ -15,11 +15,15 @@ using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Src.Mouse;
 using Androidplayer.Src.Rawinput;
 using Androidplayer.Store;
+using Androidplayer.windows;
 using Brushes = Avalonia.Media.Brushes;
 using Point = Avalonia.Point;
 using Size = Avalonia.Size;
 
 namespace Androidplayer.Src;
+
+
+
 
 public partial class Display_view : UserControl
 {
@@ -32,36 +36,19 @@ public partial class Display_view : UserControl
     [DllImport("user32.dll")]
     static extern bool SetCursorPos(int X, int Y);
 
+    
+    
+    
+    
+    
     public Display_view()
     {
         InitializeComponent();
-
-        // if (MainImage != null)
-        // {
-        //     
-        //     // Wire up surface events — using the Avalonia host's Surface control
+      
         //
-        //     if (ImageContainer != null)
-        //     {
+        // DataContext = new { CurrentDisplay = true ? new NativeDisplay() : new FallbackDisplay() };
         //
-        //         Console.WriteLine("serring mainimage events");
-        //         
-        //         ImageContainer.PointerPressed += ImageContainer_OnMouseDown;
-        //         ImageContainer.PointerReleased += ImageContainer_OnMouseUp;
-        //         ImageContainer.PointerMoved += ImageContainer_OnMouseMove;
-        //         ImageContainer.PointerWheelChanged += ImageContainer_OnMouseWheel;
         //
-        //         ImageContainer.AddHandler(DragDrop.DragEnterEvent, ImageContainer_DragEnter);
-        //         ImageContainer.AddHandler(DragDrop.DropEvent, ImageContainer_Drop);
-        //
-        //         ImageContainer.Focusable = true;
-        //         MainImage.Focusable = true;
-        //     }
-        //     ImageContainer.Focusable = true;
-        //     MainImage.Focusable = true;
-        //     
-        // }
-
         
         ModeOverlay.ZIndex = 999;
         
@@ -71,38 +58,38 @@ public partial class Display_view : UserControl
         // using var cursorStream = AssetLoader.Open(cursorUri);
         // Cursor customCursor = new Cursor(cursorStream);
         
-        // 1. Point to your converted PNG resource
-        var cursorUri = new Uri("avares://Androidplayer/Icons/cursor/black_sword.png");
+//         // 1. Point to your converted PNG resource
+//         var cursorUri = new Uri("avares://Androidplayer/Icons/cursor/black_sword.png");
+//
+// // 2. Open the asset stream
+//         using var cursorStream = AssetLoader.Open(cursorUri);
+//
+// // 3. Load the image into an Avalonia Bitmap
+//         var cursorBitmap = new Avalonia.Media.Imaging.Bitmap(cursorStream);
+//
+// // 4. Set the Hotspot (X, Y in pixels). 
+// // For a sword tip, it's typically the top-left corner (0, 0)
+//         var hotSpot = new PixelPoint(0, 0);
+//
+// // 5. Instantiate the cursor correctly
+//         Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
 
-// 2. Open the asset stream
-        using var cursorStream = AssetLoader.Open(cursorUri);
 
-// 3. Load the image into an Avalonia Bitmap
-        var cursorBitmap = new Avalonia.Media.Imaging.Bitmap(cursorStream);
-
-// 4. Set the Hotspot (X, Y in pixels). 
-// For a sword tip, it's typically the top-left corner (0, 0)
-        var hotSpot = new PixelPoint(0, 0);
-
-// 5. Instantiate the cursor correctly
-        Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
-
-
-        if (MainImage != null)
-        {
-        MainImage.Cursor = customCursor;
-            
-        }
-        
-        // if (MainImage.Overlay != null)
+        // if (MainImage != null)
         // {
-        // MainImage.Overlay.Cursor = customCursor;
+        // MainImage.Cursor = customCursor;
         //     
         // }
-        
-        
-
-        this.Cursor = customCursor;
+        //
+        // // if (MainImage.Overlay != null)
+        // // {
+        // // MainImage.Overlay.Cursor = customCursor;
+        // //     
+        // // }
+        //
+        //
+        //
+        // this.Cursor = customCursor;
         
         
         
@@ -126,13 +113,69 @@ public partial class Display_view : UserControl
         // SizeChanged += OnSizeChanged;
         
         
+        UISettings.Instance.PropertyChanged += UISettingsOnPropertyChanged;
+        
         Unloaded += OnUnloaded;
 
         _resizeTimer = new DispatcherTimer();
         _resizeTimer.Interval = TimeSpan.FromMilliseconds(200);
         _resizeTimer.Tick += ResizeTimer_Tick;
+        
     }
 
+    
+    
+    
+    
+    
+    
+    
+    private void UISettingsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(UISettings.CurrentCursor))
+        {
+            // WPF: Application.Current.Dispatcher.Invoke(...)
+            // Avalonia: Dispatcher.UIThread.Post(...) — fire-and-forget on UI thread
+            Dispatcher.UIThread.Post(() =>
+            {
+
+
+                if (UISettings.Instance.CurrentCursor == "Default")
+                {
+                    this.Cursor = new Cursor(StandardCursorType.Arrow);
+                }
+                else
+                {
+                 
+                    var cursorUri = new Uri(UISettings.Instance.CurrentCursor);
+
+                    using var cursorStream = AssetLoader.Open(cursorUri);
+
+                    var cursorBitmap = new Avalonia.Media.Imaging.Bitmap(cursorStream);
+
+                    var hotSpot = new PixelPoint(0, 0);
+
+                    Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
+
+                    if (MainImage != null)
+                    {
+                            MainImage.Cursor = customCursor;
+                        
+                    }
+                    
+                    this.Cursor = customCursor;
+                    
+                }
+                
+               
+            });
+        }
+    }
+
+
+    
+    
+    
     private void MainImageOnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
         int v_width = My_Store.Instance.VideoWidth;
@@ -320,6 +363,7 @@ public partial class Display_view : UserControl
             ImageContainer.Focusable = true;
             MainImage.Focusable = true;
             
+            // UISettings.Instance.RefreshCurrentCursor();
         }
         
         InitAppManager();
@@ -586,7 +630,7 @@ public partial class Display_view : UserControl
         }
     }
 
-    private void scale_mainwindow()
+    public void scale_mainwindow()
     {
         // var screen = Screens.Primary;
         var screen = TopLevel.GetTopLevel(this)?.Screens.Primary;
@@ -761,7 +805,7 @@ public partial class Display_view : UserControl
     {
         var pos = e.GetPosition(ImageContainer);
 
-        Console.WriteLine("clicking image");
+        // Console.WriteLine("clicking image");
         
         
         

@@ -63,6 +63,8 @@ public partial class Home : Window
     private Keymap_Window keymapWindow;
 
     private settings _settingsWindow;
+    
+    public SplashScreen splashScreen;
 
     private keymap_worker my_keymap_worker;
 
@@ -78,6 +80,9 @@ public partial class Home : Window
 
     
     private  String currently_active = null;
+    
+    public Control? displayView; 
+    
     
 //
 //     public Home()
@@ -122,22 +127,29 @@ public partial class Home : Window
     {
         StartupTimer.Mark("Home ctor start");
 
-        string _filePath = Path.Combine(Environment.CurrentDirectory, "user", "data.db");
+        // string _filePath = Path.Combine(Environment.CurrentDirectory, "user", "data.db");
+        
+        string _filePath = Path.Combine(AppContext.BaseDirectory, "user", "data.db");
 
         my_info.Instance.Dataeditor = new LiteDbEditor(_filePath, new LiteDbEditorOptions { Autosave = true });
         StartupTimer.Mark("  LiteDbEditor done");
 
         InitializeComponent();
         StartupTimer.Mark("  InitializeComponent done");
+        
+       // show_splashscreen();
 
         // Background = "#FF00FF";
 
         // Background = new SolidColorBrush(Color.FromRgb(0xFF, 0x00, 0xFF));
         Instance = this;
 
+        #if WINDOWS
+        
         
         rawInputHandler = new handle_rawinput(this);
         StartupTimer.Mark("  rawInputHandler done");
+        #endif
 
         if (_settingsWindow == null)
             _settingsWindow = new settings();
@@ -156,6 +168,30 @@ public partial class Home : Window
         
         
         this.PropertyChanged += Home_PropertyChanged;
+        
+        
+        if (UISettings.Instance.Nativeview_mode && OperatingSystem.IsWindows())
+        {
+            // Native overlay path
+            displayView = new Display_view
+            {
+                
+            };
+        }
+        else
+        {
+            
+            displayView = new Gpuintrop_view
+            {
+                
+            };
+            
+        }
+        
+        Grid.SetRow(displayView, 1);
+        int insertAt = RootGrid.Children.IndexOf(loadingpage);
+        if (insertAt < 0) insertAt = RootGrid.Children.Count;
+        RootGrid.Children.Insert(insertAt, displayView);
 
         Loaded += MainImageOnLoaded;
         k_info.Instance.PropertyChanged += K_info_changed;
@@ -189,7 +225,9 @@ public partial class Home : Window
 
             
             // Home.Instance.displayView.MainImage.IsVisible = true;
-            Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+            var mainImage = displayView?.FindControl<Native_view>("MainImage");
+            mainImage._floatingContent.Background =  Brushes.Transparent;
+            // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
             // k_info.Instance.directx.HandleResize();
 
             k_info.Instance.my_renderer?.HandleResize();
@@ -217,7 +255,16 @@ public partial class Home : Window
                     Console.WriteLine("got minimized");
                     
                     // Home.Instance.displayView.MainImage.IsVisible = false;
-                    Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Black;
+                    var mainImage = displayView?.FindControl<Native_view>("MainImage");
+                    if (mainImage != null)
+                    {
+                        if (mainImage._floatingContent != null)
+                        {
+                                
+                            mainImage._floatingContent.Background = Brushes.Black;
+                        }
+                    }
+                    // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Black;
                     break;
 
                 case WindowState.Maximized:
@@ -227,7 +274,15 @@ public partial class Home : Window
                 case WindowState.Normal:
                     Console.WriteLine("got Normal");
                     
-                    
+                    var mainImage2 = displayView?.FindControl<Native_view>("MainImage");
+                    if (mainImage2 != null)
+                    {
+                        if (mainImage2._floatingContent != null)
+                        {
+                                
+                            mainImage2._floatingContent.Background = Brushes.Black;
+                        }
+                    }
                     // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
                     
                     _NativeTimer.Stop();
@@ -293,12 +348,53 @@ public partial class Home : Window
         //
         // _NativeTimer.Stop();
         // _NativeTimer.Start();
+        UISettings.Instance.PropertyChanged += UISettingsOnPropertyChanged;
         
-        
-        
+        UISettings.Instance.RefreshCurrentCursor();
         StartupTimer.Mark("Sidebar shown");
     }
 
+    private void UISettingsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(UISettings.CurrentCursor))
+        {
+            // WPF: Application.Current.Dispatcher.Invoke(...)
+            // Avalonia: Dispatcher.UIThread.Post(...) — fire-and-forget on UI thread
+            Dispatcher.UIThread.Post(() =>
+            {
+
+
+                if (UISettings.Instance.CurrentCursor == "Default")
+                {
+                    this.Cursor = new Cursor(StandardCursorType.Arrow);
+                }
+                else
+                {
+                 
+                    var cursorUri = new Uri(UISettings.Instance.CurrentCursor);
+
+                    using var cursorStream = AssetLoader.Open(cursorUri);
+
+                    var cursorBitmap = new Avalonia.Media.Imaging.Bitmap(cursorStream);
+
+                    var hotSpot = new PixelPoint(0, 0);
+
+                    Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
+
+                    this.Cursor = customCursor;
+                    
+                }
+                
+               
+            });
+        }
+    }
+
+
+    
+    
+    
+    
     private void my_store_propertychanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
@@ -710,9 +806,103 @@ public partial class Home : Window
             _isFullscreen = false;
 
             // CustomTitleBar.IsVisible = true;
+            
         }
     }
 
+
+    private async void show_splashscreen()
+    {
+        splashScreen = new SplashScreen();
+        splashScreen.Show();
+        
+        
+        
+    }
+    
+
+    public void restore_Home()
+    {
+        
+        // splashScreen?.Close();
+
+        Console.WriteLine("restore home called");
+        
+        this.Opacity = 1;
+        this.IsVisible = true;
+        this.ShowInTaskbar = true;
+        this.WindowState = WindowState.Normal;
+        
+        scale_mainwindow();
+
+        my_info.Instance.Restored_window = true;
+
+    }
+    
+    public void scale_mainwindow()
+    {
+        var screen = TopLevel.GetTopLevel(this)?.Screens.Primary;
+        if (screen == null) return;
+
+        // Screen size in DIPs
+        double screenWidth  = screen.Bounds.Width  / screen.Scaling;
+        double screenHeight = screen.Bounds.Height / screen.Scaling;
+
+        double videoWidth  = My_Store.Instance.VideoWidth;
+        double videoHeight = My_Store.Instance.VideoHeight;
+        if (videoWidth <= 0 || videoHeight <= 0) return;
+
+        const double scaleFactor = 0.8;
+        const double titleBarHeight = 30;
+
+        double aspect = videoWidth / videoHeight;
+
+        double targetWidth, targetHeight;
+
+        if (videoWidth > videoHeight)
+        {
+            targetWidth  = screenWidth * scaleFactor;
+            targetHeight = targetWidth / aspect;
+
+            if (targetHeight > screenHeight * scaleFactor)
+            {
+                targetHeight = screenHeight * scaleFactor;
+                targetWidth  = targetHeight * aspect;
+            }
+        }
+        else
+        {
+            targetHeight = screenHeight * scaleFactor;
+            targetWidth  = targetHeight * aspect;
+
+            if (targetWidth > screenWidth * scaleFactor)
+            {
+                targetWidth  = screenWidth * scaleFactor;
+                targetHeight = targetWidth / aspect;
+            }
+        }
+
+        if (Home.Instance != null)
+        {
+            double windowWidth  = targetWidth;
+            double windowHeight = targetHeight + titleBarHeight;
+
+            Home.Instance.Width  = windowWidth;
+            Home.Instance.Height = windowHeight;
+
+            // Center using the ACTUAL window dimensions, in DIPs
+            double dipX = (screenWidth  - windowWidth)  / 2.0;
+            double dipY = (screenHeight - windowHeight) / 2.0;
+
+            // Convert to physical pixels for PixelPoint
+            int pxX = (int)Math.Round(dipX * screen.Scaling);
+            int pxY = (int)Math.Round(dipY * screen.Scaling);
+
+            Home.Instance.Position = new PixelPoint(pxX, pxY);
+        }
+
+        my_info.Instance.Auto_resizing = false;
+    }
     private void Home_OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (k_info.Instance.KeymapMode)

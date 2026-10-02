@@ -11,7 +11,17 @@ namespace Androidplayer.Store
         private static readonly Lazy<my_info> _instance = new Lazy<my_info>(() => new my_info());
         public static my_info Instance => _instance.Value;
 
-        private bool _developerMode = true;
+#if DEBUG
+        
+        private bool _developerMode = false;
+#else
+
+        
+        private bool _developerMode = false;
+#endif
+        
+        
+        private bool _restored_window = false;
         
         
         
@@ -55,6 +65,13 @@ namespace Androidplayer.Store
             set => SetProperty(ref _developerMode, value);
         }
 
+        
+        public bool Restored_window
+        {
+            get => _restored_window;
+            set => SetProperty(ref _restored_window, value);
+        }
+        
         public bool IsMouseLocked
         {
             get => _isMouseLocked;

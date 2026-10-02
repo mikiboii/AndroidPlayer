@@ -1,16 +1,4 @@
-﻿// using Avalonia;
-// using Avalonia.Controls;
-// using Avalonia.Markup.Xaml;
-//
-// namespace Androidplayer.Pages;
-//
-// public partial class TitleBar : UserControl
-// {
-//     public TitleBar()
-//     {
-//         InitializeComponent();
-//     }
-// }
+﻿
 
 using System;
 using Avalonia;

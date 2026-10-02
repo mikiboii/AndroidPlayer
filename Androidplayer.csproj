@@ -2,7 +2,9 @@
 
     <!-- 1. Main properties -->
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+<!--        <OutputType>Exe</OutputType>-->
+        <OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>
+        <OutputType Condition="'$(Configuration)' != 'Debug'">WinExe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -11,6 +13,10 @@
         <LangVersion>12.0</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
+        <AvaloniaAccessUnstablePrivateApis>true</AvaloniaAccessUnstablePrivateApis>
+        <Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>true</Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>
+        
+        
         <!--
         <PublishAot>true</PublishAot>
         <IsAotCompatible>true</IsAotCompatible>
@@ -51,6 +57,7 @@
         <PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
         <PackageReference Include="LiteDB" Version="6.0.0-prerelease.65" />
         <PackageReference Include="SharpAdbClient" Version="2.3.23" />
+        
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
     </ItemGroup>
 
@@ -70,6 +77,7 @@
     <ItemGroup Condition="'$(DepsPlatform)' == 'linux'">
         <PackageReference Include="Silk.NET.Vulkan" Version="2.23.0" />
         <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.23.0" />
+        <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.23.0" />
     </ItemGroup>
 
     <!-- 5d. macOS-only packages -->
@@ -114,6 +122,7 @@
         <None Remove="deps\**\*" />
     </ItemGroup>
     <ItemGroup>
+        <Content Include=".github\workflows\build.yml" />
         <Content Include="deps\$(DepsPlatform)\adb\**\*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -126,11 +135,33 @@
         </Content>
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="user\**\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <Content Include="scrcpy-server.jar">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <TargetPath>scrcpy-server.jar</TargetPath>
+        </Content>
+    </ItemGroup>
+    
     <!-- 8. Avalonia resources -->
     <ItemGroup>
         <AvaloniaResource Include="Icons\**" />
         <AvaloniaResource Include="Src\Keymap\K_icons\**" />
-        <AvaloniaResource Include="android.png" Condition="Exists('android.png')" />
+       
+    </ItemGroup>
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Native_test\my_view.axaml" />
+      <UpToDateCheckInput Remove="Native_test\My_window.axaml" />
+      <UpToDateCheckInput Remove="Native_test\VideoPlayer.axaml" />
+      <UpToDateCheckInput Remove="Native_test\VideoPlayer_2.axaml" />
     </ItemGroup>
 
 </Project>

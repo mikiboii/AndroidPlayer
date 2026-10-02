@@ -1,11 +1,14 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Androidplayer.windows;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 
 namespace Androidplayer
 {
@@ -87,7 +90,26 @@ namespace Androidplayer
             this.mainWindow = mainWindow;
 
             this.Owner = this.mainWindow;
+            
+//             // 1. Point to your converted PNG resource
+//             var cursorUri = new Uri("avares://Androidplayer/Icons/cursor/black_sword.png");
+//
+// // 2. Open the asset stream
+//             using var cursorStream = AssetLoader.Open(cursorUri);
+//
+// // 3. Load the image into an Avalonia Bitmap
+//             var cursorBitmap = new Avalonia.Media.Imaging.Bitmap(cursorStream);
+//
+// // 4. Set the Hotspot (X, Y in pixels). 
+// // For a sword tip, it's typically the top-left corner (0, 0)
+//             var hotSpot = new PixelPoint(0, 0);
+//
+// // 5. Instantiate the cursor correctly
+//             Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
+//
+//             this.Cursor = customCursor;
 
+            this.ShowInTaskbar = false;
             Loaded += SidebarWindow_Loaded;
 
             // this.Activated += OnActivated;
@@ -95,8 +117,50 @@ namespace Androidplayer
             mainWindow.PositionChanged += MainWindow_PositionChanged;
             mainWindow.PropertyChanged += MainWindow_PropertyChanged;
             // mainWindow.Activated += MainWindow_Activated;
+            
+            UISettings.Instance.PropertyChanged += UISettingsOnPropertyChanged;
         }
 
+        private void UISettingsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(UISettings.CurrentCursor))
+            {
+                // WPF: Application.Current.Dispatcher.Invoke(...)
+                // Avalonia: Dispatcher.UIThread.Post(...) — fire-and-forget on UI thread
+                Dispatcher.UIThread.Post(() =>
+                {
+
+
+                    if (UISettings.Instance.CurrentCursor == "Default")
+                    {
+                        this.Cursor = new Cursor(StandardCursorType.Arrow);
+                    }
+                    else
+                    {
+                 
+                        var cursorUri = new Uri(UISettings.Instance.CurrentCursor);
+
+                        using var cursorStream = AssetLoader.Open(cursorUri);
+
+                        var cursorBitmap = new Avalonia.Media.Imaging.Bitmap(cursorStream);
+
+                        var hotSpot = new PixelPoint(0, 0);
+
+                        Cursor customCursor = new Cursor(cursorBitmap, hotSpot);
+
+                        this.Cursor = customCursor;
+                    
+                    }
+                
+               
+                });
+            }
+        }
+
+
+
+        
+        
         private void OnActivated(object? sender, EventArgs e)
         {
 

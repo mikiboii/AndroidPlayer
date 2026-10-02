@@ -3,12 +3,15 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
+using Androidplayer.Rendering.win;
 using Avalonia.Threading;
 // using Androidplayer.Src.Controls;
 using Androidplayer.Src.Keymap;
 using Androidplayer.Src.Keymap.K_store;
 using Androidplayer.Src.Rendering;
 using Androidplayer.Store;
+using Androidplayer.windows;
+using Avalonia.Controls;
 using Avalonia.Media;
 
 
@@ -35,22 +38,47 @@ public class App_manager : IDisposable
     private IVideoRenderer? my_renderer;
 
     string fileToPlay = @"I:\movie\Kung.Fu.Panda.3.2016.720p.WEBRip.x264.AAC-ETRG.mp4";
+
+#if WINDOWS
+    
     Src.FFmpeg ffmpeg; // FFmpeg Video Demuxing & HW Decoding
+    
+#endif
+    
     Thread threadPlay; // Simulates FPS
 
     private bool is_running = true;
 
-    public App_manager(Native_view image)
+    public App_manager(Native_view image = null)
     {
         my_image = image;
 
         my_info.Instance.PropertyChanged += my_info_propertychanged;
+        
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (Home.Instance != null)
+            {
+                Home.Instance.loadingpage.IsVisible = true;
+                Home.Instance.CustomTitleBar.IsVisible = true;
+                
+                Home.Instance.displayView.IsVisible = false;
+            }
+        });
 
         if (!my_info.Instance.DeveloperMode)
         {
             // k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
+
+            if (UISettings.Instance.Nativeview_mode)
+            {
+                
             
             k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
+            }else{
+                
+                // D11InteropRenderer.Instance.Initialize();
+            }
 
             my_adb_worker = new Adb_worker();
             my_adb_worker.ProgressChanged += my_app_worker_ProgressChanged;
@@ -62,13 +90,23 @@ public class App_manager : IDisposable
         else
         {
             // k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
-            k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
+            // k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
+            if (UISettings.Instance.Nativeview_mode)
+            {
+                
+            
+                k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
+                var w = my_image.Bounds.Width;
+                var h = my_image.Bounds.Height;
 
-            var w = my_image.Bounds.Width;
-            var h = my_image.Bounds.Height;
+                Console.WriteLine($"Surface size FIXED after init: {w} x {h}");
+                Console.WriteLine(my_image.PlatformHandle.Handle);
+            }else{
+                
+                // D11InteropRenderer.Instance.Initialize();
+            }
+                Console.WriteLine("devmode called from app manager");
 
-            Console.WriteLine($"Surface size FIXED after init: {w} x {h}");
-            Console.WriteLine(my_image.PlatformHandle.Handle);
 
             // my_app_worker = new app_worker();
             //
@@ -87,6 +125,10 @@ public class App_manager : IDisposable
         }
     }
 
+    
+    #if WINDOWS
+    
+    
     private void play_video()
     {
         try
@@ -168,6 +210,11 @@ public class App_manager : IDisposable
         }
     }
 
+
+    
+    #endif
+    
+    
     private void my_info_propertychanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
@@ -213,19 +260,34 @@ public class App_manager : IDisposable
                             //     (int)my_image.Bounds.Width,
                             //     (int)my_image.Bounds.Height);
                             
-                            if (k_info.Instance.my_renderer is DirectX dx)
-                                dx.ResizeSwapChain(
-                                    (int)my_image.Bounds.Width,
-                                    (int)my_image.Bounds.Height);
+#if WINDOWS
+
+                            if (UISettings.Instance.Nativeview_mode)
+                            {
+            
+                                if (k_info.Instance.my_renderer is DirectX dx)
+                                    dx.ResizeSwapChain(
+                                        (int)my_image.Bounds.Width,
+                                        (int)my_image.Bounds.Height);
+                            }
+                            
+#endif
 
                             if (my_info.Instance.DeveloperMode)
                             {
                                 // k_info.Instance.directx?.HandleResize();
                                 // k_info.Instance.my_renderer?.HandleResize();
                                 
+                                #if WINDOWS
+                                if (UISettings.Instance.Nativeview_mode)
+                                {
+            
+                                    if (k_info.Instance.my_renderer is DirectX dx1)
+                                        dx1.HandleResize();
+                                    
+                                }
                                 
-                                if (k_info.Instance.my_renderer is DirectX dx1)
-                                    dx1.HandleResize();
+                                #endif
                             }
                         }
                     }, DispatcherPriority.Render);
@@ -236,39 +298,79 @@ public class App_manager : IDisposable
 
     private void del_mm()
     {
+        
         Dispatcher.UIThread.Post(() =>
         {
-            if (my_image != null)
+            if (UISettings.Instance.Nativeview_mode)
             {
-                var w = my_image.Bounds.Width;
-                var h = my_image.Bounds.Height;
+                if (my_image != null)
+                {
+                    var w = my_image.Bounds.Width;
+                    var h = my_image.Bounds.Height;
 
-                Console.WriteLine($"Surface size FIXED: {w} x {h}");
-                Console.WriteLine($"INIT DX SIZE: {w} x {h}");
-                // k_info.Instance.directx?.DisplayImage("dev_img1.jpg");
-                // k_info.Instance.directx?.DisplayImage("dev_img2.jpg");
-                
-                k_info.Instance.my_renderer?.DisplayImage("dev_img2.jpg");
-                
-                
-                // MainImage._floatingContent.Background = Brushes.Transparent;
-                Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+                    Console.WriteLine($"Surface size FIXED: {w} x {h}");
+                    Console.WriteLine($"INIT DX SIZE: {w} x {h}");
+                    
+                    k_info.Instance.my_renderer?.DisplayImage("dev_img2.jpg");
+                    
+                    
+                    // Home.Instance.Opacity = 1;
+                    // Home.Instance.WindowState = WindowState.Normal;
+                    // Home.Instance.ShowInTaskbar = true;
+                    // Home.Instance.IsVisible = true;
+                    Home.Instance.restore_Home();
+                    
+                    
+                    
+                    // if (UISettings.Instance.Nativeview_mode)
+                    // {
+                    //
+                    //
+                    //     
+                    // }else{
+                    //
+                    //     
+                    // }
+                    
+                    
+                    var mainImage = Home.Instance.displayView?.FindControl<Native_view>("MainImage");
+                    mainImage._floatingContent.Background =  Brushes.Transparent;
+                    // MainImage._floatingContent.Background = Brushes.Transparent;
+                    // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
 
-                // Home.Instance.displayView.MainImage.IsVisible = true;
+                    // Home.Instance.displayView.MainImage.IsVisible = true;
+                    
+                    // Home.Instance.Show();
+                    // Home.Instance.IsVisible = true;
+                }
                 
-                // Home.Instance.Show();
-                // Home.Instance.IsVisible = true;
+                
+                
+            }else
+            {
+                    
+                    
+                D11InteropRenderer.Instance?.DisplayImage("dev_img1.jpg");
+                
+                Home.Instance.restore_Home();
+
+
             }
+
         }, DispatcherPriority.Loaded);
     }
 
     private void My_adb_workerOndevicedisconnected()
     {
+
+        Console.WriteLine("device disconnected event $$$$$$$$$");
+        
         if (scrcpy_worker != null)
         {
             scrcpy_worker.Dispose();
             scrcpy_worker = null;
         }
+        Console.WriteLine("device disconnected event $$$$$$$$$ 2");
         my_app_worker_ProgressChanged(0, "No device found. please reconnect your device");
 
         Dispatcher.UIThread.Post(() =>
@@ -276,6 +378,8 @@ public class App_manager : IDisposable
             if (Home.Instance != null)
             {
                 Home.Instance.loadingpage.IsVisible = true;
+                Home.Instance.CustomTitleBar.IsVisible = true;
+                
                 Home.Instance.displayView.IsVisible = false;
             }
         });
@@ -290,6 +394,7 @@ public class App_manager : IDisposable
             if (Home.Instance != null)
             {
                 Home.Instance.loadingpage.IsVisible = false;
+                Home.Instance.CustomTitleBar.IsVisible = false;
                 Home.Instance.displayView.IsVisible = true;
             }
 
@@ -329,7 +434,23 @@ public class App_manager : IDisposable
         // scrcpy_worker.dx_Device = k_info.Instance.directx?.my_Device;
         
         #if WINDOWS
+
+        if (UISettings.Instance.Nativeview_mode)
+        {
+            
+        // scrcpy_worker.dx_Device = (k_info.Instance.my_renderer as DirectX)?.my_Device;
         scrcpy_worker.dx_Device = (k_info.Instance.my_renderer as DirectX)?.my_Device;
+
+        Console.WriteLine((k_info.Instance.my_renderer as DirectX)?.my_Device);
+        
+        }
+        else
+        {
+        scrcpy_worker.dx_Device = D11InteropRenderer.Instance?.my_Device;
+            
+            
+            
+        }
         #endif
 
         scrcpy_worker.Frame_almostready += Scrcpy_workerOnFrame_almostready;
@@ -337,7 +458,7 @@ public class App_manager : IDisposable
         scrcpy_worker.ControlSocketReady += on_ControlSocketReady;
         scrcpy_worker.DeviceResolutionReady += on_DeviceResolutionReady;
 
-        scrcpy_worker.FrameReady += del_display_frame;
+        // scrcpy_worker.FrameReady += del_display_frame;
         scrcpy_worker.scrcpy_desposed += My_adb_workerOnCountingCompleted;
 
         scrcpy_worker.Start();
@@ -350,6 +471,8 @@ public class App_manager : IDisposable
             if (Home.Instance != null)
             {
                 Home.Instance.loadingpage.IsVisible = false;
+                Home.Instance.CustomTitleBar.IsVisible = false;
+                
                 Home.Instance.displayView.IsVisible = true;
             }
 
@@ -360,13 +483,29 @@ public class App_manager : IDisposable
     private void on_DeviceResolutionReady((int Width, int Height) div)
     {
         My_Store.Instance.SetDeviceResolution(div.Width, div.Height);
-        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        
+        //
+        // Dispatcher.UIThread.Post(() =>
+        // {
+        //
+        //     Console.WriteLine("try restoring home");
+        //     Home.Instance.restore_Home();
+        //     
+        // });
+
+        if (UISettings.Instance.Nativeview_mode)
         {
-        
-            Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
             
-        });
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+            
+                var mainImage = Home.Instance.displayView?.FindControl<Native_view>("MainImage");
+                mainImage._floatingContent.Background =  Brushes.Transparent;
+                // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+                
+            });
         
+        }
     }
 
     private void on_ControlSocketReady(TcpClient control_socket)
@@ -377,6 +516,28 @@ public class App_manager : IDisposable
     private void on_videosizeready((int Width, int Height) vid)
     {
         My_Store.Instance.SetVideoResolution(vid.Width, vid.Height);
+        Dispatcher.UIThread.Post(() =>
+        {
+        
+            Console.WriteLine("try restoring home");
+            Home.Instance.restore_Home();
+            
+        });
+        
+        if (UISettings.Instance.Nativeview_mode)
+        {
+            
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+            
+                var mainImage = Home.Instance.displayView?.FindControl<Native_view>("MainImage");
+                mainImage._floatingContent.Background =  Brushes.Transparent;
+                // Home.Instance.displayView.MainImage._floatingContent.Background = Brushes.Transparent;
+                
+            });
+        
+        }
+
 
         if (vid.Width > vid.Height)
         {
@@ -390,83 +551,7 @@ public class App_manager : IDisposable
         Console.WriteLine("video size ready #######");
     }
 
-    private void del_display_frame(Texture2D frame)
-    {
-        try
-        {
-            if (My_Store.Instance.DisplayHeight == 0 ||
-                My_Store.Instance.DisplayHeight != (int)my_image.Bounds.Width)
-            {
-                My_Store.Instance.SetDisplayResolution(
-                    (int)my_image.Bounds.Width,
-                    (int)my_image.Bounds.Height);
-            }
-
-            if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoHeight == 0)
-            {
-                My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
-            }
-
-            if (My_Store.Instance?.DeviceHeight == 0 ||
-                My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
-            {
-                My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
-            }
-
-            if (frame == null || frame.IsDisposed)
-            {
-                Console.WriteLine("del_display_frame: Frame is null or disposed");
-                return;
-            }
-
-            // k_info.Instance.directx?.PresentFrame(frame);
-            
-                
-    #if WINDOWS
-                if (k_info.Instance.my_renderer is DirectX dx)
-                    dx.PresentFrame(frame);
-    #endif
-                
-            
-            
-            
-            
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"del_display_frame error: {ex.Message}");
-        }
-    }
-
-    private void onframe_ready(Texture2D frame)
-    {
-        try
-        {
-            if (My_Store.Instance.DisplayHeight == 0 ||
-                My_Store.Instance.DisplayHeight != (int)my_image.Bounds.Width)
-            {
-                My_Store.Instance.SetDisplayResolution(
-                    (int)my_image.Bounds.Width,
-                    (int)my_image.Bounds.Height);
-            }
-
-            if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoHeight == 0)
-            {
-                My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
-            }
-
-            if (My_Store.Instance?.DeviceHeight == 0 ||
-                My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
-            {
-                My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"VideoLoop error: {ex.Message}");
-        }
-    }
-
+    
     public void Dispose()
     {
         is_running = false;

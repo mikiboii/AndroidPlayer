@@ -17,7 +17,9 @@ using SharpAdbClient;
 
 using System;
 using System.Diagnostics;
+using Androidplayer.Store;
 using Androidplayer.windows;
+using Avalonia.Threading;
 
 namespace Androidplayer.Src
 {
@@ -83,8 +85,8 @@ namespace Androidplayer.Src
         private DeviceData device;
         
         public bool is_deviceconnected = false;
-        
-        
+
+        private bool Is_First_Run = true;
         
         
         public string JAR = "scrcpy-server.jar";
@@ -124,12 +126,12 @@ namespace Androidplayer.Src
 
                 if (OperatingSystem.IsWindows())
                 {
-                    adbPath = Path.Combine(AppContext.BaseDirectory, "adb", "adb.exe");
+                    adbPath = Path.Combine(AppContext.BaseDirectory, "adb.exe");
                 }
                 else if (OperatingSystem.IsLinux())
                 {
                     Console.WriteLine("im on Linux");
-                    adbPath = Path.Combine(AppContext.BaseDirectory, "adb", "adb");
+                    adbPath = Path.Combine(AppContext.BaseDirectory, "adb");
                 }
                 
                 StartServerResult result = server.StartServer(adbPath ,false);
@@ -165,7 +167,7 @@ namespace Androidplayer.Src
                 _devicePollTimer.Start();
                 
 
-                SwitchToTcpIp();
+                // SwitchToTcpIp();
 
             }
             catch (Exception e)
@@ -183,15 +185,49 @@ namespace Androidplayer.Src
 
         private void OnDeviceConnected(object? sender, DeviceDataEventArgs e)
         {
+
+            Console.WriteLine("OnDeviceConnected called $$$$$$$");
+            if (Is_First_Run)
+            {
+                Is_First_Run = false;
+                // return;
+                
+            }
+            else
+            {
+                
+                is_deviceconnected =  true;
+                
+                StartCounting();
+            }
             
            
-            is_deviceconnected =  true;
-            
-            StartCounting();
         }
 
         private void OnDeviceDisconnected(object? sender, DeviceDataEventArgs e)
         {
+            
+            
+            var dropped = e.Device;
+
+            // Snapshot the current device to avoid racing with Deploy_server / Stop
+            DeviceData current;
+            lock (adbLock)
+            {
+                current = device;
+            }
+
+            // Ignore disconnects for devices we don't care about
+            if (current != null && dropped != null &&
+                !string.Equals(dropped.Serial, current.Serial, StringComparison.Ordinal))
+            {
+                Console.WriteLine($"Ignoring disconnect for unrelated device: {dropped.Serial}");
+                return;
+            }
+
+            
+            
+            
             // Console.WriteLine("device disconnected event is working");
             if (cts != null && !cts.IsCancellationRequested)
             {
@@ -199,13 +235,106 @@ namespace Androidplayer.Src
                 cts.Cancel();
             }
             
+            
             is_deviceconnected =  false;
             
             ErrorOccurred?.Invoke("server exited");
             
-            devicedisconnected.Invoke();
+            devicedisconnected?.Invoke();
         }
 
+        
+        
+        
+        // private void PollDevices()
+        // {
+        //     lock (_pollLock)
+        //     {
+        //         try
+        //         {
+        //             // var current = adbClient.GetDevices();
+        //
+        //
+        //             
+        //
+        //         
+        //             var allDevices = adbClient.GetDevices();
+        //     
+        //     
+        //             Console.WriteLine("--- Connected devices ---");
+        //             foreach (var d in allDevices)
+        //             {
+        //                 
+        //                 if (device.Serial == d.Serial)
+        //                 {
+        //                     Console.WriteLine($"wireless device is {d.State}");
+        //
+        //
+        //                     if (d.State.ToString() == "Offline")
+        //                     {
+        //                         
+        //                         // break;
+        //                     }
+        //                 }
+        //             }
+        //             
+        //
+        //             // Disconnected
+        //             
+        //         }
+        //         catch (Exception ex)
+        //         {
+        //             Console.WriteLine($"PollDevices error: {ex.Message}");
+        //         }
+        //     }
+        // }
+        //
+        
+        private static bool IsHostReachable(string serial, int timeoutMs = 1000)
+        {
+            // serial looks like "192.168.100.77:5555"
+            var parts = serial.Split(':');
+            if (parts.Length != 2 || !int.TryParse(parts[1], out int port))
+                return true; // not a wireless serial, don't judge it here
+
+            try
+            {
+                using var client = new System.Net.Sockets.TcpClient();
+                var connect = client.ConnectAsync(parts[0], port);
+                return connect.Wait(timeoutMs) && client.Connected;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+      
+        private bool IsDeviceOnline(DeviceData target)
+        {
+            if (target == null || string.IsNullOrWhiteSpace(target.Serial))
+                return false;
+
+            // Fast, independent of adb server's cached state
+            if (!IsHostReachable(target.Serial))
+                return false;
+
+            try
+            {
+                using (IAdbSocket socket = Factories.AdbSocketFactory(adbClient.EndPoint))
+                {
+                    socket.SendAdbRequest($"host-serial:{target.Serial}:get-state");
+                    socket.ReadAdbResponse();
+                    string state = socket.ReadString()?.Trim();
+                    return string.Equals(state, "device", StringComparison.Ordinal);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"IsDeviceOnline({target.Serial}) failed: {ex.Message}");
+                return false;
+            }
+        }
+        
         
         
         
@@ -215,34 +344,57 @@ namespace Androidplayer.Src
             {
                 try
                 {
-                    // var current = adbClient.GetDevices();
-
-
-                    
-        
-                
                     var allDevices = adbClient.GetDevices();
-            
-            
-                    Console.WriteLine("--- Connected devices ---");
-                    foreach (var d in allDevices)
+        
+                    // Console.WriteLine("--- Connected devices ---");
+                    // foreach (var d in allDevices)
+                    // {
+                    //     // Guard against device being null before Deploy_server runs
+                    //     if (device != null && device.Serial == d.Serial)
+                    //     {
+                    //         Console.WriteLine($"wireless device is {d.State}");
+                    //     }
+                    // }
+                    
+                    
+                    DeviceData tracked;
+                    lock (adbLock) { tracked = device; }
+                    var online = IsDeviceOnline(device);
+                    Console.WriteLine($"wireless device is {online}");
+
+                    if (online == false && is_deviceconnected == true)
                     {
                         
-                        if (device.Serial == d.Serial)
+                        
+                        
+                        
+                        // Console.WriteLine("device disconnected event is working");
+                        if (cts != null && !cts.IsCancellationRequested)
                         {
-                            Console.WriteLine($"wireless device is {d.State}");
+                        
+                            cts.Cancel();
+                        }
+                        
+                        
+                        Console.WriteLine($"is_deviceconnected {is_deviceconnected}");
+                        
+                        is_deviceconnected =  false;
+                        
+                        ErrorOccurred?.Invoke("server exited");
+                        
+                        devicedisconnected?.Invoke();
+                    }
+                    else
+                    {
 
-
-                            if (d.State.ToString() == "Offline")
-                            {
-                                
-                                // break;
-                            }
+                        if (!is_deviceconnected && UISettings.Instance.SelectedConnectionType == "Wireless")
+                        {
+                            
+                        
+                            StartCounting();
                         }
                     }
                     
-        
-                    // Disconnected
                     
                 }
                 catch (Exception ex)
@@ -279,6 +431,8 @@ namespace Androidplayer.Src
             }
 
             _isCounting = true;
+            // is_deviceconnected =  true;
+            
             _adbThread = new Thread(run)
             {
                 IsBackground = true,
@@ -305,6 +459,8 @@ namespace Androidplayer.Src
             // }
 
 
+            MobileServerCleanup();
+            
             
             if (_adbThread != null && _adbThread.IsAlive)
             {
@@ -341,15 +497,118 @@ namespace Androidplayer.Src
         
         private void MobileServerCleanup()
         {
+            
+                if (device == null) return;
+            
+                // A few fallbacks, each independent, each swallowing errors.
+                string[] kills =
+                {
+                    // Matches the Java main class in the cmdline.
+                    "pkill -f com.genymobile.scrcpy.Server",
+                    // Fallback for shells without pkill.
+                    "for p in $(ps -A -o PID,CMDLINE | grep com.genymobile.scrcpy.Server | awk '{print $1}'); do kill -9 $p; done",
+                    // Last resort: kill anything named scrcpy.
+                    "for p in $(ps -A -o PID,CMDLINE | grep -i scrcpy | awk '{print $1}'); do kill -9 $p; done",
+                };
+            
+                foreach (var cmd in kills)
+                {
+                    try
+                    {
+                        var r = new ConsoleOutputReceiver();
+                        adbClient.ExecuteRemoteCommand(cmd, device, r);
+                        Thread.Sleep(150);
+                    }
+                    catch { /* best effort */ }
+                }
+
+            
             // Remove any existing network stuff.
             adbClient.RemoveAllForwards(device);
+            
             // adbClient.RemoveAllReverseForwards(device);
+        }
+        
+        
+        public int? GetDeviceOrientation()
+        {
+            try
+            {
+                DeviceData currentDevice;
+                lock (adbLock) { currentDevice = device; }
+
+                if (currentDevice == null)
+                {
+                    Console.WriteLine("[orientation] device is NULL");
+                    return null;
+                }
+                if (currentDevice.State != DeviceState.Online)
+                {
+                    Console.WriteLine($"[orientation] device not online, state={currentDevice.State}");
+                    return null;
+                }
+
+                Console.WriteLine($"[orientation] querying {currentDevice.Serial}");
+
+                var receiver = new ConsoleOutputReceiver();
+                adbClient.ExecuteRemoteCommand("settings get system user_rotation", currentDevice, receiver);
+                string output = receiver.ToString();
+                Console.WriteLine($"[orientation] raw='{output}'");
+
+                if (int.TryParse(output.Trim(), out int rotation))
+                {
+                    Console.WriteLine($"[orientation] parsed={rotation}");
+                    return rotation;
+                }
+
+                Console.WriteLine("[orientation] parse failed");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[orientation] EX: {ex}");
+            }
+            return null;
+        }
+        
+        private bool CreateForwardRaw(int localPort, string remoteSpec)
+        {
+            try
+            {
+                using (IAdbSocket socket = Factories.AdbSocketFactory(adbClient.EndPoint))
+                {
+                    // Generic host forward — same form the CLI uses.
+                    // NOTE: no SetDevice() call — that's what makes it the generic
+                    //       "host:forward:" form instead of "host-serial:<serial>:forward:".
+
+                    if (UISettings.Instance.SelectedConnectionType == "Wireless")
+                    {
+                        socket.SetDevice(device); 
+                    }
+                    else
+                    {
+                        
+                        socket.SetDevice(device); 
+                    }
+                    string request = $"host:forward:tcp:{localPort};{remoteSpec}";
+                    
+                    socket.SendAdbRequest(request);
+                    var response = socket.ReadAdbResponse();   // throws on FAIL
+
+                    Console.WriteLine($"Forward tcp:{localPort} -> {remoteSpec} OK");
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Forward tcp:{localPort} failed: {ex.Message}");
+                return false;
+            }
         }
 
         private void run()
         {
 
-            Thread.Sleep(3000);
+            // Thread.Sleep(3000);
            
                 // var devices = adbClient.GetDevices().FirstOrDefault();
                 var devices = GetDeviceBasedOnMode();
@@ -401,6 +660,13 @@ namespace Androidplayer.Src
                 
                 
                 
+                if (devices == null)
+                {
+                    Console.WriteLine("No devices found");
+                    _isCounting = false;
+                    is_deviceconnected =  false;
+                    return;
+                }
 
                 device = devices;
                 
@@ -409,14 +675,8 @@ namespace Androidplayer.Src
                 
                 
                 
-                if (devices == null)
-                {
-                    Console.WriteLine("No devices found");
-                    _isCounting = false;
-                    return;
-                }
                 
-                
+                is_deviceconnected =  true;
 
                 Console.WriteLine($"Found device: {devices}");
                 
@@ -540,22 +800,22 @@ var back_cmd = new List<string>
                 Thread.Sleep(200);
 
                 // Kill any leftover scrcpy server
-                try
-                {
-                    var killReceiver = new ConsoleOutputReceiver();
-                    adbClient.ExecuteRemoteCommand("pkill -f com.genymobile.scrcpy.Server", device, killReceiver);
-                    Thread.Sleep(300);  // give it time to die
-                }
-                catch { /* ignore if nothing to kill */ }
-             
-                try
-                {
-                    var killReceiver = new ConsoleOutputReceiver();
-                    adbClient.ExecuteRemoteCommand(
-                        "for p in $(ps -A | grep scrcpy | awk '{print $2}'); do kill -9 $p; done",
-                        device, killReceiver);
-                }
-                catch { }
+                // try
+                // {
+                //     var killReceiver = new ConsoleOutputReceiver();
+                //     adbClient.ExecuteRemoteCommand("pkill -f com.genymobile.scrcpy.Server", device, killReceiver);
+                //     Thread.Sleep(300);  // give it time to die
+                // }
+                // catch { /* ignore if nothing to kill */ }
+                //
+                // try
+                // {
+                //     var killReceiver = new ConsoleOutputReceiver();
+                //     adbClient.ExecuteRemoteCommand(
+                //         "for p in $(ps -A | grep scrcpy | awk '{print $2}'); do kill -9 $p; done",
+                //         device, killReceiver);
+                // }
+                // catch { }
                 
                 
                 
@@ -584,15 +844,25 @@ var back_cmd = new List<string>
 
                 // string adb_cmd = "cd adb && adb.exe forward tcp:1234 localabstract:scrcpy && adb.exe forward tcp:12345 localabstract:scrcpy && adb forward tcp:1717 localabstract:minicap";
                 
-                string adb_cmd = "cd adb && adb.exe forward tcp:1011 localabstract:scrcpy && adb.exe forward tcp:1012 localabstract:scrcpy && adb.exe forward tcp:1013 localabstract:scrcpy";
+                string adb_cmd = "adb.exe forward tcp:1011 localabstract:scrcpy && adb.exe forward tcp:1012 localabstract:scrcpy && adb.exe forward tcp:1013 localabstract:scrcpy";
 
 
-                adbClient.CreateForward(device, 1011, "localabstract:scrcpy");
-                adbClient.CreateForward(device, 1012, "localabstract:scrcpy");
-                adbClient.CreateForward(device, 1013, "localabstract:scrcpy");
+                // adbClient.CreateForward(device, 1011, "localabstract:scrcpy");
+                // adbClient.CreateForward(device, 1012, "localabstract:scrcpy");
+                // adbClient.CreateForward(device, 1013, "localabstract:scrcpy");
                 
                 // string result = ShellHelper_2.ExecuteCommand(adb_cmd);
                 // Console.WriteLine(result);
+                
+                
+             
+                
+                CreateForwardRaw(1011, "localabstract:scrcpy");
+                CreateForwardRaw(1012, "localabstract:scrcpy");
+                CreateForwardRaw(1013, "localabstract:scrcpy");
+                
+                
+                
                 
                 ProgressChanged?.Invoke(65, $"Staging server...");
                 
@@ -622,6 +892,7 @@ var back_cmd = new List<string>
                 ProgressChanged?.Invoke(100, $"server started!");
                 
 
+                
                 CountingCompleted?.Invoke();
                
                 try
@@ -645,6 +916,14 @@ var back_cmd = new List<string>
                 }
 
                 Console.WriteLine("adb continued running ##########");
+
+
+                Console.WriteLine("about to query orientation...");
+                var orientation = GetDeviceOrientation();
+                Console.WriteLine($"my device orientation: {orientation}");
+                
+                
+                // Thread.Sleep(2000);
 
 
                 // adbClient.ExecuteRemoteCommand(command, device, receiver);
@@ -674,8 +953,8 @@ private DeviceData GetDeviceBasedOnMode()
     lock (adbLock)
     {
         // Respect the actual setting instead of hardcoding "Wireless".
-        // string mode = UISettings.Instance.SelectedConnectionType;
-        string mode = "Wireless";
+        string mode = UISettings.Instance.SelectedConnectionType;
+        // string mode = "Wireless";
 
         if (mode == "USB")
         {
@@ -683,7 +962,28 @@ private DeviceData GetDeviceBasedOnMode()
         }
         else if (mode == "Wireless")
         {
-            return GetWirelessDevice();
+            var w_device = GetWirelessDevice();
+            if (w_device != null)
+            {
+                
+                is_deviceconnected =  true;
+                
+                
+                
+
+            }
+            else
+            {
+                if (my_info.Instance.Restored_window == false)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        Home.Instance?.restore_Home();
+                    });
+        
+                }
+            }
+            return w_device;
         }
 
         return null;
@@ -693,15 +993,68 @@ private DeviceData GetDeviceBasedOnMode()
 
 private DeviceData GetUsbDevice()
 {
-    var usbDevice = adbClient.GetDevices()
-        .FirstOrDefault(d => d.State == DeviceState.Online && !d.Serial.Contains(":"));
+    int maxAttempts = 3;
+    int delayMs = 500;
+    
+    
+    for (int attempt = 1; attempt <= maxAttempts; attempt++)
+    {
+        DeviceData usbDevice = null;
 
-    device = usbDevice;
+        try
+        {
+            usbDevice = adbClient.GetDevices()
+                .FirstOrDefault(d => d.State == DeviceState.Online && !d.Serial.Contains(":"));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"GetUsbDevice attempt {attempt}/{maxAttempts} error: {ex.Message}");
+        }
 
-    if (usbDevice == null)
-        Console.WriteLine("No USB device found.");
+        if (usbDevice != null)
+        {
+            lock (adbLock) { device = usbDevice; }
 
-    return usbDevice;
+            if (attempt > 1)
+                Console.WriteLine($"USB device found on attempt {attempt}: {usbDevice.Serial}");
+
+            return usbDevice;
+        }
+
+        Console.WriteLine($"No USB device found (attempt {attempt}/{maxAttempts}).");
+
+        if (attempt < maxAttempts)
+            Thread.Sleep(delayMs);
+    }
+
+    // Give up — clear stale device so PollDevices doesn't probe a ghost.
+    lock (adbLock) { device = null; }
+    Console.WriteLine("No USB device found after retries.");
+
+    if (my_info.Instance.Restored_window == false)
+    {
+    Dispatcher.UIThread.Post(() =>
+    {
+        Home.Instance?.restore_Home();
+    });
+        
+    
+    
+    }
+    
+    
+    return null;
+    
+    
+    // var usbDevice = adbClient.GetDevices()
+    //     .FirstOrDefault(d => d.State == DeviceState.Online && !d.Serial.Contains(":"));
+    //
+    // device = usbDevice;
+    //
+    // if (usbDevice == null)
+    //     Console.WriteLine("No USB device found.");
+    //
+    // return usbDevice;
 }
 
 
@@ -948,3 +1301,9 @@ private bool SwitchToTcpIp(DeviceData targetDevice = null, int port = 5555)
         }
     }
 }
+
+
+
+
+
+
