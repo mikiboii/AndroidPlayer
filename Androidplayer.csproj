@@ -158,6 +158,19 @@
         <AvaloniaResource Include="Src\Keymap\K_icons\**" />
        
     </ItemGroup>
+
+
+    <ItemGroup Condition="'$(DepsPlatform)' != 'windows'">
+        <Compile Remove="Src\Rendering\win\**\*.cs" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(DepsPlatform)' != 'linux'">
+        <Compile Remove="Src\Rendering\linux\**\*.cs" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(DepsPlatform)' != 'macos'">
+        <Compile Remove="Src\Rendering\macos\**\*.cs" />
+    </ItemGroup>
+    
+    
     <ItemGroup>
       <UpToDateCheckInput Remove="Native_test\my_view.axaml" />
       <UpToDateCheckInput Remove="Native_test\My_window.axaml" />
