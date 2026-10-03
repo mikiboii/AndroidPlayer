@@ -20,6 +20,7 @@
                 BorderBrush="#D0D0D0" BorderThickness="1"
                 Background="White" Foreground="#555" Cursor="Hand"
                 PointerMoved="Button_MouseMove"
+                Width="80"
                 Tag="Direction">
           <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Src/Keymap/K_icons/direction.png" Height="25"
@@ -33,6 +34,7 @@
                 BorderBrush="#D0D0D0" BorderThickness="1"
                 Background="White" Foreground="#555" Cursor="Hand"
                 PointerMoved="Button_MouseMove"
+                Width="80"
                 Tag="Grenade">
           <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Src/Keymap/K_icons/grenade_2.png" Height="23"
@@ -46,6 +48,7 @@
                 BorderBrush="#D0D0D0" BorderThickness="1"
                 Background="White" Foreground="#555" Cursor="Hand"
                 PointerMoved="Button_MouseMove"
+                Width="80"
                 Tag="Visual">
           <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Src/Keymap/K_icons/target.png" Height="25"
@@ -59,6 +62,7 @@
                 BorderBrush="#D0D0D0" BorderThickness="1"
                 Background="White" Foreground="#555" Cursor="Hand"
                 PointerMoved="Button_MouseMove"
+                Width="80"
                 Tag="Fire">
           <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Src/Keymap/K_icons/bullet_2.png" Height="25"
@@ -72,6 +76,7 @@
                 BorderBrush="#D0D0D0" BorderThickness="1"
                 Background="White" Foreground="#555" Cursor="Hand"
                 PointerMoved="Button_MouseMove"
+                Width="80"
                 Tag="Mouse up">
           <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Src/Keymap/K_icons/mouse_up.png" Height="25"
@@ -85,6 +90,7 @@
                 BorderBrush="#D0D0D0" BorderThickness="1"
                 Background="White" Foreground="#555" Cursor="Hand"
                 PointerMoved="Button_MouseMove"
+                Width="80"
                 Tag="Mouse down">
           <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Src/Keymap/K_icons/mouse_down.png" Height="25"
@@ -98,6 +104,7 @@
                 BorderBrush="#D0D0D0" BorderThickness="1"
                 Background="White" Foreground="#555" Cursor="Hand"
                 PointerMoved="Button_MouseMove"
+                Width="80"
                 Tag="Peak left">
           <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Src/Keymap/K_icons/arrow-left.png" Height="25"
@@ -111,6 +118,7 @@
                 BorderBrush="#D0D0D0" BorderThickness="1"
                 Background="White" Foreground="#555" Cursor="Hand"
                 PointerMoved="Button_MouseMove"
+                Width="80"
                 Tag="Peak right">
           <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Src/Keymap/K_icons/arrow-right.png" Height="25"
@@ -124,6 +132,7 @@
                 BorderBrush="#D0D0D0" BorderThickness="1"
                 Background="White" Foreground="#555" Cursor="Hand"
                 PointerMoved="Button_MouseMove"
+                Width="80"
                 Tag="Mouse right">
           <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Src/Keymap/K_icons/mouse_right.png" Height="25"
@@ -137,6 +146,7 @@
                 BorderBrush="#D0D0D0" BorderThickness="1"
                 Background="White" Foreground="#555" Cursor="Hand"
                 PointerMoved="Button_MouseMove"
+                Width="80"
                 Tag="Grenade vision">
           <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Image Source="/Src/Keymap/K_icons/eye.png" Height="25"

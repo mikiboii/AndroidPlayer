@@ -21,6 +21,7 @@
         <entry key="Src/Keymap/Keymap_items/Keymap_element_new.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Keymap/Keymap_items/Keymap_element_normal.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Keymap/Keymap_items/Visual_keymap.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Keymap/List_item.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Keymap/keymap_menu.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Pages/Loading_page.axaml" value="Androidplayer.csproj" />
         <entry key="Src/Pages/TitleBar.axaml" value="Androidplayer.csproj" />

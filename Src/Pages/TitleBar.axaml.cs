@@ -1,6 +1,7 @@
 ﻿
 
 using System;
+using Androidplayer.Store;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -190,5 +191,10 @@ public partial class TitleBar : UserControl
         {
             MaximizeBtn.Content = Home.Instance.WindowState == WindowState.Maximized ? "❐" : "☐";
         }
+    }
+
+    private void TypingModeBtn_OnClick(object? sender, RoutedEventArgs e)
+    {
+        my_info.Instance.Toggle_typing_mode();
     }
 }

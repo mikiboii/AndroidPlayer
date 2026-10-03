@@ -80,6 +80,8 @@
                     Classes="IconButton"
                     Foreground="#333"
                     ToolTip.Tip="Edit"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
                     Click="EditButton_Click">
               <!-- Keep Segoe MDL2 Assets for Windows, or swap for an Image -->
               <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE70F;" FontSize="14"/>
@@ -87,6 +89,8 @@
             <Button x:Name="DeleteButton"
                     Classes="IconButton"
                     Foreground="#333"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
                     ToolTip.Tip="Delete"
                     Click="DeleteButton_Click">
               <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" FontSize="14"/>

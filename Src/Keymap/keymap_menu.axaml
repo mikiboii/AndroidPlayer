@@ -5,9 +5,37 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Androidplayer.Src.Keymap"
              mc:Ignorable="d"
-             d:DesignHeight="800" d:DesignWidth="290"
+             d:DesignHeight="800" d:DesignWidth="314"
              Width="314">
-
+  <UserControl.Styles>
+    <!-- Collapse / expand toggle -->
+    <Style Selector="Button#ToggleButton">
+      <Setter Property="Width" Value="28"/>
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="1"/>
+  
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.15"/>
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.15"/>
+        </Transitions>
+      </Setter>
+    </Style>
+  
+  
+  </UserControl.Styles>
+  <!-- -->
+  <!-- -->
+  
+  
   <Grid Background="White">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
@@ -15,7 +43,7 @@
     </Grid.ColumnDefinitions>
 
     <!-- Main content -->
-    <Grid x:Name="ContentGrid" Margin="15">
+    <Grid x:Name="ContentGrid" Margin="15,15,0,15">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
         <RowDefinition Height="*"/>
@@ -45,11 +73,13 @@
               <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="Add Key Type"
-                       FontSize="14"
-                       FontWeight="SemiBold"
-                       Foreground="#333"
-                       Margin="0,0,0,12"/>
+            <TextBlock Text="Secondary Keys"
+                      
+                       FontWeight="Bold"
+                       FontSize="16"
+                       Foreground="#1A73E8"
+                       
+                       Margin="0,5,0,7"/>
 
             <local:Elements_view Grid.Row="1" Height="150"/>
           </Grid>
@@ -66,11 +96,12 @@
 
             <!-- Title with Add Button -->
             <DockPanel Grid.Row="0" Margin="0,0,0,12">
-              <TextBlock Text="Selected Key: F+2"
+              <TextBlock Text="Current Keymaps"
                          FontWeight="Bold"
                          FontSize="16"
                          Foreground="#1A73E8"
                          DockPanel.Dock="Left"
+                         Margin="0,0,60,0"
                          VerticalAlignment="Center"/>
 
               <Button DockPanel.Dock="Right"
@@ -100,12 +131,12 @@
             </DockPanel>
 
             <!-- Current Keymaps label -->
-            <TextBlock Grid.Row="1"
-                       Text="Current Keymaps"
-                       FontSize="18"
-                       FontWeight="SemiBold"
-                       Margin="0,0,0,12"
-                       Foreground="#333"/>
+            <!-- <TextBlock Grid.Row="1" -->
+            <!--            Text="Current Keymaps" -->
+            <!--            FontSize="18" -->
+            <!--            FontWeight="SemiBold" -->
+            <!--            Margin="0,0,0,12" -->
+            <!--            Foreground="#333"/> -->
 
             <Border Grid.Row="2" Background="White" CornerRadius="4" Height="300">
               <ScrollViewer VerticalScrollBarVisibility="Auto"
@@ -171,16 +202,17 @@
     <Button Grid.Column="1"
             x:Name="ToggleButton"
             Height="30"
-            Width="24"
+            Width="30"
             Background="Transparent"
-            BorderThickness="0"
+            BorderThickness="3"
+           Margin="0,0,0,0"
             Cursor="Hand"
 
             ToolTip.Tip="Collapse / Expand"
             Click="ToggleButton_OnClick">
       <Image x:Name="ToggleIcon"
              Source="/Src/Keymap/K_icons/arrow-left.png"
-             Height="25"
+             Height="30"
              RenderOptions.BitmapInterpolationMode="HighQuality"
              VerticalAlignment="Center"
              Margin="0,0,0,0"/>

@@ -674,7 +674,11 @@ namespace Androidplayer.Src
         private const long AudioWaitMs = 2000;
         private const int MaxPending = 3000;
 
-        private readonly string _path;
+        
+
+        public string Path { get; }
+        
+        
         private readonly int _videoWidth;
         private readonly int _videoHeight;
         private readonly bool _includeAudio;
@@ -793,7 +797,7 @@ namespace Androidplayer.Src
         /// <param name="includeAudio">Add an Opus audio track when audio packets are arriving.</param>
         public Video_recorder(string path, int videoWidth, int videoHeight, bool includeAudio = true)
         {
-            _path = path;
+            path = path;
             _videoWidth = videoWidth > 0 ? videoWidth : 1280;
             _videoHeight = videoHeight > 0 ? videoHeight : 720;
             _includeAudio = includeAudio;
@@ -1043,7 +1047,7 @@ namespace Androidplayer.Src
             bool wantAudio = _includeAudio && audioKnown;
 
             AVFormatContext* fmt = null;
-            int ret = avformat_alloc_output_context2(&fmt, null, "mp4", _path);
+            int ret = avformat_alloc_output_context2(&fmt, null, "mp4", Path);
             if (ret < 0 || fmt == null)
             {
                 Console.WriteLine($"[recorder] avformat_alloc_output_context2 failed: {FFErr(ret)}");
@@ -1114,7 +1118,7 @@ namespace Androidplayer.Src
             // ---- Open output ----
             if ((_fmt->oformat->flags & AVFMT_NOFILE) == 0)
             {
-                ret = avio_open(&_fmt->pb, _path, AVIO_FLAG_WRITE);
+                ret = avio_open(&_fmt->pb, Path, AVIO_FLAG_WRITE);
                 if (ret < 0)
                 {
                     Console.WriteLine($"[recorder] avio_open failed: {FFErr(ret)}");

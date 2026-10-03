@@ -574,8 +574,8 @@ namespace Androidplayer.Src.Keymap
         //     // Asset URI: avares://<AssemblyName>/<path>
         //     image.Source = new Bitmap(AssetLoader.Open(new Uri(
         //         mode.Equals("keyboard", StringComparison.OrdinalIgnoreCase)
-        //             ? "avares://Androidplayer/Icons/Keyboard_2.png"
-        //             : "avares://Androidplayer/Icons/Controller_2.png"
+        //             ? "avares://Androidplayer/Icons/Keyboard.png"
+        //             : "avares://Androidplayer/Icons/Controller.png"
         //     )));
         //
         //     overlay.IsVisible = true;
@@ -603,8 +603,8 @@ namespace Androidplayer.Src.Keymap
         //
         //     image.Source = new Bitmap(AssetLoader.Open(new Uri(
         //         mode.Equals("keyboard", StringComparison.OrdinalIgnoreCase)
-        //             ? "avares://Androidplayer/Icons/Keyboard_2.png"
-        //             : "avares://Androidplayer/Icons/Controller_2.png"
+        //             ? "avares://Androidplayer/Icons/Keyboard.png"
+        //             : "avares://Androidplayer/Icons/Controller.png"
         //     )));
         //
         //     overlay.IsVisible = true;
@@ -662,8 +662,8 @@ public async void AnimateModeOverlay(string mode)
         // ---- 1. Icon ----
         image.Source = new Bitmap(AssetLoader.Open(new Uri(
             mode.Equals("keyboard", StringComparison.OrdinalIgnoreCase)
-                ? "avares://Androidplayer/Icons/Keyboard_2.png"
-                : "avares://Androidplayer/Icons/Controller_2.png")));
+                ? "avares://Androidplayer/Icons/Keyboard.png"
+                : "avares://Androidplayer/Icons/Controller.png")));
 
         // ---- 2. Fill the canvas ----
         double cw = _canvas.Bounds.Width;
@@ -871,6 +871,8 @@ public async void AnimateModeOverlay(string mode)
                     {
                         ShowToast("warning", "The current Keymap data was created For a different device. " +
                                   "please create a new keymap. or select a diffrent one");
+                        
+                        return;
                     }
                 }
 

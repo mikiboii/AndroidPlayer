@@ -348,9 +348,16 @@ namespace Androidplayer.Src
         
         private void StopRecording()
         {
-            Console.WriteLine("stoped recording!");
-            _recorder?.Dispose();
+            string finishedPath = _recorder.Path;
+            _recorder.Dispose();
             _recorder = null;
+
+            Console.WriteLine($"[recorder] stopped, file at: {finishedPath}");
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                OverlayManager.Instance.ShowToast("done", $"Recording saved: {finishedPath}");
+            });
         }
         
  

@@ -80,7 +80,7 @@ public partial class Keymap_Window : Window
                     }
                     else
                     {
-                        this.Width = 314;
+                        this.Width = 200;
                     }
                 });
                 break;

@@ -1,6 +1,7 @@
 ﻿<Window x:Class="Androidplayer.SidebarWindow"
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:appstore="clr-namespace:Androidplayer.Store"
         Title="Sidebar"
         Height="400"
         Width="35"
@@ -38,12 +39,50 @@
         </Style>
 
         <!-- Record -->
+        <!-- <Style Selector="Image.record"> -->
+        <!--   <Setter Property="Source" Value="/Icons/sidebar1/record.png"/> -->
+        <!-- </Style> -->
+        
+        <!-- <Style Selector="Image.record"> -->
+        <!--   <Setter Property="Source" Value="/Icons/sidebar1/record.png"/> -->
+        <!-- </Style> -->
+        <!-- -->
+        <!-- <Style Selector="Image.record:pointerover"> -->
+        <!--   <Setter Property="Source" Value="/Icons/sidebar2/record.png"/> -->
+        <!-- </Style> -->
+        <!-- -->
+        
+        <!-- Record — default (idle) -->
         <Style Selector="Image.record">
           <Setter Property="Source" Value="/Icons/sidebar1/record.png"/>
         </Style>
         <Style Selector="Image.record:pointerover">
           <Setter Property="Source" Value="/Icons/sidebar2/record.png"/>
         </Style>
+
+        <!-- Record — while recording (overrides the above) -->
+        <Style Selector="Image.record.recording">
+          <Setter Property="Source" Value="/Icons/sidebar1/Stop_recording.png"/>
+        </Style>
+        <Style Selector="Image.record.recording:pointerover">
+          <Setter Property="Source" Value="/Icons/sidebar1/Stop_recording.png"/>
+          <Setter Property="RenderTransform" Value="scale(1.08)"/>
+        </Style>
+        
+        
+        <Style Selector="Image.record">
+          <Setter Property="ToolTip.Tip" Value="Record"/>
+        </Style>
+
+        <Style Selector="Image.record.recording">
+          <Setter Property="ToolTip.Tip" Value="Stop recording"/>
+        </Style>
+        
+        
+        
+        
+        
+        
 
         <!-- Keyboard -->
         <Style Selector="Image.keyboard">
@@ -111,9 +150,17 @@
              UseLayoutRounding="True"
              PointerPressed="OnSidebarButtonClick"/>
 
+      <!-- <Image Classes="sidebarIcon record" -->
+      <!--        Tag="Record" -->
+      <!--        ToolTip.Tip="Record" -->
+      <!--        RenderOptions.BitmapInterpolationMode="HighQuality" -->
+      <!--        UseLayoutRounding="True" -->
+      <!--        PointerPressed="OnSidebarButtonClick"/> -->
+      
       <Image Classes="sidebarIcon record"
+             Classes.recording="{Binding Source={x:Static appstore:my_info.Instance}, Path=Recording}"
              Tag="Record"
-             ToolTip.Tip="Record"
+             
              RenderOptions.BitmapInterpolationMode="HighQuality"
              UseLayoutRounding="True"
              PointerPressed="OnSidebarButtonClick"/>
