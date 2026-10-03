@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Configuration;
+using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -14,6 +15,41 @@ namespace Androidplayer.windows;
 
 public partial class settings : Window
 {
+
+    
+#if WINDOWS
+        
+    // 1. P/Invoke declarations
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+    [DllImport("user32.dll")]
+    private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+
+    private const int GWL_EXSTYLE = -20;
+    private const int WS_EX_LAYERED = 0x00080000;
+    private const uint LWA_COLORKEY = 0x00000001;
+        
+        
+        
+        
+    private const int WS_EX_TOOLWINDOW = 0x00000080;
+    private const int WS_EX_APPWINDOW  = 0x00040000;
+
+       
+
+            
+            
+            
+            
+            
+#endif
+
+    
+    
     Configuration AppConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
     public settings()
@@ -43,6 +79,38 @@ public partial class settings : Window
         //
         // this.Cursor = customCursor;
         
+    }
+
+    protected override void OnOpened(EventArgs e)
+    {
+        // Console.WriteLine("s");
+        base.OnOpened(e);
+
+        // this.Owner = Home.Instance;
+
+#if WINDOWS
+        if (OperatingSystem.IsWindows() && Home.Instance != null)
+        {
+            this.Owner = Home.Instance;
+
+            var handle = this.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
+            if (handle != IntPtr.Zero)
+            {
+                int exStyle = GetWindowLong(handle, GWL_EXSTYLE);
+                exStyle |= WS_EX_TOOLWINDOW;     // remove from Alt+Tab
+                exStyle &= ~WS_EX_APPWINDOW;     // belt-and-braces
+                SetWindowLong(handle, GWL_EXSTYLE, exStyle);
+
+                // Console.WriteLine($"Sidebar EXSTYLE=0x{exStyle:X8} " +
+                //                   $"TOOLWINDOW={(exStyle & WS_EX_TOOLWINDOW) != 0} " +
+                //                   $"APPWINDOW={(exStyle & WS_EX_APPWINDOW) != 0}");
+            }
+        }
+        
+        #endif
+
+
+
     }
 
     private void UISettingsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)

@@ -45,9 +45,11 @@ public unsafe class my_AV_win : IDisposable
      * We reproduce that behavior here.
      * -------------------------------------------------------------
      */
-    private byte[] configPacket = null;
+    public byte[] configPacket = null;
     
-   
+    // permanent copy — never cleared
+    private byte[] _lastConfig = null;
+    public byte[]? LastConfig => _lastConfig;
 
     public long FrameCount { get; private set; }
     public int Width { get; private set; }
@@ -235,6 +237,9 @@ public unsafe class my_AV_win : IDisposable
         {
             configPacket =
                 new byte[h264Data.Length];
+            
+            
+            
 
             System.Buffer.BlockCopy(
                 h264Data,
@@ -243,6 +248,11 @@ public unsafe class my_AV_win : IDisposable
                 0,
                 h264Data.Length);
 
+            // keep a permanent copy for anything that joins mid-stream
+            _lastConfig = new byte[h264Data.Length];
+            System.Buffer.BlockCopy(h264Data, 0, _lastConfig, 0, h264Data.Length);
+            
+            
             Console.WriteLine(
                 $"Stored H264 config packet: {configPacket.Length} bytes");
 

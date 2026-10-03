@@ -2,11 +2,13 @@ using System;
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Androidplayer.Audio;
 using Avalonia.Threading;
 
 #if WINDOWS
@@ -16,6 +18,11 @@ using SharpDX.XAudio2;
 using SharpDX.Multimedia;
 using SharpDX;
 
+
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+using SharpDX.Direct3D11;
 #endif
 
 
@@ -34,23 +41,10 @@ namespace Androidplayer.Src
 {
     public class Scrcpy_worker : IDisposable
     {
-#if WINDOWS
-        // XAudio2 fields
-        private XAudio2 _xaudio;
-        private MasteringVoice _masteringVoice;
-        private SourceVoice _sourceVoice;
-        private WaveFormat _waveFormat;
-        private readonly object _audioLock = new object();
 
-        // Track DataStreams so they aren't GC'd while XAudio2 is using them
-        private readonly Queue<DataStream> _pendingStreams = new Queue<DataStream>();
-        
-        
-           
-#endif
-        
-        
-        private bool _xaudioStarted = false;
+   
+        private IAudioPlayer? _audioPlayer;
+        private Video_recorder? _recorder;
 
         ///////////////////
 
@@ -141,8 +135,55 @@ namespace Androidplayer.Src
             _audio_decoder = new my_audio();
 
             #if WINDOWS
-            InitAudio();
+                _audioPlayer = new WindowsAudioPlayer();
+            #elif LINUX
+                _audioPlayer = new LinuxAudioPlayer();
+            #elif MACOS
+                _audioPlayer = new MacOSAudioPlayer();
             #endif
+            
+                _audioPlayer?.Initialize();
+            
+                
+             my_info.Instance.PropertyChanged += my_infoOnPropertyChanged;
+
+             
+        }
+
+        private void my_infoOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(my_info.Recording))
+            {
+
+
+                if (my_info.Instance.Recording)
+                {
+                    StartRecording();
+                }
+                else
+                {
+                    
+                    StopRecording();
+                    
+                }
+                
+                
+                
+            }
+
+            if (e.PropertyName == nameof(my_info.TakeScreenshot))
+            {
+                
+                if (my_info.Instance.TakeScreenshot)
+                {
+                    SaveScreenshot(_previousFrame);
+                }
+                
+                
+            }
+            
+            
+            
         }
 
         public void Start()
@@ -165,25 +206,7 @@ namespace Androidplayer.Src
             audio_thread.Start();
         }
 
-        // public void Stop()
-        // {
-        //     isrunning = false;
-        //
-        //     if (scrcpy_thread != null && scrcpy_thread.IsAlive)
-        //     {
-        //         scrcpy_thread.Join(1000);
-        //         scrcpy_thread = null;
-        //     }
-        //
-        //     audioReadyEvent.Set();
-        //
-        //     if (audio_thread != null && audio_thread.IsAlive)
-        //     {
-        //         audio_thread.Join(1000);
-        //         audio_thread = null;
-        //     }
-        // }
-        
+      
         
         
         
@@ -216,10 +239,7 @@ namespace Androidplayer.Src
         
         
 
-        public void SetFrameSize(int width, int height)
-        {
-            // Intentionally empty — preserved from original
-        }
+        
 
         public void TakeScreenshot(string word)
         {
@@ -229,109 +249,86 @@ namespace Androidplayer.Src
             }
         }
 
-        #region Audio Player
+        #region Audio Player & VideoRecorder
 
         
-        #if WINDOWS
+        
+
+        // private void StartRecording()
+        // {
+        //     if (_recorder != null) return;
+        //
+        //     var dir = Path.Combine(
+        //         Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
+        //         "Androidplayer");
+        //     Directory.CreateDirectory(dir);
+        //
+        //     var file = Path.Combine(dir, $"rec_{DateTime.Now:yyyyMMdd_HHmmss}.mp4");
+        //     _recorder = new Video_recorder(file);
+        //     Console.WriteLine($"[recorder] recording to {file}");
+        // }
+
+        // In Scrcpy_worker.cs
+
+      
+
+        private void StartRecording()
+        {
+            if (_recorder != null) return;
+
+            // Wait for decoder to be ready with actual dimensions
+            if (_decoder == null || _decoder.Width <= 0 || _decoder.Height <= 0)
+            {
+                Console.WriteLine("[recorder] ERROR: Decoder not ready or invalid dimensions");
+                return;
+            }
+
+            var dir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
+                "Androidplayer");
+            Directory.CreateDirectory(dir);
+
+            var file = Path.Combine(dir, $"rec_{DateTime.Now:yyyyMMdd_HHmmss}.mp4");
+
+            // Use actual decoder dimensions
+            int w = _decoder.Width;
+            int h = _decoder.Height;
+
+            _recorder = new Video_recorder(file, w, h);
+
+            // IMPORTANT: Seed extradata from the live decoders
+            var videoConfig = _decoder?.LastConfig;
+            if (videoConfig != null && videoConfig.Length > 0)
+            {
+                Console.WriteLine($"[recorder] Seeding video config: {videoConfig.Length} bytes");
+                _recorder.SetVideoExtradata(videoConfig);
+            }
+            else
+            {
+                Console.WriteLine("[recorder] WARNING: no video config available at start");
+            }
+
+            var audioConfig = _audio_decoder?.PendingExtradata;
+            if (audioConfig != null && audioConfig.Length > 0)
+            {
+                Console.WriteLine($"[recorder] Seeding audio config: {audioConfig.Length} bytes");
+                _recorder.SetAudioExtradata(audioConfig);
+            }
+
+            Console.WriteLine($"[recorder] recording to {file} ({w}x{h})");
+        }
+
+      
         
         
-        private void InitAudio()
+        private void StopRecording()
         {
-            lock (_audioLock)
-            {
-                if (_xaudio != null) return;
-
-                _xaudio = new XAudio2();
-                _masteringVoice = new MasteringVoice(_xaudio);
-
-                // Hardcoded for scrcpy: 48kHz, stereo, 16-bit PCM
-                _waveFormat = new WaveFormat(48000, 16, 2);
-
-                _sourceVoice = new SourceVoice(_xaudio, _waveFormat);
-                _sourceVoice.Start();
-
-                _pendingStreams.Clear();
-                _xaudioStarted = true;
-
-                Console.WriteLine("XAudio2 initialized for real-time playback");
-            }
+            Console.WriteLine("stoped recording!");
+            _recorder?.Dispose();
+            _recorder = null;
         }
-
-        private const int MAX_QUEUED_BUFFERS = 4;
-
-        private void SubmitPcmToXAudio(byte[] pcm)
-        {
-            if (pcm == null || pcm.Length == 0) return;
-
-            lock (_audioLock)
-            {
-                if (_sourceVoice == null || !_xaudioStarted) return;
-
-                var state = _sourceVoice.State;
-                if (state.BuffersQueued >= MAX_QUEUED_BUFFERS)
-                {
-                    Console.WriteLine($"Audio backlog: {state.BuffersQueued} buffers queued, flushing to resync");
-
-                    _sourceVoice.Stop();
-                    _sourceVoice.FlushSourceBuffers();
-                    _sourceVoice.Start();
-                }
-
-                int blockAlign = _waveFormat.BlockAlign;
-                if (pcm.Length % blockAlign != 0)
-                {
-                    int paddedLen = ((pcm.Length + blockAlign - 1) / blockAlign) * blockAlign;
-                    Array.Resize(ref pcm, paddedLen);
-                }
-
-                var ds = new DataStream(pcm.Length, true, true);
-                ds.Write(pcm, 0, pcm.Length);
-                ds.Position = 0;
-
-                var buffer = new AudioBuffer
-                {
-                    Stream = ds,
-                    AudioBytes = pcm.Length,
-                    Flags = BufferFlags.None
-                };
-
-                try
-                {
-                    _sourceVoice.SubmitSourceBuffer(buffer, null);
-                    _pendingStreams.Enqueue(ds);
-                }
-                catch (SharpDX.SharpDXException ex)
-                {
-                    Console.WriteLine($"XAudio2 submit error: {ex.ResultCode} / {ex.Message}");
-                    try { ds.Dispose(); } catch { }
-                }
-            }
-        }
-
-        private void PollXAudioAndCleanup()
-        {
-            lock (_audioLock)
-            {
-                if (_sourceVoice == null) return;
-
-                var state = _sourceVoice.State;
-                int buffersQueued = (int)state.BuffersQueued;
-
-                while (_pendingStreams.Count > buffersQueued)
-                {
-                    var ds = _pendingStreams.Dequeue();
-                    try
-                    {
-                        ds.Dispose();
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-        }
-
-#endif
+        
+ 
 
         private void start_audio()
         {
@@ -410,16 +407,23 @@ namespace Androidplayer.Src
                             Console.WriteLine(
                                 $"Audio config packet: {payload.Length} bytes");
                             _audio_decoder?.SetExtradata(payload);
+                            _recorder?.SetAudioExtradata(payload);
                             continue;
                         }
 
+                        long ptsUs = ptsAndFlags & ((1L << 62) - 1);
+                        _recorder?.WriteAudioPacket(payload, ptsUs);
+                        
+                        
                         byte[]? pcm = _audio_decoder?.Decode(payload);
                         
-#if WINDOWS
+
            
                         if (pcm != null && pcm.Length > 0)
-                            SubmitPcmToXAudio(pcm);
-#endif
+                        {
+                            _audioPlayer?.Play(pcm);
+                        }
+
                     }
                 }
                 catch (IOException ioEx) when (ioEx.InnerException is SocketException sockEx)
@@ -427,20 +431,14 @@ namespace Androidplayer.Src
                     Console.WriteLine($"Audio socket error: {sockEx.SocketErrorCode}");
                     ErrorOccurred?.Invoke(sockEx.Message);
                     audioReadyEvent.Reset();
-#if WINDOWS          
-                    
-                    PollXAudioAndCleanup();
-#endif
+
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Audio receive error: {ex.Message}");
                     ErrorOccurred?.Invoke(ex.Message);
                     audioReadyEvent.Reset();
-#if WINDOWS
-           
-                    PollXAudioAndCleanup();
-#endif
+
                 }
                 finally
                 {
@@ -494,6 +492,11 @@ namespace Androidplayer.Src
                     if (dummyRead != 1)
                     {
                         ErrorOccurred?.Invoke($"Expected to read dummy byte (1 byte), but got {dummyRead} bytes.");
+                        
+                       
+                        Thread.Sleep(1000);
+                        
+                        continue;
                     }
 
                     // Thread.Sleep(500);
@@ -641,12 +644,12 @@ namespace Androidplayer.Src
                 }
                 else
                 {
-                    my_directx = D11InteropRenderer.Instance;
+                    // my_directx = D11InteropRenderer.Instance;
                     
-                    long decodeTimestamp = my_directx.NowTicks;
+                    long decodeTimestamp = D11InteropRenderer.Instance.NowTicks;
 
                     if (_pendingFrame != null)
-                        my_directx.PresentFrame(_pendingFrame, decodeTimestamp);
+                        D11InteropRenderer.Instance?.PresentFrame(_pendingFrame, decodeTimestamp);
 
                 }
 
@@ -687,6 +690,133 @@ namespace Androidplayer.Src
 
             return timeSinceLastFrame < TARGET_FRAME_TIME_MS;
         }
+        
+        
+        #if WINDOWS
+
+
+
+private void SaveScreenshot(Texture2D frame)
+{
+ 
+
+    try
+    {
+        int width = frame.Description.Width;
+        int height = frame.Description.Height;
+
+        using var staging = new Texture2D(
+            frame.Device,
+            new Texture2DDescription
+            {
+                Width = width,
+                Height = height,
+                MipLevels = 1,
+                ArraySize = 1,
+                Format = frame.Description.Format,
+                SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0),
+                Usage = ResourceUsage.Staging,
+                BindFlags = BindFlags.None,
+                CpuAccessFlags = CpuAccessFlags.Read,
+                OptionFlags = ResourceOptionFlags.None
+            });
+
+        using var context = frame.Device.ImmediateContext;
+
+        context.CopyResource(
+            frame,
+            staging);
+
+        var mapped = context.MapSubresource(
+            staging,
+            0,
+            MapMode.Read,
+            MapFlags.None);
+
+        try
+        {
+            // string directory = Path.Combine(
+            //     AppContext.BaseDirectory,
+            //     "Screenshots");
+            //
+            // Directory.CreateDirectory(directory);
+            
+            
+            var directory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                "Androidplayer");
+            Directory.CreateDirectory(directory);
+
+            string filePath = Path.Combine(
+                directory,
+                $"Screenshot_{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fff}.jpg");
+
+            using var bitmap = new Bitmap(
+                width,
+                height,
+                PixelFormat.Format32bppArgb);
+
+            var bitmapData = bitmap.LockBits(
+                new System.Drawing.Rectangle(0, 0, width, height),
+                ImageLockMode.WriteOnly,
+                PixelFormat.Format32bppArgb);
+
+            try
+            {
+                int rowBytes = width * 4;
+
+                for (int y = 0; y < height; y++)
+                {
+                    IntPtr source =
+                        mapped.DataPointer +
+                        y * mapped.RowPitch;
+
+                    IntPtr destination =
+                        bitmapData.Scan0 +
+                        y * bitmapData.Stride;
+
+                    byte[] row = new byte[rowBytes];
+
+                    Marshal.Copy(
+                        source,
+                        row,
+                        0,
+                        rowBytes);
+
+                    Marshal.Copy(
+                        row,
+                        0,
+                        destination,
+                        rowBytes);
+                }
+            }
+            finally
+            {
+                bitmap.UnlockBits(bitmapData);
+            }
+
+            bitmap.Save(
+                filePath,
+                ImageFormat.Jpeg);
+
+            Console.WriteLine(
+                $"[Screenshot] Saved: {filePath}");
+        }
+        finally
+        {
+            context.UnmapSubresource(
+                staging,
+                0);
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(
+            $"[Screenshot] Error: {ex}");
+    }
+}
+
+#endif
 
         private void ReceiveVideoData()
         {
@@ -740,8 +870,13 @@ namespace Androidplayer.Src
 
                         Texture2D frame = null;
                         dynamic  my_directx = null ;
-                        
-                        
+
+                        if (packet.IsConfig)
+                        {
+                            _recorder?.SetVideoExtradata( packet.Data);
+                        }
+                        else
+                            _recorder?.WriteVideoPacket( packet.Data, packet.Pts, packet.IsKeyFrame);
                   
                         if (UISettings.Instance.Nativeview_mode)
                         {
@@ -767,6 +902,14 @@ namespace Androidplayer.Src
                                                        return;
                                                        // continue;
                                                    }
+
+                                                   if (my_info.Instance.TakeScreenshot)
+                                                   {
+                                                       SaveScreenshot(frame);
+                                                       my_info.Instance.TakeScreenshot = false;
+                                                   }
+                                                   
+                                                   
                            
                                                    // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
                                                    // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
@@ -805,9 +948,10 @@ namespace Androidplayer.Src
                         }
                         else
                         {
-                            my_directx = D11InteropRenderer.Instance;
+                            // my_directx = D11InteropRenderer.Instance;
 
-                            my_directx?.RunOnContext(new Action<object>(_ =>
+                            // D11InteropRenderer.Instance?.RunOnContext(new Action<object>(_ =>
+                                D11InteropRenderer.Instance?.RunOnContext(new Action<DeviceContext>(_ =>
                             {
                                 
                             frame = _decoder.DecodePacket(
@@ -1002,58 +1146,11 @@ namespace Androidplayer.Src
 
             _audio_decoder.Dispose();
 
-                  
-#if WINDOWS
-
-            lock (_audioLock)
-            {
-                try
-                {
-                    if (_sourceVoice != null)
-                    {
-                        _sourceVoice.Stop();
-                        _sourceVoice.FlushSourceBuffers();
-                    }
-
-                    while (_pendingStreams.Count > 0)
-                    {
-                        try
-                        {
-                            _pendingStreams.Dequeue().Dispose();
-                        }
-                        catch
-                        {
-                        }
-                    }
-
-                    if (_sourceVoice != null)
-                    {
-                        _sourceVoice.DestroyVoice();
-                        _sourceVoice = null;
-                    }
-
-                    if (_masteringVoice != null)
-                    {
-                        _masteringVoice.Dispose();
-                        _masteringVoice = null;
-                    }
-
-                    if (_xaudio != null)
-                    {
-                        _xaudio.Dispose();
-                        _xaudio = null;
-                    }
-
-                    _xaudioStarted = false;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error disposing audio: {ex.Message}");
-                }
-            }
-      
-#endif
             
+            
+            
+            _audioPlayer?.Dispose();
+            _audioPlayer = null;
             
             
             

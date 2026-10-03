@@ -459,9 +459,15 @@ public class App_manager : IDisposable
         scrcpy_worker.DeviceResolutionReady += on_DeviceResolutionReady;
 
         // scrcpy_worker.FrameReady += del_display_frame;
+        scrcpy_worker.ErrorOccurred += Scrcpy_workerOnErrorOccurred;
         scrcpy_worker.scrcpy_desposed += My_adb_workerOnCountingCompleted;
 
         scrcpy_worker.Start();
+    }
+
+    private void Scrcpy_workerOnErrorOccurred(string obj)
+    {
+        // My_adb_workerOnCountingCompleted();
     }
 
     private void Scrcpy_workerOnFrame_almostready()

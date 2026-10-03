@@ -705,6 +705,9 @@ public partial class Home : Window
                 my_info.Instance.TakeScreenshot = true;
                 break;
             case "Record":
+                
+                my_info.Instance.Toggle_Recording_mode();
+                
                 break;
             case "Keyboard":
                 break;
@@ -715,6 +718,7 @@ public partial class Home : Window
             case "Settings":
                 if (_settingsWindow == null)
                     _settingsWindow = new settings();
+              
 
                 if (_settingsWindow.IsVisible)
                 {

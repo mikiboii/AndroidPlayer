@@ -23,6 +23,9 @@ namespace Androidplayer
         public int Channels   => 2;
 
         private byte[] _pendingExtradata = null;
+        
+        public byte[]? PendingExtradata => _pendingExtradata;
+        
         private const int AV_INPUT_BUFFER_PADDING_SIZE = 64;
 
         public my_audio()
