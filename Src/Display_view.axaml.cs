@@ -38,7 +38,7 @@ public partial class Display_view : UserControl
 
     
     
-    
+    private DispatcherTimer? _recIndicatorTimer;
     
     
     public Display_view()
@@ -127,7 +127,25 @@ public partial class Display_view : UserControl
     
     
     
-    
+    public void ShowRecordingIndicator(int durationMs = 3000)
+    {
+        if (RecIndicator == null) return;
+
+        RecIndicator.IsVisible = true;
+
+        _recIndicatorTimer?.Stop();
+        _recIndicatorTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(durationMs)
+        };
+        _recIndicatorTimer.Tick += (_, _) =>
+        {
+            _recIndicatorTimer!.Stop();
+            _recIndicatorTimer = null;
+            RecIndicator.IsVisible = false;
+        };
+        _recIndicatorTimer.Start();
+    }
     
     
     private void UISettingsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -186,7 +204,8 @@ public partial class Display_view : UserControl
             ScaleFormToFit(v_width, v_height);
         }
 
-        
+        // ShowRecordingIndicator(3000);
+        // RecIndicator.IsVisible = true;
 
         // MainImage.IsVisible = false;
         
@@ -222,14 +241,16 @@ public partial class Display_view : UserControl
                 // cannot touch the D3D11 context at the same time.
                 dx.RunOnContext(_ =>
                 {
-                    dx.ResizeToClient(MainImage.NativeHandle);
+                    // dx.ResizeToClient(MainImage.NativeHandle);
+                    dx.ResizeSwapChain((int)MainImage.Bounds.Width , (int)MainImage.Bounds.Height);
 
-                    // Console.WriteLine("resizing directx handle");
+                    Console.WriteLine("resizing directx handle");
+                    dx.HandleResize();
 
-                    if (my_info.Instance.DeveloperMode)
-                    {
-                        dx.HandleResize();
-                    }
+                    // if (my_info.Instance.DeveloperMode)
+                    // {
+                    //     dx.HandleResize();
+                    // }
                 });
             }
         }

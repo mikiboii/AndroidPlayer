@@ -13,7 +13,7 @@ namespace Androidplayer.Store
 
 #if DEBUG
         
-        private bool _developerMode = false;
+        private bool _developerMode = true;
 #else
 
         
@@ -92,6 +92,16 @@ namespace Androidplayer.Store
             set => SetProperty(ref _isRecording, value);
         }
 
+
+        private bool _isFullscreen = false;
+
+        public bool IsFullscreen
+        {
+            get => _isFullscreen;
+            set => SetProperty(ref _isFullscreen, value);
+        }
+
+        
         
         public void Toggle_Recording_mode() => Recording = !Recording;
         

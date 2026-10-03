@@ -176,7 +176,32 @@ namespace Androidplayer.Src
                 
                 if (my_info.Instance.TakeScreenshot)
                 {
-                    SaveScreenshot(_previousFrame);
+                    // SaveScreenshot(_previousFrame);
+                    
+                    
+                    #if WINDOWS
+                            if (k_info.Instance.my_renderer is DirectX dx)
+                            {
+                                // SaveScreenshot runs entirely under _renderLock,
+                                // so the decoder can't dispose _previousFrame mid-copy.
+                                dx.RunOnContext(_ =>
+                                {
+                                    if (_previousFrame != null && !_previousFrame.IsDisposed)
+                                    {
+                                        SaveScreenshot(_previousFrame);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("[Screenshot] no frame available yet");
+                                    }
+                                });
+                            }
+                    #endif
+                    
+                    
+                    
+                    
+                    my_info.Instance.TakeScreenshot = false;
                 }
                 
                 
@@ -692,21 +717,30 @@ namespace Androidplayer.Src
         }
         
         
-        #if WINDOWS
-
-
+     #if WINDOWS
 
 private void SaveScreenshot(Texture2D frame)
 {
- 
-
     try
     {
+        if (frame == null || frame.IsDisposed || frame.NativePointer == IntPtr.Zero)
+        {
+            Console.WriteLine("[Screenshot] frame is null/disposed");
+            return;
+        }
+
+        var device = frame.Device;
+        if (device == null || device.IsDisposed || device.NativePointer == IntPtr.Zero)
+        {
+            Console.WriteLine("[Screenshot] device is null/disposed");
+            return;
+        }
+
         int width = frame.Description.Width;
         int height = frame.Description.Height;
 
         using var staging = new Texture2D(
-            frame.Device,
+            device,
             new Texture2DDescription
             {
                 Width = width,
@@ -721,11 +755,11 @@ private void SaveScreenshot(Texture2D frame)
                 OptionFlags = ResourceOptionFlags.None
             });
 
-        using var context = frame.Device.ImmediateContext;
+        // IMPORTANT: do NOT dispose the ImmediateContext.
+        // It is owned by the Device and shared with the renderer/decoder.
+        var context = device.ImmediateContext;
 
-        context.CopyResource(
-            frame,
-            staging);
+        context.CopyResource(frame, staging);
 
         var mapped = context.MapSubresource(
             staging,
@@ -735,13 +769,6 @@ private void SaveScreenshot(Texture2D frame)
 
         try
         {
-            // string directory = Path.Combine(
-            //     AppContext.BaseDirectory,
-            //     "Screenshots");
-            //
-            // Directory.CreateDirectory(directory);
-            
-            
             var directory = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
                 "Androidplayer");
@@ -765,29 +792,27 @@ private void SaveScreenshot(Texture2D frame)
             {
                 int rowBytes = width * 4;
 
-                for (int y = 0; y < height; y++)
+                if (mapped.RowPitch == rowBytes && bitmapData.Stride == rowBytes)
                 {
-                    IntPtr source =
-                        mapped.DataPointer +
-                        y * mapped.RowPitch;
-
-                    IntPtr destination =
-                        bitmapData.Scan0 +
-                        y * bitmapData.Stride;
-
+                    // Fast path: contiguous rows on both sides, one memcpy.
+                    long total = (long)rowBytes * height;
+                    byte[] all = new byte[total];
+                    Marshal.Copy(mapped.DataPointer, all, 0, (int)total);
+                    Marshal.Copy(all, 0, bitmapData.Scan0, (int)total);
+                }
+                else
+                {
+                    // Slow path: honor each side's stride, row by row.
                     byte[] row = new byte[rowBytes];
 
-                    Marshal.Copy(
-                        source,
-                        row,
-                        0,
-                        rowBytes);
+                    for (int y = 0; y < height; y++)
+                    {
+                        IntPtr source = mapped.DataPointer + y * mapped.RowPitch;
+                        IntPtr destination = bitmapData.Scan0 + y * bitmapData.Stride;
 
-                    Marshal.Copy(
-                        row,
-                        0,
-                        destination,
-                        rowBytes);
+                        Marshal.Copy(source, row, 0, rowBytes);
+                        Marshal.Copy(row, 0, destination, rowBytes);
+                    }
                 }
             }
             finally
@@ -795,24 +820,23 @@ private void SaveScreenshot(Texture2D frame)
                 bitmap.UnlockBits(bitmapData);
             }
 
-            bitmap.Save(
-                filePath,
-                ImageFormat.Jpeg);
+            bitmap.Save(filePath, ImageFormat.Jpeg);
 
-            Console.WriteLine(
-                $"[Screenshot] Saved: {filePath}");
+            Console.WriteLine($"[Screenshot] Saved: {filePath}");
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                OverlayManager.Instance.ShowToast("done", $"[Screenshot] Saved: {filePath}");
+            });
         }
         finally
         {
-            context.UnmapSubresource(
-                staging,
-                0);
+            context.UnmapSubresource(staging, 0);
         }
     }
     catch (Exception ex)
     {
-        Console.WriteLine(
-            $"[Screenshot] Error: {ex}");
+        Console.WriteLine($"[Screenshot] Error: {ex}");
     }
 }
 
@@ -903,12 +927,7 @@ private void SaveScreenshot(Texture2D frame)
                                                        // continue;
                                                    }
 
-                                                   if (my_info.Instance.TakeScreenshot)
-                                                   {
-                                                       SaveScreenshot(frame);
-                                                       my_info.Instance.TakeScreenshot = false;
-                                                   }
-                                                   
+                                              
                                                    
                            
                                                    // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.

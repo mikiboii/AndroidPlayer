@@ -82,15 +82,15 @@ namespace Androidplayer.Src.Keymap
                     });
                     break;
 
-                case nameof(my_info.TakeScreenshot):
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        if (my_info.Instance.TakeScreenshot)
-                        {
-                            ShowToast("done", "TakeScreenshot!");
-                        }
-                    });
-                    break;
+                // case nameof(my_info.TakeScreenshot):
+                //     Dispatcher.UIThread.Post(() =>
+                //     {
+                //         if (my_info.Instance.TakeScreenshot)
+                //         {
+                //             ShowToast("done", "TakeScreenshot!");
+                //         }
+                //     });
+                //     break;
             }
         }
 

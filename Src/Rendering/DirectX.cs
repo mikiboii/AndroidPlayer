@@ -76,6 +76,9 @@ namespace Androidplayer.Src
         
         
         public string BackendName => "Direct3D 11";
+        
+        
+        // private Texture2D _lastLiveTexture;
 
         // public DirectX(IntPtr outputHandle) 
         //
@@ -586,17 +589,69 @@ namespace Androidplayer.Src
         Utilities.Dispose(ref vpiv);
     }
 }
-        
-        
-        
+
+
+
         public void HandleResize()
         {
 
             // Console.WriteLine("handling resize......");
-            if (!string.IsNullOrEmpty(_currentImagePath) && _staticImageTexture != null)
+            if ( _staticImageTexture != null)
             {
                 PresentStaticImage();
             }
+
+            // if (_lastLiveTexture != null)
+            // {
+            //     try
+            //     {
+            //         var context = _device.ImmediateContext;
+            //         using (var rtv = new RenderTargetView(_device, _backBuffer))
+            //         {
+            //             context.ClearRenderTargetView(rtv, new RawColor4(0, 0, 0, 1));
+            //         }
+            //
+            //         if (_useHardwareVideoProcessor && videoDevice1 != null
+            //                                        && videoProcessor != null && vpov != null && vpe != null)
+            //         {
+            //             Utilities.Dispose(ref vpiv);
+            //             videoDevice1.CreateVideoProcessorInputView(
+            //                 _lastLiveTexture, vpe, vpivd, out vpiv);
+            //
+            //             vpsa[0] = new VideoProcessorStream
+            //             {
+            //                 PInputSurface = vpiv,
+            //                 Enable = new RawBool(true)
+            //             };
+            //
+            //             SetVideoProcessorRects(
+            //                 _lastLiveTexture.Description.Width,
+            //                 _lastLiveTexture.Description.Height);
+            //
+            //             videoContext1.VideoProcessorBlt(
+            //                 videoProcessor, vpov, 0, 1, vpsa);
+            //
+            //             Utilities.Dispose(ref vpiv);
+            //         }
+            //         else if (_shaderResourcesInitialized)
+            //         {
+            //             RenderWithShader(_lastLiveTexture);
+            //         }
+            //
+            //         _swapChain.Present(1, PresentFlags.None);
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         Console.WriteLine($"HandleResize (live) error: {ex.Message}");
+            //     }
+            //
+            // }
+
+
+            
+            
+            
+            
         }
 
         public Texture2D LoadTextureFromFile(string filePath)
@@ -667,6 +722,9 @@ namespace Androidplayer.Src
                     PresentFrameKeepAlive();
                     return;
                 }
+                
+                // _lastLiveTexture = textureHW; 
+                _staticImageTexture = textureHW; 
 
                 try
                 {
@@ -904,10 +962,14 @@ namespace Androidplayer.Src
                     width = Math.Max(width, 1);
                     height = Math.Max(height, 1);
 
+                    Console.WriteLine($" from ResizeSwapChain {width} x {height}");
+
                     if (_backBuffer != null &&
                         _backBuffer.Description.Width == width &&
                         _backBuffer.Description.Height == height)
                     {
+
+                        Console.WriteLine("not resizing swapchain...");
                         return;
                     }
 

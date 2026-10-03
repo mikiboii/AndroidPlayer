@@ -264,11 +264,16 @@ public class App_manager : IDisposable
 
                             if (UISettings.Instance.Nativeview_mode)
                             {
-            
+
                                 if (k_info.Instance.my_renderer is DirectX dx)
+                                {
+                                    
                                     dx.ResizeSwapChain(
                                         (int)my_image.Bounds.Width,
                                         (int)my_image.Bounds.Height);
+                                    
+                                    dx.HandleResize();
+                                }
                             }
                             
 #endif
@@ -311,7 +316,7 @@ public class App_manager : IDisposable
                     Console.WriteLine($"Surface size FIXED: {w} x {h}");
                     Console.WriteLine($"INIT DX SIZE: {w} x {h}");
                     
-                    k_info.Instance.my_renderer?.DisplayImage("dev_img2.jpg");
+                    k_info.Instance.my_renderer?.DisplayImage("dev_img1.jpg");
                     
                     
                     // Home.Instance.Opacity = 1;

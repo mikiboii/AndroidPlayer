@@ -37,7 +37,12 @@ public partial class Home : Window
     
     
     private Rect _restoreBounds; // store original window size/position
+    
+    
+    
     private bool _isFullscreen = false;
+    
+   
 
     private const byte TYPE_INJECT_KEYCODE = 0x00;
     private const byte TYPE_INJECT_TEXT = 0x01;
@@ -775,7 +780,7 @@ public partial class Home : Window
 
     private void ToggleFullscreen()
     {
-        if (!_isFullscreen)
+        if (!my_info.Instance.IsFullscreen)
         {
             // Save current size and position
             _restoreBounds = new Rect(this.Position.X, this.Position.Y, this.Width, this.Height);
@@ -793,7 +798,9 @@ public partial class Home : Window
                 Height = screen.Bounds.Height;
             }
 
-            _isFullscreen = true;
+            my_info.Instance.IsFullscreen = true;
+            
+            
 
             // CustomTitleBar.IsVisible = false;
         }
@@ -807,7 +814,7 @@ public partial class Home : Window
             Width = _restoreBounds.Width;
             Height = _restoreBounds.Height;
 
-            _isFullscreen = false;
+            my_info.Instance.IsFullscreen = false;
 
             // CustomTitleBar.IsVisible = true;
             

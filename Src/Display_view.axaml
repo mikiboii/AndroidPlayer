@@ -12,8 +12,9 @@
              
              xmlns:androidplayer="clr-namespace:Androidplayer"
              xmlns:pages="clr-namespace:Androidplayer.Pages"
+             xmlns:appstore="clr-namespace:Androidplayer.Store"
 
-            
+
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              Background="Black"
@@ -41,7 +42,8 @@
                        >
       
       <Grid  RowDefinitions="Auto, *, Auto">
-    <pages:TitleBar Grid.Row="0" ClipToBounds="True"   x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar>
+    <pages:TitleBar Grid.Row="0" ClipToBounds="True"   IsVisible="{Binding Source={x:Static appstore:my_info.Instance}, Path=!IsFullscreen}"
+                    x:Name="AppTitleBar" ParentWindow="{Binding $parent[Window]}" ></pages:TitleBar>
         
 
       <Canvas  Grid.Row="1" x:Name="ImageContainer"
@@ -130,7 +132,48 @@
         </Border>
 
       </Canvas>
-      
+        <!-- Recording indicator overlay: top-right corner -->
+        <Border x:Name="RecIndicator"
+                Grid.RowSpan="3"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,40,16,0"
+                Background="#80000000"
+                CornerRadius="12"
+                Padding="8,4"
+                IsHitTestVisible="False"
+                
+                IsVisible="{Binding Source={x:Static appstore:my_info.Instance}, Path=Recording}"
+                >
+          <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <Ellipse x:Name="RecDot"
+                     Width="10" Height="10"
+                     Fill="#FF3B30"
+                     VerticalAlignment="Center">
+              <Ellipse.Styles>
+                <Style Selector="Ellipse">
+                  <Style.Animations>
+                    <Animation Duration="0:0:1"
+                               IterationCount="Infinite"
+                               PlaybackDirection="Alternate">
+                      <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1.0"/>
+                      </KeyFrame>
+                      <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="0.15"/>
+                      </KeyFrame>
+                    </Animation>
+                  </Style.Animations>
+                </Style>
+              </Ellipse.Styles>
+            </Ellipse>
+            <TextBlock Text="REC"
+                       Foreground="White"
+                       FontSize="12"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"/>
+          </StackPanel>
+        </Border>
       
       <keymap:keymap_menu  HorizontalAlignment="Left" VerticalAlignment="Stretch" IsVisible="False"/>
       
