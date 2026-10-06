@@ -50,7 +50,17 @@ namespace Androidplayer.Src.Keymap.Keymap_items
             CloseButton.Click += CloseButton_Click;
             RootGrid.PointerPressed += DisplayKey_MouseLeftButtonDown;
 
-            RootGrid.Background = KeyColorBrush;
+            
+            
+            if (OperatingSystem.IsWindows() && Environment.OSVersion.Version.Major == 6)
+            {
+                RootGrid.Background = KeyColorBrush;
+            }
+            else
+            {
+                RootGrid.Background = Brushes.Transparent;
+            }
+            
             
             InputField.LostFocus += InputField_LostKeyboardFocus;
             InputField.KeyDown += InputField_KeyDown;

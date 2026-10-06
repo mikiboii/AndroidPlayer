@@ -90,9 +90,9 @@ namespace Androidplayer.Src
         private bool Is_First_Run = true;
         
         
-        public string JAR = "scrcpy-server.jar";
+        // public string JAR = "scrcpy-server.jar";
         
-       
+        public string JAR = Path.Combine(AppContext.BaseDirectory, "scrcpy-server.jar");
         
         public string VERSION = "1.20";
         public int max_size = 1080;
@@ -508,6 +508,9 @@ namespace Androidplayer.Src
             using SyncService service = new(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), device);
             using Stream stream = File.OpenRead(JAR);
             service.Push(stream, "/data/local/tmp/scrcpy-server.jar", 444, DateTime.Now, null, CancellationToken.None);
+            
+            
+            
         }
         
         private void MobileServerCleanup()
@@ -539,7 +542,7 @@ namespace Androidplayer.Src
 
             
             // Remove any existing network stuff.
-            adbClient.RemoveAllForwards(device);
+            // adbClient.RemoveAllForwards(device);
             
             // adbClient.RemoveAllReverseForwards(device);
         }

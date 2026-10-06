@@ -70,7 +70,7 @@ public class App_manager : IDisposable
         {
             // k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
 
-            if (UISettings.Instance.Nativeview_mode)
+            if ( my_info.Instance.Nativeview_mode_local)
             {
                 
             
@@ -91,7 +91,7 @@ public class App_manager : IDisposable
         {
             // k_info.Instance.directx = new DirectX(my_image.PlatformHandle.Handle);
             // k_info.Instance.my_renderer.Initialize(my_image.PlatformHandle.Handle);
-            if (UISettings.Instance.Nativeview_mode)
+            if ( my_info.Instance.Nativeview_mode_local)
             {
                 
             
@@ -262,7 +262,7 @@ public class App_manager : IDisposable
                             
 #if WINDOWS
 
-                            if (UISettings.Instance.Nativeview_mode)
+                            if ( my_info.Instance.Nativeview_mode_local)
                             {
 
                                 if (k_info.Instance.my_renderer is DirectX dx)
@@ -284,7 +284,7 @@ public class App_manager : IDisposable
                                 // k_info.Instance.my_renderer?.HandleResize();
                                 
                                 #if WINDOWS
-                                if (UISettings.Instance.Nativeview_mode)
+                                if ( my_info.Instance.Nativeview_mode_local)
                                 {
             
                                     if (k_info.Instance.my_renderer is DirectX dx1)
@@ -306,7 +306,7 @@ public class App_manager : IDisposable
         
         Dispatcher.UIThread.Post(() =>
         {
-            if (UISettings.Instance.Nativeview_mode)
+            if ( my_info.Instance.Nativeview_mode_local)
             {
                 if (my_image != null)
                 {
@@ -327,7 +327,7 @@ public class App_manager : IDisposable
                     
                     
                     
-                    // if (UISettings.Instance.Nativeview_mode)
+                    // if ( my_info.Instance.Nativeview_mode_local)
                     // {
                     //
                     //
@@ -353,8 +353,8 @@ public class App_manager : IDisposable
                 
             }else
             {
-                    
-                    
+
+                Console.WriteLine("gpuintrop displayimage called $$$$$$$$");
                 D11InteropRenderer.Instance?.DisplayImage("dev_img1.jpg");
                 
                 Home.Instance.restore_Home();
@@ -440,7 +440,7 @@ public class App_manager : IDisposable
         
         #if WINDOWS
 
-        if (UISettings.Instance.Nativeview_mode)
+        if ( my_info.Instance.Nativeview_mode_local)
         {
             
         // scrcpy_worker.dx_Device = (k_info.Instance.my_renderer as DirectX)?.my_Device;
@@ -504,7 +504,7 @@ public class App_manager : IDisposable
         //     
         // });
 
-        if (UISettings.Instance.Nativeview_mode)
+        if ( my_info.Instance.Nativeview_mode_local)
         {
             
             Avalonia.Threading.Dispatcher.UIThread.Post(() =>
@@ -535,7 +535,7 @@ public class App_manager : IDisposable
             
         });
         
-        if (UISettings.Instance.Nativeview_mode)
+        if ( my_info.Instance.Nativeview_mode_local)
         {
             
             Avalonia.Threading.Dispatcher.UIThread.Post(() =>

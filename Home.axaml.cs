@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using Androidplayer.Rendering.win;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -173,6 +174,10 @@ public partial class Home : Window
         
         
         this.PropertyChanged += Home_PropertyChanged;
+
+
+        my_info.Instance.Nativeview_mode_local = UISettings.Instance.Nativeview_mode;
+        
         
         
         if (UISettings.Instance.Nativeview_mode && OperatingSystem.IsWindows())
@@ -492,6 +497,24 @@ public partial class Home : Window
                 resetTimer.Stop();
 
 
+                Console.WriteLine("resize finished");
+                
+                if (k_info.Instance.my_renderer is DirectX dx && my_info.Instance.Nativeview_mode_local)
+                {
+            
+                    if (dx != null)
+                    {
+                
+                        dx.RunOnContext(_ =>
+                        {
+                            // dx.ResizeToClient(MainImage.NativeHandle);
+                            // dx.ResizeSwapChain((int)_restoreBounds.Width , (int)_restoreBounds.Height);
+
+                            dx.HandleResize();
+
+                        });
+                    }
+                }
 
                 // Console.WriteLine($"window activation finished {currently_active}" );
                 currently_active = null;
@@ -789,13 +812,40 @@ public partial class Home : Window
             SystemDecorations = SystemDecorations.None;
             CanResize = false;
 
-            Position = new PixelPoint(0, 0);
+            // Position = new PixelPoint(0, 0);
 
             var screen = Screens.Primary;
             if (screen != null)
             {
-                Width = screen.Bounds.Width;
-                Height = screen.Bounds.Height;
+                // D11InteropRenderer.Instance?.ResizeSwapChain(screen.Bounds.Width, screen.Bounds.Height);
+                
+                // Width = screen.Bounds.Width;
+                // Height = screen.Bounds.Height;
+                
+                this.WindowState = WindowState.FullScreen;
+                
+                               
+#if WINDOWS
+                if (k_info.Instance.my_renderer is DirectX dx && my_info.Instance.Nativeview_mode_local)
+                {
+            
+                    if (dx != null)
+                    {
+                
+                        dx.RunOnContext(_ =>
+                        {
+                            // dx.ResizeToClient(MainImage.NativeHandle);
+                            dx.ResizeSwapChain((int)screen.Bounds.Width , (int)screen.Bounds.Height);
+
+                            dx.HandleResize();
+
+                        });
+                    }
+                }
+            
+#endif
+
+
             }
 
             my_info.Instance.IsFullscreen = true;
@@ -810,9 +860,37 @@ public partial class Home : Window
             SystemDecorations = SystemDecorations.Full;
             CanResize = true;
 
-            Position = new PixelPoint((int)_restoreBounds.X, (int)_restoreBounds.Y);
-            Width = _restoreBounds.Width;
-            Height = _restoreBounds.Height;
+            // Position = new PixelPoint((int)_restoreBounds.X, (int)_restoreBounds.Y);
+            // // D11InteropRenderer.Instance?.ResizeSwapChain((int)_restoreBounds.Width, (int)_restoreBounds.Height);
+            //
+            // Width = _restoreBounds.Width;
+            // Height = _restoreBounds.Height;
+            
+            this.WindowState = WindowState.Normal;
+                
+#if WINDOWS
+            if (k_info.Instance.my_renderer is DirectX dx && my_info.Instance.Nativeview_mode_local)
+            {
+            
+                if (dx != null)
+                {
+                
+                    dx.RunOnContext(_ =>
+                    {
+                        // dx.ResizeToClient(MainImage.NativeHandle);
+                        dx.ResizeSwapChain((int)_restoreBounds.Width , (int)_restoreBounds.Height);
+
+                        dx.HandleResize();
+
+                    });
+                }
+            }
+            
+#endif
+
+            
+            
+            
 
             my_info.Instance.IsFullscreen = false;
 
@@ -821,6 +899,28 @@ public partial class Home : Window
         }
     }
 
+
+    protected override void OnResized(WindowResizedEventArgs e)
+    {
+        base.OnResized(e);
+        
+        if (k_info.Instance.my_renderer is DirectX dx && my_info.Instance.Nativeview_mode_local)
+        {
+            
+            if (dx != null)
+            {
+                
+                dx.RunOnContext(_ =>
+                {
+                    // dx.ResizeToClient(MainImage.NativeHandle);
+                    // dx.ResizeSwapChain((int)_restoreBounds.Width , (int)_restoreBounds.Height);
+
+                    dx.HandleResize();
+
+                });
+            }
+        }
+    }
 
     private async void show_splashscreen()
     {

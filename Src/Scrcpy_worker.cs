@@ -667,7 +667,7 @@ namespace Androidplayer.Src
                 dynamic  my_directx = null ;
                 // Console.WriteLine("presenting frames");
                   
-                if (UISettings.Instance.Nativeview_mode)
+                if ( my_info.Instance.Nativeview_mode_local)
                 {
 
                     var renderer = k_info.Instance.my_renderer as DirectX;
@@ -684,6 +684,8 @@ namespace Androidplayer.Src
                         D11InteropRenderer.Instance?.PresentFrame(_pendingFrame, decodeTimestamp);
 
                 }
+                
+                
 
 
 
@@ -909,7 +911,7 @@ private void SaveScreenshot(Texture2D frame)
                         else
                             _recorder?.WriteVideoPacket( packet.Data, packet.Pts, packet.IsKeyFrame);
                   
-                        if (UISettings.Instance.Nativeview_mode)
+                        if (my_info.Instance.Nativeview_mode_local)
                         {
 
                            // my_directx = k_info.Instance.directx;

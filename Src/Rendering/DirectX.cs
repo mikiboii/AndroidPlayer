@@ -924,7 +924,8 @@ namespace Androidplayer.Src
             if (_device == null)
             {
 
-                Console.WriteLine("device is null");
+                Console.WriteLine("device is null in directx");
+                // Console.WriteLine("device is null");
                 return;
             }
             lock (_renderLock) action(_device.ImmediateContext);

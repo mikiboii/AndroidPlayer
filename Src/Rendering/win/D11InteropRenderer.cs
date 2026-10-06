@@ -1,3 +1,2823 @@
+//
+//
+// using System;
+// using System.Collections.Generic;
+// using System.Diagnostics;
+// using System.IO;
+// using System.Linq;
+// using System.Runtime.InteropServices;
+// using System.Threading;
+// using System.Threading.Tasks;
+//
+// using Avalonia;
+// using Avalonia.Media;
+// using Avalonia.Platform;
+// using Avalonia.Rendering.Composition;
+//
+// using SharpDX;
+// using SharpDX.Direct3D;
+// using SharpDX.Direct3D11;
+// using SharpDX.DXGI;
+// using SharpDX.D3DCompiler;
+// using SharpDX.Mathematics.Interop;
+// using SharpDX.WIC;
+//
+// using D3DDevice   = SharpDX.Direct3D11.Device;
+// using DxgiFactory = SharpDX.DXGI.Factory1;
+// using Buffer      = SharpDX.Direct3D11.Buffer;
+// using Resource    = SharpDX.Direct3D11.Resource;
+//
+//
+// namespace Androidplayer.Rendering.win;
+// public class D11InteropRenderer : DrawingSurfaceDemoBase
+// {
+//     // ------------------------------------------------------------------
+//     // Core GPU objects
+//     // ------------------------------------------------------------------
+//     private D3DDevice?      _device;
+//     private D3D11Swapchain? _swapchain;
+//
+//     public readonly object _d3dLock = new();
+//
+//     // GPU mode: RenderFrame fires every composition tick.
+//     // Software mode: drawing happens in Render(), no need to spin.
+//     protected override bool RunContinuously => !_softwareMode;
+//
+//     // ------------------------------------------------------------------
+//     // Software (no-GPU) mode
+//     // ------------------------------------------------------------------
+//     private volatile bool _softwareMode;
+//     public bool IsSoftwareMode => _softwareMode;
+//
+//     private readonly object _swLock = new();
+//     private byte[]? _swBuffer;
+//     private int _swW, _swH, _swStride;
+//     private long _swSerial, _swShownSerial = -1;
+//     private Avalonia.Media.Imaging.WriteableBitmap? _swBitmap;
+//     private Avalonia.Media.Imaging.Bitmap? _swStaticImage;
+//     private int _swInvalidatePending;
+//
+//     // ------------------------------------------------------------------
+//     // Static image (GPU mode)
+//     // ------------------------------------------------------------------
+//     private Texture2D?          _staticImageTexture;
+//     private ShaderResourceView? _staticImageView;
+//
+//     private VertexShader? _vertexShader;
+//     private PixelShader?  _pixelShader;
+//     private InputLayout?  _inputLayout;
+//     private Buffer?       _vertexBuffer;
+//     private SamplerState? _sampler;
+//
+//     // ------------------------------------------------------------------
+//     // Resize debounce
+//     // ------------------------------------------------------------------
+//     private PixelSize _currentSwapchainSize;
+//     private PixelSize _pendingSwapchainSize;
+//     private int       _pendingSwapchainTicks;
+//     private const int ResizeStableTicks = 2;
+//
+//     // ------------------------------------------------------------------
+//     // Video processor
+//     // ------------------------------------------------------------------
+//     private VideoDevice1?             _videoDevice1;
+//     private VideoContext1?            _videoContext1;
+//     private VideoProcessor?           _videoProcessor;
+//     private VideoProcessorEnumerator? _vpe;
+//
+//     private VideoProcessorInputViewDescription  _vpivd;
+//     private VideoProcessorOutputViewDescription _vpovd;
+//     private VideoProcessorContentDescription    _vpcd;
+//     private bool _videoProcessorReady;
+//
+//     private readonly Dictionary<IntPtr, VideoProcessorOutputView> _vpovCache = new();
+//     private const int MaxOutputViewCacheSize = 8;
+//
+//     private const int VideoProcessorOutputAlignment = 256;
+//     private const int VideoProcessorShrinkThreshold = VideoProcessorOutputAlignment * 4;
+//
+//     // ------------------------------------------------------------------
+//     // Current frame (all access under _d3dLock)
+//     // ------------------------------------------------------------------
+//     private Texture2D? _currentVideoFrame;
+//     private bool       _currentVideoFrameOwned = true;
+//     private int        _currentVideoFrameSlice;
+//     private long       _currentFrameSerial;
+//     private long       _lastDrawnSerial = -1;
+//     private bool       _forceRedraw = true;
+//
+//     // ------------------------------------------------------------------
+//     // Last-good-frame copy of the back buffer
+//     // ------------------------------------------------------------------
+//     private Texture2D? _lastGoodFrameTexture;
+//     private PixelSize  _lastGoodFrameSize;
+//     private Format     _lastGoodFrameFormat;
+//
+//     // ------------------------------------------------------------------
+//     // Misc
+//     // ------------------------------------------------------------------
+//     private readonly Stopwatch _globalClock = Stopwatch.StartNew();
+//     public long NowTicks => _globalClock.ElapsedTicks;
+//
+//     /// <summary>Path of the video to play. Set this before calling Play_video().</summary>
+//     public string FileToPlay { get; set; } =
+//         @"M:\movie\Kung.Fu.Panda.3.2016.720p.WEBRip.x264.AAC-ETRG.mp4";
+//
+//     private Src.FFmpeg? ffmpeg;
+//     private Thread? threadPlay;
+//     private volatile bool is_running = true;
+//     private bool _disposed;
+//
+//     // ==================================================================
+//     // Public API
+//     // ==================================================================
+//
+//     public D3DDevice? my_Device => _device;
+//
+//     public string BackendName =>
+//         _softwareMode
+//             ? "Software renderer (no GPU)"
+//             : _device is null
+//                 ? "Direct3D 11 (Avalonia interop, uninitialized)"
+//                 : $"Direct3D 11 ({_device.FeatureLevel}) (Avalonia interop)";
+//
+//     public event EventHandler? Initialized;
+//     public bool IsInitialized => _softwareMode || (_device is not null && _swapchain is not null);
+//
+//     public static D11InteropRenderer? Instance { get; private set; }
+//
+//     // ---- shims (kept so existing callers still compile) ----
+//     public void Initialize(IntPtr outputHandle, int d_width = 0, int d_height = 0) { }
+//     public void PresentStaticImage() { }
+//     public void PresentFrameKeepAlive() { }
+//     public void HandleResize() { }
+//     public void ResizeToClient(IntPtr hwnd) { }
+//
+//     public void PresentFrame(Texture2D textureHW, long decodeTimestamp, int d_width = 0, int d_height = 0)
+//         => SetSourceTexture(textureHW, decodeTimestamp);
+//     
+//     public void PresentFrame(Texture2D textureHW, int d_width = 0, int d_height = 0)
+//         => SetSourceTexture(textureHW, _globalClock.ElapsedTicks);
+//     
+//     
+//     
+//     
+//     
+//     
+//     
+//     
+//     
+//     
+//     
+//     
+//     /// <summary>
+//     /// GPU mode only. Replaces the frame RenderFrame draws.
+//     /// ownsTexture = true : this renderer disposes the texture when replaced.
+//     /// ownsTexture = false: the texture belongs to FFmpeg; never dispose it here.
+//     /// </summary>
+//     public void SetSourceTexture(Texture2D? texture, long decodeTimestamp = 0,
+//                                  int arraySlice = 0, bool ownsTexture = true)
+//     {
+//         if (texture == null) return;
+//
+//         lock (_d3dLock)
+//         {
+//             var old = _currentVideoFrame;
+//             if (old != null && _currentVideoFrameOwned && !ReferenceEquals(old, texture))
+//             {
+//                 try { old.Dispose(); } catch { }
+//             }
+//
+//             _currentVideoFrame      = texture;
+//             _currentVideoFrameOwned = ownsTexture;
+//             _currentVideoFrameSlice = arraySlice;
+//             _currentFrameSerial++;
+//         }
+//     }
+//
+//     public void ResizeSwapChain(int width, int height)
+//     {
+//         if (width <= 0 || height <= 0) return;
+//         if (_softwareMode) return;
+//
+//         lock (_d3dLock)
+//         {
+//             _currentSwapchainSize  = new PixelSize(width, height);
+//             _pendingSwapchainSize  = default;
+//             _pendingSwapchainTicks = 0;
+//             ClearOutputViewCache();
+//             _forceRedraw = true;
+//         }
+//     }
+//
+//     public void RunOnContext(Action<DeviceContext> action)
+//     {
+//         if (_device == null) return;
+//         lock (_d3dLock) action(_device.ImmediateContext);
+//     }
+//
+//     public new void Dispose() => DisposeAll();
+//
+//     // ==================================================================
+//     // Software (CPU) rendering path
+//     // ==================================================================
+//
+//     
+//     
+//     protected override (bool success, string info) InitializeSoftwareFallback(string reason)
+//     {
+//         Instance = this;
+//
+//         // Drop any half-created GPU objects from a failed GPU init.
+//         ReleaseGpuAsync();
+//
+//         _softwareMode = true;
+//         Console.WriteLine($"[Interop] Using software renderer: {reason}");
+//         Initialized?.Invoke(this, EventArgs.Empty);
+//         return (true, $"Software renderer ({reason})");
+//     }
+//
+//     /// <summary>
+//     /// Software mode: submit a BGRA frame (stride in bytes).
+//     /// Safe to call from any thread. The data is copied.
+//     /// </summary>
+//     public void SetSoftwareFrame(byte[] bgra, int width, int height, int stride)
+//     {
+//         if (!_softwareMode || width <= 0 || height <= 0 || stride < width * 4) return;
+//
+//         int len = stride * height;
+//         if (bgra.Length < len) return;
+//
+//         lock (_swLock)
+//         {
+//             if (_swBuffer == null || _swBuffer.Length < len)
+//                 _swBuffer = new byte[len];
+//
+//             Buffer_BlockCopy(bgra, _swBuffer, len);
+//             _swW = width; _swH = height; _swStride = stride;
+//             _swSerial++;
+//         }
+//
+//         // Coalesce: at most one pending invalidate.
+//         if (Interlocked.Exchange(ref _swInvalidatePending, 1) == 0)
+//         {
+//             Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+//             {
+//                 Interlocked.Exchange(ref _swInvalidatePending, 0);
+//                 InvalidateVisual();
+//             }, Avalonia.Threading.DispatcherPriority.Render);
+//         }
+//     }
+//
+//     // "Buffer" is aliased to the SharpDX type, so use System.Buffer explicitly.
+//     private static void Buffer_BlockCopy(byte[] src, byte[] dst, int len)
+//         => System.Buffer.BlockCopy(src, 0, dst, 0, len);
+//
+//     public override void Render(DrawingContext ctx)
+//     {
+//         if (!_softwareMode)
+//         {
+//             base.Render(ctx);
+//             return;
+//         }
+//
+//         var bounds = new Rect(Bounds.Size);
+//         ctx.FillRectangle(Brushes.Black, bounds);
+//
+//         lock (_swLock)
+//         {
+//             if (_swBuffer != null && _swW > 0 && _swH > 0)
+//             {
+//                 if (_swBitmap == null ||
+//                     _swBitmap.PixelSize.Width != _swW ||
+//                     _swBitmap.PixelSize.Height != _swH)
+//                 {
+//                     _swBitmap?.Dispose();
+//                     _swBitmap = new Avalonia.Media.Imaging.WriteableBitmap(
+//                         new PixelSize(_swW, _swH),
+//                         new Vector(96, 96),
+//                         Avalonia.Platform.PixelFormat.Bgra8888,
+//                         Avalonia.Platform.AlphaFormat.Opaque);
+//                     _swShownSerial = -1;
+//                 }
+//
+//                 if (_swShownSerial != _swSerial)
+//                 {
+//                     using var fb = _swBitmap.Lock();
+//                     int rowBytes = Math.Min(_swW * 4, fb.RowBytes);
+//                     for (int y = 0; y < _swH; y++)
+//                         Marshal.Copy(_swBuffer, y * _swStride, fb.Address + y * fb.RowBytes, rowBytes);
+//                     _swShownSerial = _swSerial;
+//                 }
+//
+//                 DrawLetterboxed(ctx, _swBitmap, _swW, _swH, bounds);
+//                 return;
+//             }
+//         }
+//
+//         if (_swStaticImage != null)
+//         {
+//             DrawLetterboxed(ctx, _swStaticImage,
+//                 (int)_swStaticImage.Size.Width, (int)_swStaticImage.Size.Height, bounds);
+//         }
+//     }
+//
+//     private static void DrawLetterboxed(DrawingContext ctx, Avalonia.Media.IImage image,
+//                                         int srcW, int srcH, Rect bounds)
+//     {
+//         if (srcW <= 0 || srcH <= 0 || bounds.Width <= 0 || bounds.Height <= 0) return;
+//
+//         double scale = Math.Min(bounds.Width / srcW, bounds.Height / srcH);
+//         double w = srcW * scale, h = srcH * scale;
+//         var dest = new Rect((bounds.Width - w) / 2, (bounds.Height - h) / 2, w, h);
+//         ctx.DrawImage(image, new Rect(0, 0, srcW, srcH), dest);
+//     }
+//
+//     // ==================================================================
+//     // Static image
+//     // ==================================================================
+//
+//     public void DisplayImage(string fileName)
+//     {
+//         string imagePath = Path.IsPathRooted(fileName)
+//             ? fileName
+//             : Path.Combine(Directory.GetCurrentDirectory(), fileName);
+//
+//         if (_softwareMode)
+//         {
+//             try
+//             {
+//                 if (!File.Exists(imagePath))
+//                 {
+//                     Console.WriteLine($"Image file not found: {imagePath}");
+//                     return;
+//                 }
+//
+//                 var bmp = new Avalonia.Media.Imaging.Bitmap(imagePath);
+//                 lock (_swLock)
+//                 {
+//                     _swStaticImage?.Dispose();
+//                     _swStaticImage = bmp;
+//                 }
+//                 Avalonia.Threading.Dispatcher.UIThread.Post(InvalidateVisual);
+//             }
+//             catch (Exception ex)
+//             {
+//                 Console.WriteLine($"Error displaying image {fileName}: {ex.Message}");
+//             }
+//             return;
+//         }
+//
+//         if (_device == null)
+//         {
+//             Console.WriteLine("[AvaloniaInteropRenderer] DisplayImage before init.");
+//             return;
+//         }
+//
+//         try
+//         {
+//             if (!File.Exists(imagePath))
+//             {
+//                 Console.WriteLine($"Image file not found: {imagePath}");
+//                 return;
+//             }
+//
+//             lock (_d3dLock)
+//             {
+//                 Utilities.Dispose(ref _staticImageView);
+//                 Utilities.Dispose(ref _staticImageTexture);
+//
+//                 _staticImageTexture = LoadTextureFromFile(imagePath);
+//
+//                 if (_staticImageTexture != null)
+//                 {
+//                     _staticImageView = new ShaderResourceView(_device, _staticImageTexture);
+//                     Console.WriteLine($"Successfully loaded image: {fileName}");
+//                 }
+//
+//                 _forceRedraw = true;
+//             }
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"Error displaying image {fileName}: {ex.Message}");
+//         }
+//     }
+//
+//     public Texture2D? LoadTextureFromFile(string filePath)
+//     {
+//         if (_device == null) return null;
+//
+//         try
+//         {
+//             using var factory = new ImagingFactory();
+//             using var bitmapDecoder = new BitmapDecoder(factory, filePath, DecodeOptions.CacheOnLoad);
+//             using var frame = bitmapDecoder.GetFrame(0);
+//
+//             using var flipRotator = new BitmapFlipRotator(factory);
+//             flipRotator.Initialize(frame, BitmapTransformOptions.FlipVertical);
+//
+//             using var formatConverter = new FormatConverter(factory);
+//             formatConverter.Initialize(flipRotator, SharpDX.WIC.PixelFormat.Format32bppRGBA);
+//
+//             var width  = formatConverter.Size.Width;
+//             var height = formatConverter.Size.Height;
+//
+//             var stride = width * 4;
+//             using var dataStream = new DataStream(height * stride, true, true);
+//             formatConverter.CopyPixels(stride, dataStream);
+//
+//             var textureDesc = new Texture2DDescription
+//             {
+//                 Width             = width,
+//                 Height            = height,
+//                 ArraySize         = 1,
+//                 BindFlags         = BindFlags.ShaderResource | BindFlags.RenderTarget,
+//                 Usage             = ResourceUsage.Default,
+//                 CpuAccessFlags    = CpuAccessFlags.None,
+//                 Format            = Format.R8G8B8A8_UNorm,
+//                 MipLevels         = 1,
+//                 OptionFlags       = ResourceOptionFlags.None,
+//                 SampleDescription = new SampleDescription(1, 0)
+//             };
+//
+//             return new Texture2D(
+//                 _device,
+//                 textureDesc,
+//                 new DataRectangle(dataStream.DataPointer, stride));
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"Error loading texture from file: {ex.Message}");
+//             return null;
+//         }
+//     }
+//
+//     // ==================================================================
+//     // Init
+//     // ==================================================================
+//
+//     protected override (bool success, string info) InitializeGraphicsResources(
+//         Compositor compositor,
+//         CompositionDrawingSurface surface,
+//         ICompositionGpuInterop interop)
+//     {
+//         try
+//         {
+//             Instance = this;
+//
+//             if (interop.SupportedImageHandleTypes.Contains(
+//                     KnownPlatformGraphicsExternalImageHandleTypes
+//                         .D3D11TextureGlobalSharedHandle) != true)
+//             {
+//                 return (false,
+//                     "DXGI shared handle import is not supported by the current graphics backend");
+//             }
+//
+//             using var factory = new DxgiFactory();
+//
+//             // Pick the first REAL hardware adapter. Skip WARP / Basic Render Driver.
+//             Adapter1? adapter = null;
+//             int count = factory.GetAdapterCount1();
+//             for (int i = 0; i < count; i++)
+//             {
+//                 var candidate = factory.GetAdapter1(i);
+//                 var d = candidate.Description1;
+//                 bool isSoftware = (d.Flags & AdapterFlags.Software) != 0 || d.VendorId == 0x1414;
+//                 if (!isSoftware)
+//                 {
+//                     adapter = candidate;
+//                     break;
+//                 }
+//                 candidate.Dispose();
+//             }
+//
+//             if (adapter == null)
+//                 return (false, "No hardware GPU found");
+//
+//             using (adapter)
+//             {
+//                 _device = new D3DDevice(
+//                     adapter,
+//                     DeviceCreationFlags.BgraSupport,
+//                     new[]
+//                     {
+//                         FeatureLevel.Level_12_1,
+//                         FeatureLevel.Level_12_0,
+//                         FeatureLevel.Level_11_1,
+//                         FeatureLevel.Level_11_0,
+//                         FeatureLevel.Level_10_0,
+//                         FeatureLevel.Level_9_3,
+//                         FeatureLevel.Level_9_2,
+//                         FeatureLevel.Level_9_1
+//                     });
+//
+//                 _swapchain = new D3D11Swapchain(_device, interop, surface);
+//
+//                 try
+//                 {
+//                     _videoDevice1  = _device.QueryInterface<VideoDevice1>();
+//                     _videoContext1 = _device.ImmediateContext.QueryInterface<VideoContext1>();
+//                 }
+//                 catch (Exception ex)
+//                 {
+//                     Console.WriteLine($"[Interop] Video processor not available: {ex.Message}");
+//                     _videoProcessorReady = false;
+//                 }
+//
+//                 CreateShaders();
+//                 CreateQuad();
+//                 CreateSampler();
+//
+//                 _currentSwapchainSize  = default;
+//                 _pendingSwapchainSize  = default;
+//                 _pendingSwapchainTicks = 0;
+//                 _lastDrawnSerial       = -1;
+//                 _forceRedraw           = true;
+//
+//                 Initialized?.Invoke(this, EventArgs.Empty);
+//
+//                 Console.WriteLine("initialized gpuinterop class");
+//
+//                 return (true,
+//                     $"D3D11 ({_device.FeatureLevel}) {adapter.Description1.Description} [Avalonia interop]");
+//             }
+//         }
+//         catch (Exception ex)
+//         {
+//             // Base class will clean up and switch to software mode.
+//             return (false, $"GPU init failed: {ex.Message}");
+//         }
+//     }
+//
+//     protected override void FreeGraphicsResources() => DisposeAll();
+//
+//     // ==================================================================
+//     // Video processor setup
+//     // ==================================================================
+//
+//     private void ClearOutputViewCache()
+//     {
+//         foreach (var v in _vpovCache.Values)
+//         {
+//             try { v.Dispose(); } catch { }
+//         }
+//         _vpovCache.Clear();
+//     }
+//
+//     private static int AlignUp(int value, int alignment)
+//         => ((value + alignment - 1) / alignment) * alignment;
+//
+//     private bool EnsureVideoProcessorFor(int inputWidth, int inputHeight, int outputWidth, int outputHeight)
+//     {
+//         if (_videoDevice1 == null || _videoContext1 == null) return false;
+//         if (inputWidth <= 0 || inputHeight <= 0) return false;
+//         if (outputWidth <= 0 || outputHeight <= 0) return false;
+//
+//         int neededOutW = Math.Max(outputWidth, inputWidth);
+//         int neededOutH = Math.Max(outputHeight, inputHeight);
+//
+//         bool tooBig = _videoProcessorReady &&
+//             ((_vpcd.OutputWidth  > neededOutW * 2 && _vpcd.OutputWidth  > VideoProcessorShrinkThreshold) ||
+//              (_vpcd.OutputHeight > neededOutH * 2 && _vpcd.OutputHeight > VideoProcessorShrinkThreshold));
+//
+//         if (_videoProcessorReady &&
+//             !tooBig &&
+//             _vpcd.InputWidth  == inputWidth &&
+//             _vpcd.InputHeight == inputHeight &&
+//             neededOutW <= _vpcd.OutputWidth &&
+//             neededOutH <= _vpcd.OutputHeight)
+//         {
+//             return true;
+//         }
+//
+//         ClearOutputViewCache();
+//         Utilities.Dispose(ref _videoProcessor);
+//         Utilities.Dispose(ref _vpe);
+//
+//         int paddedOutW = AlignUp(neededOutW, VideoProcessorOutputAlignment);
+//         int paddedOutH = AlignUp(neededOutH, VideoProcessorOutputAlignment);
+//
+//         _vpcd = new VideoProcessorContentDescription
+//         {
+//             Usage            = VideoUsage.PlaybackNormal,
+//             InputFrameFormat = VideoFrameFormat.Progressive,
+//             InputFrameRate   = new Rational(1, 1),
+//             OutputFrameRate  = new Rational(1, 1),
+//             InputWidth       = inputWidth,
+//             InputHeight      = inputHeight,
+//             OutputWidth      = paddedOutW,
+//             OutputHeight     = paddedOutH
+//         };
+//
+//         try
+//         {
+//             _videoDevice1.CreateVideoProcessorEnumerator(ref _vpcd, out _vpe);
+//             _videoDevice1.CreateVideoProcessor(_vpe, 0, out _videoProcessor);
+//
+//             try { _videoContext1.VideoProcessorSetStreamAutoProcessingMode(_videoProcessor, 0, false); }
+//             catch { /* not implemented on some drivers; not fatal */ }
+//
+//             _vpivd = new VideoProcessorInputViewDescription
+//             {
+//                 FourCC    = 0,
+//                 Dimension = VpivDimension.Texture2D,
+//                 Texture2D = new Texture2DVpiv { MipSlice = 0, ArraySlice = 0 }
+//             };
+//
+//             _vpovd = new VideoProcessorOutputViewDescription
+//             {
+//                 Dimension = VpovDimension.Texture2D,
+//                 Texture2D = new Texture2DVpov { MipSlice = 0 }
+//             };
+//
+//             _videoProcessorReady = true;
+//             Console.WriteLine(
+//                 $"[Interop] Video processor ready for input {inputWidth}x{inputHeight}, " +
+//                 $"output up to {paddedOutW}x{paddedOutH}");
+//             return true;
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"[Interop] Video processor creation failed: {ex.Message}");
+//             _videoProcessorReady = false;
+//             return false;
+//         }
+//     }
+//
+//     // ==================================================================
+//     // Render (GPU mode)
+//     // ==================================================================
+//
+//     private bool TryCommitSwapchainSize(PixelSize pixelSize)
+//     {
+//         if (_currentSwapchainSize == default)
+//         {
+//             _currentSwapchainSize  = pixelSize;
+//             _pendingSwapchainSize  = default;
+//             _pendingSwapchainTicks = 0;
+//             return true;
+//         }
+//
+//         if (pixelSize == _currentSwapchainSize)
+//         {
+//             _pendingSwapchainSize  = default;
+//             _pendingSwapchainTicks = 0;
+//             return false;
+//         }
+//
+//         if (pixelSize != _pendingSwapchainSize)
+//         {
+//             _pendingSwapchainSize  = pixelSize;
+//             _pendingSwapchainTicks = 1;
+//             return false;
+//         }
+//
+//         if (++_pendingSwapchainTicks < ResizeStableTicks)
+//             return false;
+//
+//         _currentSwapchainSize  = pixelSize;
+//         _pendingSwapchainSize  = default;
+//         _pendingSwapchainTicks = 0;
+//         return true;
+//     }
+//
+//     protected override void RenderFrame(PixelSize pixelSize)
+//     {
+//         // Software mode draws in Render(), not through the swapchain.
+//         if (_softwareMode) return;
+//
+//         if (pixelSize == default) return;
+//         if (pixelSize.Width <= 1 || pixelSize.Height <= 1) return;
+//         if (_swapchain is null || _device is null) return;
+//
+//         bool sizeChanged = TryCommitSwapchainSize(pixelSize);
+//
+//         // Size still settling: keep showing the last presented image.
+//         if (pixelSize != _currentSwapchainSize) return;
+//
+//         lock (_d3dLock)
+//         {
+//             if (sizeChanged)
+//                 ClearOutputViewCache();
+//
+//             bool newFrame = _currentFrameSerial != _lastDrawnSerial;
+//             if (!newFrame && !sizeChanged && !_forceRedraw)
+//                 return;
+//
+//             var context = _device.ImmediateContext;
+//
+//             using (_swapchain.BeginDraw(_currentSwapchainSize, out var renderView))
+//             {
+//                 Texture2D? renderTexture = null;
+//                 Resource?  rtResource    = null;
+//                 try
+//                 {
+//                     rtResource    = renderView.Resource;
+//                     renderTexture = rtResource.QueryInterface<Texture2D>();
+//                 }
+//                 catch (Exception ex)
+//                 {
+//                     Console.WriteLine($"[Interop] RT query failed: {ex.Message}");
+//                 }
+//                 finally
+//                 {
+//                     rtResource?.Dispose();
+//                 }
+//
+//                 try
+//                 {
+//                     context.OutputMerger.SetTargets(renderView);
+//                     context.ClearRenderTargetView(renderView, new RawColor4(0f, 0f, 0f, 1f));
+//
+//                     bool didBlit = false;
+//                     Texture2D? frame = _currentVideoFrame;
+//
+//                     if (renderTexture is not null && frame is not null && frame.NativePointer != IntPtr.Zero)
+//                     {
+//                         Texture2DDescription frameDesc = default;
+//                         bool frameValid = true;
+//
+//                         try
+//                         {
+//                             frameDesc = frame.Description;
+//                         }
+//                         catch (Exception ex)
+//                         {
+//                             Console.WriteLine($"[Interop] Dropping invalid video frame: {ex.Message}");
+//                             _currentVideoFrame = null;
+//                             frameValid = false;
+//                         }
+//
+//                         if (frameValid &&
+//                             EnsureVideoProcessorFor(
+//                                 frameDesc.Width, frameDesc.Height,
+//                                 _currentSwapchainSize.Width, _currentSwapchainSize.Height))
+//                         {
+//                             didBlit = BlitVideoFrame(frame, _currentVideoFrameSlice, renderTexture, _currentSwapchainSize);
+//
+//                             if (!didBlit)
+//                             {
+//                                 ClearOutputViewCache();
+//                                 didBlit = BlitVideoFrame(frame, _currentVideoFrameSlice, renderTexture, _currentSwapchainSize);
+//                             }
+//
+//                             if (didBlit)
+//                                 CaptureLastGoodFrame(context, renderTexture);
+//                         }
+//                     }
+//
+//                     if (!didBlit)
+//                     {
+//                         bool drawn = false;
+//
+//                         if (_currentVideoFrame is not null && renderTexture is not null)
+//                             drawn = TryRestoreLastGoodFrame(context, renderTexture, renderView);
+//
+//                         if (!drawn && _staticImageView is not null && _staticImageTexture is not null)
+//                         {
+//                             DrawFullscreenQuad(context, _staticImageView,
+//                                 _staticImageTexture.Description.Width,
+//                                 _staticImageTexture.Description.Height);
+//                         }
+//                     }
+//
+//                     context.PixelShader.SetShaderResource(0, null);
+//                     context.OutputMerger.ResetTargets();
+//
+//                     _lastDrawnSerial = _currentFrameSerial;
+//                     _forceRedraw     = false;
+//                 }
+//                 finally
+//                 {
+//                     renderTexture?.Dispose();
+//                 }
+//             }
+//
+//             if (sizeChanged)
+//             {
+//                 try
+//                 {
+//                     context.ClearState();
+//                     context.Flush();
+//                 }
+//                 catch (Exception ex)
+//                 {
+//                     Console.WriteLine($"[Interop] Post-resize flush failed: {ex.Message}");
+//                 }
+//             }
+//         }
+//     }
+//
+//     // ------------------------------------------------------------------
+//     // Letterbox
+//     // ------------------------------------------------------------------
+//     private void ComputeLetterboxRect(int srcW, int srcH,
+//         out int outX, out int outY, out int outW, out int outH)
+//     {
+//         int bbW = _currentSwapchainSize.Width;
+//         int bbH = _currentSwapchainSize.Height;
+//
+//         if (srcW <= 0 || srcH <= 0 || bbW <= 0 || bbH <= 0)
+//         {
+//             outX = outY = 0;
+//             outW = bbW;
+//             outH = bbH;
+//             return;
+//         }
+//
+//         float srcAspect = (float)srcW / srcH;
+//
+//         if ((float)bbW / bbH > srcAspect)
+//         {
+//             outH = bbH;
+//             outW = (int)Math.Round(bbH * srcAspect);
+//         }
+//         else
+//         {
+//             outW = bbW;
+//             outH = (int)Math.Round(bbW / srcAspect);
+//         }
+//
+//         outW = Math.Clamp(outW, 1, bbW);
+//         outH = Math.Clamp(outH, 1, bbH);
+//         outX = (bbW - outW) / 2;
+//         outY = (bbH - outH) / 2;
+//     }
+//
+//     // ------------------------------------------------------------------
+//     // Static image quad
+//     // ------------------------------------------------------------------
+//     private void DrawFullscreenQuad(DeviceContext context, ShaderResourceView view, int srcW, int srcH)
+//     {
+//         ComputeLetterboxRect(srcW, srcH,
+//             out int outX, out int outY, out int outW, out int outH);
+//
+//         context.Rasterizer.SetViewport(outX, outY, outW, outH, 0f, 1f);
+//
+//         context.InputAssembler.InputLayout = _inputLayout;
+//         context.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+//         context.InputAssembler.SetVertexBuffers(
+//             0, new VertexBufferBinding(_vertexBuffer!, sizeof(float) * 5, 0));
+//
+//         context.VertexShader.Set(_vertexShader);
+//         context.PixelShader.Set(_pixelShader);
+//         context.PixelShader.SetShaderResource(0, view);
+//         context.PixelShader.SetSampler(0, _sampler);
+//
+//         context.Draw(6, 0);
+//     }
+//
+//     // ------------------------------------------------------------------
+//     // Video blit
+//     // ------------------------------------------------------------------
+//     private bool BlitVideoFrame(Texture2D inputTexture, int arraySlice,
+//                                 Texture2D outputTexture, PixelSize destSize)
+//     {
+//         if (_videoDevice1 is null || _videoContext1 is null ||
+//             _videoProcessor is null || _vpe is null)
+//             return false;
+//
+//         VideoProcessorInputView? vpiv = null;
+//         try
+//         {
+//             var inDesc = inputTexture.Description;
+//
+//             ComputeLetterboxRect(inDesc.Width, inDesc.Height,
+//                 out int outX, out int outY, out int outW, out int outH);
+//
+//             var vpivd = _vpivd;
+//             vpivd.Texture2D = new Texture2DVpiv
+//             {
+//                 MipSlice   = 0,
+//                 ArraySlice = inDesc.ArraySize > 1 ? arraySlice : 0
+//             };
+//
+//             _videoDevice1.CreateVideoProcessorInputView(inputTexture, _vpe, vpivd, out vpiv);
+//
+//             IntPtr outId = outputTexture.NativePointer;
+//             if (!_vpovCache.TryGetValue(outId, out var vpov))
+//             {
+//                 if (_vpovCache.Count >= MaxOutputViewCacheSize)
+//                     ClearOutputViewCache();
+//
+//                 _videoDevice1.CreateVideoProcessorOutputView(outputTexture, _vpe, _vpovd, out vpov);
+//                 _vpovCache[outId] = vpov;
+//             }
+//
+//             _videoContext1.VideoProcessorSetStreamMirror(
+//                 _videoProcessor, 0, true, false, true); // flip vertical
+//
+//             _videoContext1.VideoProcessorSetStreamSourceRect(
+//                 _videoProcessor, 0, true,
+//                 new RawRectangle(0, 0, inDesc.Width, inDesc.Height));
+//
+//             _videoContext1.VideoProcessorSetStreamDestRect(
+//                 _videoProcessor, 0, true,
+//                 new RawRectangle(outX, outY, outX + outW, outY + outH));
+//
+//             _videoContext1.VideoProcessorSetOutputTargetRect(
+//                 _videoProcessor, true,
+//                 new RawRectangle(0, 0, destSize.Width, destSize.Height));
+//
+//             var streams = new[]
+//             {
+//                 new VideoProcessorStream { PInputSurface = vpiv, Enable = new RawBool(true) }
+//             };
+//
+//             _videoContext1.VideoProcessorBlt(_videoProcessor, vpov, 0, 1, streams);
+//             return true;
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"[Interop] VideoProcessorBlt failed: {ex.Message}");
+//             return false;
+//         }
+//         finally
+//         {
+//             Utilities.Dispose(ref vpiv);
+//         }
+//     }
+//
+//     // ------------------------------------------------------------------
+//     // Last good frame
+//     // ------------------------------------------------------------------
+//     private void CaptureLastGoodFrame(DeviceContext context, Texture2D backBuffer)
+//     {
+//         if (_device is null) return;
+//
+//         Texture2DDescription src;
+//         try { src = backBuffer.Description; }
+//         catch { return; }
+//
+//         var size = new PixelSize(src.Width, src.Height);
+//
+//         if (_lastGoodFrameTexture is null ||
+//             _lastGoodFrameSize   != size ||
+//             _lastGoodFrameFormat != src.Format)
+//         {
+//             Utilities.Dispose(ref _lastGoodFrameTexture);
+//
+//             try
+//             {
+//                 _lastGoodFrameTexture = new Texture2D(_device, new Texture2DDescription
+//                 {
+//                     Width             = src.Width,
+//                     Height            = src.Height,
+//                     ArraySize         = 1,
+//                     MipLevels         = 1,
+//                     Format            = src.Format,
+//                     Usage             = ResourceUsage.Default,
+//                     BindFlags         = BindFlags.None,
+//                     CpuAccessFlags    = CpuAccessFlags.None,
+//                     OptionFlags       = ResourceOptionFlags.None,
+//                     SampleDescription = new SampleDescription(1, 0)
+//                 });
+//                 _lastGoodFrameSize   = size;
+//                 _lastGoodFrameFormat = src.Format;
+//             }
+//             catch (Exception ex)
+//             {
+//                 Console.WriteLine($"[Interop] Failed to allocate last-good-frame: {ex.Message}");
+//                 Utilities.Dispose(ref _lastGoodFrameTexture);
+//                 return;
+//             }
+//         }
+//
+//         try { context.CopyResource(backBuffer, _lastGoodFrameTexture); }
+//         catch (Exception ex) { Console.WriteLine($"[Interop] Capture last-good-frame failed: {ex.Message}"); }
+//     }
+//
+//     private bool TryRestoreLastGoodFrame(DeviceContext context, Texture2D backBuffer, RenderTargetView renderView)
+//     {
+//         if (_lastGoodFrameTexture is null) return false;
+//
+//         try
+//         {
+//             var dst = backBuffer.Description;
+//             if (dst.Width  != _lastGoodFrameSize.Width  ||
+//                 dst.Height != _lastGoodFrameSize.Height ||
+//                 dst.Format != _lastGoodFrameFormat)
+//                 return false;
+//
+//             context.OutputMerger.ResetTargets();
+//             context.CopyResource(_lastGoodFrameTexture, backBuffer);
+//             context.OutputMerger.SetTargets(renderView);
+//             return true;
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"[Interop] Restore last-good-frame failed: {ex.Message}");
+//             try { context.OutputMerger.SetTargets(renderView); } catch { }
+//             return false;
+//         }
+//     }
+//
+//     // ==================================================================
+//     // Video playback
+//     // ==================================================================
+//
+//     // public void Play_video()
+//     // {
+//     //     try
+//     //     {
+//     //         ffmpeg = new test.FFmpeg();
+//     //
+//     //         if (_softwareMode)
+//     //         {
+//     //             // NEW: plain CPU decode, no D3D11VA hardware device context.
+//     //             if (!ffmpeg.InitSoftware())
+//     //             {
+//     //                 Console.WriteLine("FFmpeg software init failed");
+//     //                 return;
+//     //             }
+//     //         }
+//     //         else if (!ffmpeg.InitHWAccel(_device!))
+//     //         {
+//     //             Console.WriteLine("Failed to Initialize FFmpeg's HW Acceleration");
+//     //             return;
+//     //         }
+//     //
+//     //         if (!ffmpeg.Open(FileToPlay))
+//     //         {
+//     //             Console.WriteLine("FFmpeg failed to open input");
+//     //             return;
+//     //         }
+//     //
+//     //         threadPlay = new Thread(() =>
+//     //         {
+//     //             try
+//     //             {
+//     //                 var sw = new Stopwatch();
+//     //
+//     //                 while (is_running)
+//     //                 {
+//     //                     sw.Restart();
+//     //
+//     //                     if (_softwareMode)
+//     //                     {
+//     //                         // NEW: CPU path. Frame is converted to BGRA by sws_scale.
+//     //                         if (!ffmpeg.GetFrameBgra(out var data, out int w, out int h, out int stride))
+//     //                         {
+//     //                             Thread.Sleep(1);
+//     //                             continue;
+//     //                         }
+//     //                         SetSoftwareFrame(data, w, h, stride);
+//     //                     }
+//     //                     else
+//     //                     {
+//     //                         Texture2D? texture = ffmpeg.GetFrame();
+//     //                         if (texture == null)
+//     //                         {
+//     //                             Thread.Sleep(1);
+//     //                             continue;
+//     //                         }
+//     //
+//     //                         // If GetFrame() returns FFmpeg's pooled surface use:
+//     //                         //   SetSourceTexture(texture, stamp, sliceIndex, ownsTexture: false)
+//     //                         SetSourceTexture(texture, _globalClock.ElapsedTicks);
+//     //                     }
+//     //
+//     //                     double remaining = 16.67 - sw.Elapsed.TotalMilliseconds;
+//     //                     if (remaining > 1)
+//     //                         Thread.Sleep((int)remaining);
+//     //                 }
+//     //             }
+//     //             catch (Exception ex)
+//     //             {
+//     //                 Console.WriteLine($"Thread error: {ex.Message}");
+//     //                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
+//     //             }
+//     //         });
+//     //
+//     //         threadPlay.SetApartmentState(ApartmentState.STA);
+//     //         threadPlay.Start();
+//     //     }
+//     //     catch (Exception ex)
+//     //     {
+//     //         Console.WriteLine($"Initialization error: {ex.Message}");
+//     //         Console.WriteLine($"Stack trace: {ex.StackTrace}");
+//     //     }
+//     // }
+//
+//     // ==================================================================
+//     // Shaders, quad, sampler
+//     // ==================================================================
+//
+//     private void CreateShaders()
+//     {
+//         const string vertexShaderCode = @"
+// struct VSInput
+// {
+//     float3 Position : POSITION;
+//     float2 TexCoord : TEXCOORD0;
+// };
+//
+// struct VSOutput
+// {
+//     float4 Position : SV_POSITION;
+//     float2 TexCoord : TEXCOORD0;
+// };
+//
+// VSOutput main(VSInput input)
+// {
+//     VSOutput output;
+//     output.Position = float4(input.Position, 1.0);
+//     output.TexCoord = input.TexCoord;
+//     return output;
+// }";
+//
+//         const string pixelShaderCode = @"
+// Texture2D Image : register(t0);
+// SamplerState Sampler : register(s0);
+//
+// struct PSInput
+// {
+//     float4 Position : SV_POSITION;
+//     float2 TexCoord : TEXCOORD0;
+// };
+//
+// float4 main(PSInput input) : SV_TARGET
+// {
+//     return Image.Sample(Sampler, input.TexCoord);
+// }";
+//
+//         using var vsByteCode = ShaderBytecode.Compile(vertexShaderCode, "main", "vs_5_0");
+//         using var psByteCode = ShaderBytecode.Compile(pixelShaderCode,   "main", "ps_5_0");
+//
+//         _vertexShader = new VertexShader(_device!, vsByteCode);
+//         _pixelShader  = new PixelShader(_device!, psByteCode);
+//
+//         _inputLayout = new InputLayout(
+//             _device!,
+//             ShaderSignature.GetInputSignature(vsByteCode),
+//             new[]
+//             {
+//                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0, 0),
+//                 new InputElement("TEXCOORD", 0, Format.R32G32_Float,   12, 0)
+//             });
+//     }
+//
+//     private void CreateQuad()
+//     {
+//         var vertices = new[]
+//         {
+//             -1.0f,  1.0f, 0.0f,   0.0f, 0.0f,
+//              1.0f,  1.0f, 0.0f,   1.0f, 0.0f,
+//              1.0f, -1.0f, 0.0f,   1.0f, 1.0f,
+//
+//             -1.0f,  1.0f, 0.0f,   0.0f, 0.0f,
+//              1.0f, -1.0f, 0.0f,   1.0f, 1.0f,
+//             -1.0f, -1.0f, 0.0f,   0.0f, 1.0f
+//         };
+//
+//         Utilities.Dispose(ref _vertexBuffer);
+//
+//         _vertexBuffer = Buffer.Create(
+//             _device!,
+//             BindFlags.VertexBuffer,
+//             vertices);
+//     }
+//
+//     private void CreateSampler()
+//     {
+//         _sampler = new SamplerState(_device!, new SamplerStateDescription
+//         {
+//             Filter             = Filter.MinMagMipLinear,
+//             AddressU           = TextureAddressMode.Clamp,
+//             AddressV           = TextureAddressMode.Clamp,
+//             AddressW           = TextureAddressMode.Clamp,
+//             ComparisonFunction = Comparison.Never,
+//             MinimumLod         = 0,
+//             MaximumLod         = float.MaxValue
+//         });
+//     }
+//
+//     // ==================================================================
+//     // Cleanup
+//     // ==================================================================
+//
+//     public void DisposeAll()
+//     {
+//         if (_disposed) return;
+//         _disposed = true;
+//
+//         is_running = false;
+//
+//         ReleaseGpuAsync();
+//         ReleaseSoftwareResources();
+//     }
+//
+//     /// <summary>
+//     /// Disposes the swapchain first (async), then every other D3D object.
+//     /// Safe to call when nothing was created.
+//     /// </summary>
+//     private void ReleaseGpuAsync()
+//     {
+//         var swapchain = _swapchain;
+//         _swapchain = null;
+//
+//         if (swapchain is null)
+//             ReleaseD3DResources();
+//         else
+//             _ = swapchain.DisposeAsync().AsTask()
+//                 .ContinueWith(_ => ReleaseD3DResources(), TaskScheduler.Default);
+//     }
+//
+//     private void ReleaseSoftwareResources()
+//     {
+//         lock (_swLock)
+//         {
+//             _swBitmap?.Dispose();      _swBitmap = null;
+//             _swStaticImage?.Dispose(); _swStaticImage = null;
+//             _swBuffer = null;
+//         }
+//     }
+//
+//     private void ReleaseD3DResources()
+//     {
+//         lock (_d3dLock)
+//         {
+//             if (_currentVideoFrameOwned)
+//                 Utilities.Dispose(ref _currentVideoFrame);
+//             else
+//                 _currentVideoFrame = null;
+//
+//             ClearOutputViewCache();
+//             Utilities.Dispose(ref _videoProcessor);
+//             Utilities.Dispose(ref _vpe);
+//             Utilities.Dispose(ref _videoContext1);
+//             Utilities.Dispose(ref _videoDevice1);
+//
+//             Utilities.Dispose(ref _sampler);
+//             Utilities.Dispose(ref _vertexBuffer);
+//             Utilities.Dispose(ref _inputLayout);
+//             Utilities.Dispose(ref _vertexShader);
+//             Utilities.Dispose(ref _pixelShader);
+//             Utilities.Dispose(ref _staticImageView);
+//             Utilities.Dispose(ref _staticImageTexture);
+//             Utilities.Dispose(ref _lastGoodFrameTexture);
+//             Utilities.Dispose(ref _device);
+//         }
+//     }
+// }
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// using System;
+// using System.Collections.Generic;
+// using System.Diagnostics;
+// using System.IO;
+// using System.Linq;
+// using System.Runtime.InteropServices;
+// using System.Threading;
+// using System.Threading.Tasks;
+//
+// using Avalonia;
+// using Avalonia.Media;
+// using Avalonia.Platform;
+// using Avalonia.Rendering.Composition;
+// using Avalonia.VisualTree;
+// using SharpDX;
+// using SharpDX.Direct3D;
+// using SharpDX.Direct3D11;
+// using SharpDX.DXGI;
+// using SharpDX.D3DCompiler;
+// using SharpDX.Mathematics.Interop;
+// using SharpDX.WIC;
+//
+// using D3DDevice   = SharpDX.Direct3D11.Device;
+// using DxgiFactory = SharpDX.DXGI.Factory1;
+// using Buffer      = SharpDX.Direct3D11.Buffer;
+// using Resource    = SharpDX.Direct3D11.Resource;
+//
+// namespace Androidplayer.Rendering.win;
+//
+// public class D11InteropRenderer : DrawingSurfaceDemoBase
+// {
+//     // ==================================================================
+//     // Modes
+//     //
+//     //   Swapchain  : full Avalonia GPU interop, VideoProcessor blits into
+//     //                the composition surface's swapchain image.
+//     //   GpuShader  : D3D11 device works, but Avalonia interop doesn't.
+//     //                We draw with a pixel shader into an offscreen
+//     //                texture, read it back, and feed it through the
+//     //                software upload path.
+//     //   Software   : no D3D11 device at all. Pure CPU path via
+//     //                SetSoftwareFrame. This is the only mode that
+//     //                does not touch the GPU.
+//     // ==================================================================
+//
+//     private volatile bool _gpuShaderMode;
+//     private volatile bool _softwareMode;
+//     public  bool IsSoftwareMode  => _softwareMode;
+//     public  bool IsGpuShaderMode => _gpuShaderMode;
+//
+//     // GPU mode: RenderFrame fires every composition tick.
+//     // Software mode: drawing happens in Render(), no need to spin.
+//     protected override bool RunContinuously => !_softwareMode;
+//
+//     // ------------------------------------------------------------------
+//     // Core GPU objects
+//     // ------------------------------------------------------------------
+//     private D3DDevice?      _device;
+//     private D3D11Swapchain? _swapchain;
+//
+//     public readonly object _d3dLock = new();
+//
+//     // ------------------------------------------------------------------
+//     // Software (CPU) rendering path
+//     // ------------------------------------------------------------------
+//     private readonly object _swLock = new();
+//     private byte[]? _swBuffer;
+//     private int _swW, _swH, _swStride;
+//     private long _swSerial, _swShownSerial = -1;
+//     private Avalonia.Media.Imaging.WriteableBitmap? _swBitmap;
+//     private Avalonia.Media.Imaging.Bitmap? _swStaticImage;
+//     private int _swInvalidatePending;
+//
+//     // ------------------------------------------------------------------
+//     // GPU-shader-mode offscreen target
+//     // ------------------------------------------------------------------
+//     private Texture2D?         _shaderTarget;
+//     private ShaderResourceView? _shaderTargetSrv;
+//     private PixelSize          _shaderTargetSize;
+//
+//     // ------------------------------------------------------------------
+//     // Static image (GPU modes)
+//     // ------------------------------------------------------------------
+//     private Texture2D?          _staticImageTexture;
+//     private ShaderResourceView? _staticImageView;
+//
+//     private VertexShader? _vertexShader;
+//     private PixelShader?  _pixelShader;
+//     private InputLayout?  _inputLayout;
+//     private Buffer?       _vertexBuffer;
+//     private SamplerState? _sampler;
+//
+//     // ------------------------------------------------------------------
+//     // Resize debounce (swapchain mode)
+//     // ------------------------------------------------------------------
+//     private PixelSize _currentSwapchainSize;
+//     private PixelSize _pendingSwapchainSize;
+//     private int       _pendingSwapchainTicks;
+//     private const int ResizeStableTicks = 2;
+//
+//     // ------------------------------------------------------------------
+//     // Video processor
+//     // ------------------------------------------------------------------
+//     private VideoDevice1?             _videoDevice1;
+//     private VideoContext1?            _videoContext1;
+//     private VideoProcessor?           _videoProcessor;
+//     private VideoProcessorEnumerator? _vpe;
+//
+//     private VideoProcessorInputViewDescription  _vpivd;
+//     private VideoProcessorOutputViewDescription _vpovd;
+//     private VideoProcessorContentDescription    _vpcd;
+//     private bool _videoProcessorReady;
+//
+//     private readonly Dictionary<IntPtr, VideoProcessorOutputView> _vpovCache = new();
+//     private const int MaxOutputViewCacheSize = 8;
+//
+//     private const int VideoProcessorOutputAlignment = 256;
+//     private const int VideoProcessorShrinkThreshold = VideoProcessorOutputAlignment * 4;
+//
+//     // ------------------------------------------------------------------
+//     // Current frame (all access under _d3dLock)
+//     // ------------------------------------------------------------------
+//     private Texture2D? _currentVideoFrame;
+//     private bool       _currentVideoFrameOwned = true;
+//     private int        _currentVideoFrameSlice;
+//     private long       _currentFrameSerial;
+//     private long       _lastDrawnSerial = -1;
+//     private bool       _forceRedraw = true;
+//
+//     // ------------------------------------------------------------------
+//     // Last-good-frame copy of the back buffer (swapchain mode only)
+//     // ------------------------------------------------------------------
+//     private Texture2D? _lastGoodFrameTexture;
+//     private PixelSize  _lastGoodFrameSize;
+//     private Format     _lastGoodFrameFormat;
+//
+//     // ------------------------------------------------------------------
+//     // Misc
+//     // ------------------------------------------------------------------
+//     private readonly Stopwatch _globalClock = Stopwatch.StartNew();
+//     public long NowTicks => _globalClock.ElapsedTicks;
+//
+//     /// <summary>Path of the video to play. Set this before calling Play_video().</summary>
+//     public string FileToPlay { get; set; } =
+//         @"M:\movie\Kung.Fu.Panda.3.2016.720p.WEBRip.x264.AAC-ETRG.mp4";
+//
+//     private Src.FFmpeg? ffmpeg;
+//     private Thread? threadPlay;
+//     private volatile bool is_running = true;
+//     private bool _disposed;
+//
+//     // ==================================================================
+//     // Public API
+//     // ==================================================================
+//
+//     public D3DDevice? my_Device => _device;
+//
+//     public string BackendName =>
+//         _softwareMode
+//             ? "Software renderer (no GPU)"
+//             : _device is null
+//                 ? "Direct3D 11 (Avalonia interop, uninitialized)"
+//                 : _gpuShaderMode
+//                     ? $"Direct3D 11 ({_device.FeatureLevel}) [Avalonia interop: shader mode]"
+//                     : $"Direct3D 11 ({_device.FeatureLevel}) [Avalonia interop]";
+//
+//     public event EventHandler? Initialized;
+//     public bool IsInitialized =>
+//         _softwareMode || (_device is not null && (_swapchain is not null || _gpuShaderMode));
+//
+//     public static D11InteropRenderer? Instance { get; private set; }
+//
+//     // ---- shims (kept so existing callers still compile) ----
+//     public void Initialize(IntPtr outputHandle, int d_width = 0, int d_height = 0) { }
+//     public void PresentStaticImage() { }
+//     public void PresentFrameKeepAlive() { }
+//     public void HandleResize() { }
+//     public void ResizeToClient(IntPtr hwnd) { }
+//
+//     // ------------------------------------------------------------------
+//     // PresentFrame overloads
+//     //
+//     //   Swapchain mode : stores the texture; RenderFrame blits it.
+//     //   GPU-shader mode: stores the texture; RenderFrame draws it with
+//     //                    the pixel shader into _shaderTarget, then we
+//     //                    upload that to Avalonia through SetSoftwareFrame.
+//     //   Software mode  : no D3D device, so a Texture2D can't be drawn.
+//     //                    Call SetSoftwareFrame directly instead.
+//     // ------------------------------------------------------------------
+//     public void PresentFrame(Texture2D textureHW, long decodeTimestamp,
+//                              int d_width = 0, int d_height = 0)
+//         => PresentFrameInternal(textureHW, decodeTimestamp, arraySlice: 0, ownsTexture: true);
+//
+//     public void PresentFrame(Texture2D textureHW, int d_width = 0, int d_height = 0)
+//         => PresentFrameInternal(textureHW, _globalClock.ElapsedTicks, arraySlice: 0, ownsTexture: true);
+//
+//     private void PresentFrameInternal(Texture2D? texture, long decodeTimestamp,
+//                                       int arraySlice, bool ownsTexture)
+//     {
+//         if (texture == null) return;
+//
+//         if (_softwareMode)
+//         {
+//             // No device — nothing we can do with a texture here.
+//             if (ownsTexture) { try { texture.Dispose(); } catch { } }
+//             return;
+//         }
+//
+//         SetSourceTexture(texture, decodeTimestamp, arraySlice, ownsTexture);
+//         
+//         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+//         {
+//             if (this.GetVisualRoot() is Avalonia.Rendering.IRenderRoot root)
+//             {
+//                 // This is the snippet you quoted. It's a UI-thread-only call.
+//                 root.Renderer.Paint(new Rect(root.ClientSize));
+//             }
+//         }, Avalonia.Threading.DispatcherPriority.Render);
+//     }
+//
+//     /// <summary>
+//     /// GPU modes only. Replaces the frame RenderFrame draws.
+//     /// ownsTexture = true : this renderer disposes the texture when replaced.
+//     /// ownsTexture = false: the texture belongs to FFmpeg; never dispose it here.
+//     /// </summary>
+//     public void SetSourceTexture(Texture2D? texture, long decodeTimestamp = 0,
+//                                  int arraySlice = 0, bool ownsTexture = true)
+//     {
+//         if (texture == null) return;
+//         if (_softwareMode)
+//         {
+//             if (ownsTexture) { try { texture.Dispose(); } catch { } }
+//             return;
+//         }
+//
+//         lock (_d3dLock)
+//         {
+//             var old = _currentVideoFrame;
+//             if (old != null && _currentVideoFrameOwned && !ReferenceEquals(old, texture))
+//             {
+//                 try { old.Dispose(); } catch { }
+//             }
+//
+//             _currentVideoFrame      = texture;
+//             _currentVideoFrameOwned = ownsTexture;
+//             _currentVideoFrameSlice = arraySlice;
+//             _currentFrameSerial++;
+//             _forceRedraw = true;
+//         }
+//     }
+//
+//     public void ResizeSwapChain(int width, int height)
+//     {
+//         if (width <= 0 || height <= 0) return;
+//         if (_softwareMode) return;
+//
+//         lock (_d3dLock)
+//         {
+//             if (_gpuShaderMode)
+//             {
+//                 // Force the shader target to be recreated next tick.
+//                 _shaderTargetSize = default;
+//                 _forceRedraw = true;
+//                 return;
+//             }
+//
+//             _currentSwapchainSize  = new PixelSize(width, height);
+//             _pendingSwapchainSize  = default;
+//             _pendingSwapchainTicks = 0;
+//             ClearOutputViewCache();
+//             _forceRedraw = true;
+//         }
+//     }
+//
+//     public void RunOnContext(Action<DeviceContext> action)
+//     {
+//         if (_device == null) return;
+//         lock (_d3dLock) action(_device.ImmediateContext);
+//     }
+//
+//     public new void Dispose() => DisposeAll();
+//
+//     // ==================================================================
+//     // Software (CPU) rendering path
+//     // ==================================================================
+//
+//     protected override (bool success, string info) InitializeSoftwareFallback(string reason)
+// {
+//     Instance = this;
+//
+//     // Keep / create a D3D11 device so my_Device is never null.
+//     // Try WARP — that's the same fallback DirectX uses.
+//     if (_device is null)
+//     {
+//         try
+//         {
+//             _device = new D3DDevice(
+//                 SharpDX.Direct3D.DriverType.Warp,
+//                 DeviceCreationFlags.BgraSupport,
+//                 new[]
+//                 {
+//                     FeatureLevel.Level_11_1,
+//                     FeatureLevel.Level_11_0,
+//                     FeatureLevel.Level_10_0,
+//                     FeatureLevel.Level_9_3,
+//                     FeatureLevel.Level_9_2,
+//                     FeatureLevel.Level_9_1
+//                 });
+//             Console.WriteLine("[Interop] Created WARP device for software fallback");
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"[Interop] WARP device creation failed: {ex.Message}");
+//         }
+//     }
+//
+//     // Make sure the shared rendering resources exist so the shader path
+//     // and my_AV_win both have what they need.
+//     if (_device is not null)
+//     {
+//         try
+//         {
+//             if (_vertexShader is null)   CreateShaders();
+//             if (_vertexBuffer is null)   CreateQuad();
+//             if (_sampler is null)        CreateSampler();
+//
+//             _gpuShaderMode = true;   // we have a device, draw with the pixel shader
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"[Interop] Shader setup failed in fallback: {ex.Message}");
+//             _gpuShaderMode = false;
+//         }
+//     }
+//
+//     _softwareMode = _device is null;   // only true if even WARP failed
+//
+//     Console.WriteLine(
+//         $"[Interop] Fallback mode: " +
+//         $"{(_softwareMode ? "CPU only" : "D3D11 shader (WARP/hardware)")} ({reason})");
+//
+//     Initialized?.Invoke(this, EventArgs.Empty);
+//
+//     return (true,
+//         _softwareMode
+//             ? $"Software renderer ({reason})"
+//             : $"D3D11 shader renderer ({reason})");
+// }
+//     
+//     
+//     
+//     
+//     
+//     /// <summary>
+//     /// Feed a BGRA frame (stride in bytes). Works in all modes:
+//     /// - Software mode: Render() paints this buffer.
+//     /// - GPU-shader mode: same — we render on the GPU, then upload the
+//     ///   result through this method so Avalonia can display it.
+//     /// </summary>
+//     public void SetSoftwareFrame(byte[] bgra, int width, int height, int stride)
+//     {
+//         if (width <= 0 || height <= 0 || stride < width * 4) return;
+//
+//         int len = stride * height;
+//         if (bgra.Length < len) return;
+//
+//         lock (_swLock)
+//         {
+//             if (_swBuffer == null || _swBuffer.Length < len)
+//                 _swBuffer = new byte[len];
+//
+//             Buffer_BlockCopy(bgra, _swBuffer, len);
+//             _swW = width; _swH = height; _swStride = stride;
+//             _swSerial++;
+//         }
+//
+//         // Coalesce: at most one pending invalidate.
+//         if (Interlocked.Exchange(ref _swInvalidatePending, 1) == 0)
+//         {
+//             Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+//             {
+//                 Interlocked.Exchange(ref _swInvalidatePending, 0);
+//                 InvalidateVisual();
+//             }, Avalonia.Threading.DispatcherPriority.Render);
+//         }
+//     }
+//
+//     // "Buffer" is aliased to the SharpDX type, so use System.Buffer explicitly.
+//     private static void Buffer_BlockCopy(byte[] src, byte[] dst, int len)
+//         => System.Buffer.BlockCopy(src, 0, dst, 0, len);
+//
+//     public override void Render(DrawingContext ctx)
+//     {
+//         // Only the pure CPU path paints here.
+//         if (!_softwareMode && !_gpuShaderMode)
+//         {
+//             base.Render(ctx);
+//             return;
+//         }
+//
+//         var bounds = new Rect(Bounds.Size);
+//         ctx.FillRectangle(Brushes.Black, bounds);
+//
+//         lock (_swLock)
+//         {
+//             if (_swBuffer != null && _swW > 0 && _swH > 0)
+//             {
+//                 if (_swBitmap == null ||
+//                     _swBitmap.PixelSize.Width != _swW ||
+//                     _swBitmap.PixelSize.Height != _swH)
+//                 {
+//                     _swBitmap?.Dispose();
+//                     _swBitmap = new Avalonia.Media.Imaging.WriteableBitmap(
+//                         new PixelSize(_swW, _swH),
+//                         new Vector(96, 96),
+//                         Avalonia.Platform.PixelFormat.Bgra8888,
+//                         Avalonia.Platform.AlphaFormat.Opaque);
+//                     _swShownSerial = -1;
+//                 }
+//
+//                 if (_swShownSerial != _swSerial)
+//                 {
+//                     using var fb = _swBitmap.Lock();
+//                     int rowBytes = Math.Min(_swW * 4, fb.RowBytes);
+//                     for (int y = 0; y < _swH; y++)
+//                         Marshal.Copy(_swBuffer, y * _swStride, fb.Address + y * fb.RowBytes, rowBytes);
+//                     _swShownSerial = _swSerial;
+//                 }
+//
+//                 DrawLetterboxed(ctx, _swBitmap, _swW, _swH, bounds);
+//                 return;
+//             }
+//         }
+//
+//         if (_swStaticImage != null)
+//         {
+//             DrawLetterboxed(ctx, _swStaticImage,
+//                 (int)_swStaticImage.Size.Width, (int)_swStaticImage.Size.Height, bounds);
+//         }
+//     }
+//
+//     private static void DrawLetterboxed(DrawingContext ctx, Avalonia.Media.IImage image,
+//                                         int srcW, int srcH, Rect bounds)
+//     {
+//         if (srcW <= 0 || srcH <= 0 || bounds.Width <= 0 || bounds.Height <= 0) return;
+//
+//         double scale = Math.Min(bounds.Width / srcW, bounds.Height / srcH);
+//         double w = srcW * scale, h = srcH * scale;
+//         var dest = new Rect((bounds.Width - w) / 2, (bounds.Height - h) / 2, w, h);
+//         ctx.DrawImage(image, new Rect(0, 0, srcW, srcH), dest);
+//     }
+//
+//     // ==================================================================
+//     // Static image
+//     // ==================================================================
+//
+//     public void DisplayImage(string fileName)
+//     {
+//         string imagePath = Path.IsPathRooted(fileName)
+//             ? fileName
+//             : Path.Combine(Directory.GetCurrentDirectory(), fileName);
+//
+//         if (_softwareMode)
+//         {
+//             try
+//             {
+//                 if (!File.Exists(imagePath))
+//                 {
+//                     Console.WriteLine($"Image file not found: {imagePath}");
+//                     return;
+//                 }
+//
+//                 var bmp = new Avalonia.Media.Imaging.Bitmap(imagePath);
+//                 lock (_swLock)
+//                 {
+//                     _swStaticImage?.Dispose();
+//                     _swStaticImage = bmp;
+//                 }
+//                 Avalonia.Threading.Dispatcher.UIThread.Post(InvalidateVisual);
+//             }
+//             catch (Exception ex)
+//             {
+//                 Console.WriteLine($"Error displaying image {fileName}: {ex.Message}");
+//             }
+//             return;
+//         }
+//
+//         if (_device == null)
+//         {
+//             Console.WriteLine("[Interop] DisplayImage before init.");
+//             return;
+//         }
+//
+//         try
+//         {
+//             if (!File.Exists(imagePath))
+//             {
+//                 Console.WriteLine($"Image file not found: {imagePath}");
+//                 return;
+//             }
+//
+//             lock (_d3dLock)
+//             {
+//                 Utilities.Dispose(ref _staticImageView);
+//                 Utilities.Dispose(ref _staticImageTexture);
+//
+//                 _staticImageTexture = LoadTextureFromFile(imagePath);
+//
+//                 if (_staticImageTexture != null)
+//                 {
+//                     _staticImageView = new ShaderResourceView(_device, _staticImageTexture);
+//                     Console.WriteLine($"Successfully loaded image: {fileName}");
+//                 }
+//
+//                 _forceRedraw = true;
+//             }
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"Error displaying image {fileName}: {ex.Message}");
+//         }
+//     }
+//
+//     public Texture2D? LoadTextureFromFile(string filePath)
+//     {
+//         if (_device == null) return null;
+//
+//         try
+//         {
+//             using var factory = new ImagingFactory();
+//             using var bitmapDecoder = new BitmapDecoder(factory, filePath, DecodeOptions.CacheOnLoad);
+//             using var frame = bitmapDecoder.GetFrame(0);
+//
+//             using var flipRotator = new BitmapFlipRotator(factory);
+//             flipRotator.Initialize(frame, BitmapTransformOptions.FlipVertical);
+//
+//             using var formatConverter = new FormatConverter(factory);
+//             formatConverter.Initialize(flipRotator, SharpDX.WIC.PixelFormat.Format32bppRGBA);
+//
+//             var width  = formatConverter.Size.Width;
+//             var height = formatConverter.Size.Height;
+//
+//             var stride = width * 4;
+//             using var dataStream = new DataStream(height * stride, true, true);
+//             formatConverter.CopyPixels(stride, dataStream);
+//
+//             var textureDesc = new Texture2DDescription
+//             {
+//                 Width             = width,
+//                 Height            = height,
+//                 ArraySize         = 1,
+//                 BindFlags         = BindFlags.ShaderResource | BindFlags.RenderTarget,
+//                 Usage             = ResourceUsage.Default,
+//                 CpuAccessFlags    = CpuAccessFlags.None,
+//                 Format            = Format.R8G8B8A8_UNorm,
+//                 MipLevels         = 1,
+//                 OptionFlags       = ResourceOptionFlags.None,
+//                 SampleDescription = new SampleDescription(1, 0)
+//             };
+//
+//             return new Texture2D(
+//                 _device,
+//                 textureDesc,
+//                 new DataRectangle(dataStream.DataPointer, stride));
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"Error loading texture from file: {ex.Message}");
+//             return null;
+//         }
+//     }
+//
+//     // ==================================================================
+//     // Init
+//     // ==================================================================
+//
+//     protected override (bool success, string info) InitializeGraphicsResources(
+//         Compositor compositor,
+//         CompositionDrawingSurface surface,
+//         ICompositionGpuInterop interop)
+//     {
+//         try
+//         {
+//             Instance = this;
+//
+//             bool interopOk =
+//                 interop.SupportedImageHandleTypes.Contains(
+//                     KnownPlatformGraphicsExternalImageHandleTypes
+//                         .D3D11TextureGlobalSharedHandle) == true;
+//
+//             using var factory = new DxgiFactory();
+//
+//             // Pick the first REAL hardware adapter. Skip WARP / Basic Render Driver.
+//             Adapter1? adapter = null;
+//             int count = factory.GetAdapterCount1();
+//             for (int i = 0; i < count; i++)
+//             {
+//                 var candidate = factory.GetAdapter1(i);
+//                 var d = candidate.Description1;
+//                 bool isSoftware = (d.Flags & AdapterFlags.Software) != 0 || d.VendorId == 0x1414;
+//                 if (!isSoftware)
+//                 {
+//                     adapter = candidate;
+//                     break;
+//                 }
+//                 candidate.Dispose();
+//             }
+//
+//             if (adapter == null)
+//                 return (false, "No hardware GPU found");
+//
+//             using (adapter)
+//             {
+//                 _device = new D3DDevice(
+//                     adapter,
+//                     DeviceCreationFlags.BgraSupport,
+//                     new[]
+//                     {
+//                         FeatureLevel.Level_12_1,
+//                         FeatureLevel.Level_12_0,
+//                         FeatureLevel.Level_11_1,
+//                         FeatureLevel.Level_11_0,
+//                         FeatureLevel.Level_10_0,
+//                         FeatureLevel.Level_9_3,
+//                         FeatureLevel.Level_9_2,
+//                         FeatureLevel.Level_9_1
+//                     });
+//
+//                 // ---- Swapchain only if interop is usable. ----
+//                 if (interopOk)
+//                 {
+//                     try
+//                     {
+//                         _swapchain = new D3D11Swapchain(_device, interop, surface);
+//                     }
+//                     catch (Exception ex)
+//                     {
+//                         Console.WriteLine(
+//                             $"[Interop] Swapchain creation failed: {ex.Message} — falling back to shader mode");
+//                         _swapchain = null;
+//                         interopOk = false;
+//                     }
+//                 }
+//
+//                 if (!interopOk)
+//                 {
+//                     _gpuShaderMode = true;
+//                     Console.WriteLine(
+//                         "[Interop] Avalonia GPU interop unavailable — using D3D11 shader mode");
+//                 }
+//
+//                 // Video processor (only useful in swapchain mode).
+//                 if (interopOk)
+//                 {
+//                     try
+//                     {
+//                         _videoDevice1  = _device.QueryInterface<VideoDevice1>();
+//                         _videoContext1 = _device.ImmediateContext.QueryInterface<VideoContext1>();
+//                     }
+//                     catch (Exception ex)
+//                     {
+//                         Console.WriteLine($"[Interop] Video processor not available: {ex.Message}");
+//                         _videoProcessorReady = false;
+//                     }
+//                 }
+//
+//                 CreateShaders();
+//                 CreateQuad();
+//                 CreateSampler();
+//
+//                 _currentSwapchainSize  = default;
+//                 _pendingSwapchainSize  = default;
+//                 _pendingSwapchainTicks = 0;
+//                 _lastDrawnSerial       = -1;
+//                 _forceRedraw           = true;
+//
+//                 Initialized?.Invoke(this, EventArgs.Empty);
+//
+//                 Console.WriteLine("initialized gpuinterop class");
+//
+//                 string adapterName = adapter.Description1.Description;
+//                 return (true,
+//                     _gpuShaderMode
+//                         ? $"D3D11 ({_device.FeatureLevel}) {adapterName} [Avalonia interop: shader mode]"
+//                         : $"D3D11 ({_device.FeatureLevel}) {adapterName} [Avalonia interop]");
+//             }
+//         }
+//         catch (Exception ex)
+//         {
+//             // Base class will clean up and switch to software mode.
+//             return (false, $"GPU init failed: {ex.Message}");
+//         }
+//     }
+//
+//     protected override void FreeGraphicsResources() => DisposeAll();
+//
+//     // ==================================================================
+//     // Video processor setup
+//     // ==================================================================
+//
+//     private void ClearOutputViewCache()
+//     {
+//         foreach (var v in _vpovCache.Values)
+//         {
+//             try { v.Dispose(); } catch { }
+//         }
+//         _vpovCache.Clear();
+//     }
+//
+//     private static int AlignUp(int value, int alignment)
+//         => ((value + alignment - 1) / alignment) * alignment;
+//
+//     private bool EnsureVideoProcessorFor(int inputWidth, int inputHeight, int outputWidth, int outputHeight)
+//     {
+//         if (_videoDevice1 == null || _videoContext1 == null) return false;
+//         if (inputWidth <= 0 || inputHeight <= 0) return false;
+//         if (outputWidth <= 0 || outputHeight <= 0) return false;
+//
+//         int neededOutW = Math.Max(outputWidth, inputWidth);
+//         int neededOutH = Math.Max(outputHeight, inputHeight);
+//
+//         bool tooBig = _videoProcessorReady &&
+//             ((_vpcd.OutputWidth  > neededOutW * 2 && _vpcd.OutputWidth  > VideoProcessorShrinkThreshold) ||
+//              (_vpcd.OutputHeight > neededOutH * 2 && _vpcd.OutputHeight > VideoProcessorShrinkThreshold));
+//
+//         if (_videoProcessorReady &&
+//             !tooBig &&
+//             _vpcd.InputWidth  == inputWidth &&
+//             _vpcd.InputHeight == inputHeight &&
+//             neededOutW <= _vpcd.OutputWidth &&
+//             neededOutH <= _vpcd.OutputHeight)
+//         {
+//             return true;
+//         }
+//
+//         ClearOutputViewCache();
+//         Utilities.Dispose(ref _videoProcessor);
+//         Utilities.Dispose(ref _vpe);
+//
+//         int paddedOutW = AlignUp(neededOutW, VideoProcessorOutputAlignment);
+//         int paddedOutH = AlignUp(neededOutH, VideoProcessorOutputAlignment);
+//
+//         _vpcd = new VideoProcessorContentDescription
+//         {
+//             Usage            = VideoUsage.PlaybackNormal,
+//             InputFrameFormat = VideoFrameFormat.Progressive,
+//             InputFrameRate   = new Rational(1, 1),
+//             OutputFrameRate  = new Rational(1, 1),
+//             InputWidth       = inputWidth,
+//             InputHeight      = inputHeight,
+//             OutputWidth      = paddedOutW,
+//             OutputHeight     = paddedOutH
+//         };
+//
+//         try
+//         {
+//             _videoDevice1.CreateVideoProcessorEnumerator(ref _vpcd, out _vpe);
+//             _videoDevice1.CreateVideoProcessor(_vpe, 0, out _videoProcessor);
+//
+//             try { _videoContext1.VideoProcessorSetStreamAutoProcessingMode(_videoProcessor, 0, false); }
+//             catch { /* not implemented on some drivers; not fatal */ }
+//
+//             _vpivd = new VideoProcessorInputViewDescription
+//             {
+//                 FourCC    = 0,
+//                 Dimension = VpivDimension.Texture2D,
+//                 Texture2D = new Texture2DVpiv { MipSlice = 0, ArraySlice = 0 }
+//             };
+//
+//             _vpovd = new VideoProcessorOutputViewDescription
+//             {
+//                 Dimension = VpovDimension.Texture2D,
+//                 Texture2D = new Texture2DVpov { MipSlice = 0 }
+//             };
+//
+//             _videoProcessorReady = true;
+//             Console.WriteLine(
+//                 $"[Interop] Video processor ready for input {inputWidth}x{inputHeight}, " +
+//                 $"output up to {paddedOutW}x{paddedOutH}");
+//             return true;
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"[Interop] Video processor creation failed: {ex.Message}");
+//             _videoProcessorReady = false;
+//             return false;
+//         }
+//     }
+//
+//     // ==================================================================
+//     // Render dispatch
+//     // ==================================================================
+//
+//     private bool TryCommitSwapchainSize(PixelSize pixelSize)
+//     {
+//         if (_currentSwapchainSize == default)
+//         {
+//             _currentSwapchainSize  = pixelSize;
+//             _pendingSwapchainSize  = default;
+//             _pendingSwapchainTicks = 0;
+//             return true;
+//         }
+//
+//         if (pixelSize == _currentSwapchainSize)
+//         {
+//             _pendingSwapchainSize  = default;
+//             _pendingSwapchainTicks = 0;
+//             return false;
+//         }
+//
+//         if (pixelSize != _pendingSwapchainSize)
+//         {
+//             _pendingSwapchainSize  = pixelSize;
+//             _pendingSwapchainTicks = 1;
+//             return false;
+//         }
+//
+//         if (++_pendingSwapchainTicks < ResizeStableTicks)
+//             return false;
+//
+//         _currentSwapchainSize  = pixelSize;
+//         _pendingSwapchainSize  = default;
+//         _pendingSwapchainTicks = 0;
+//         return true;
+//     }
+//
+//     protected override void RenderFrame(PixelSize pixelSize)
+//     {
+//         if (_softwareMode) return;
+//         if (pixelSize == default) return;
+//         if (pixelSize.Width <= 1 || pixelSize.Height <= 1) return;
+//         if (_device is null) return;
+//
+//         if (_gpuShaderMode)
+//         {
+//             RenderGpuShaderMode(pixelSize);
+//             return;
+//         }
+//
+//         RenderSwapchainMode(pixelSize);
+//     }
+//
+//     // ==================================================================
+//     // GPU shader mode
+//     //
+//     // Mirrors the DirectX class's "software" fallback:
+//     //   - clear a render target to black
+//     //   - set the aspect-correct viewport
+//     //   - draw a fullscreen quad with a pixel shader
+//     //   - present
+//     //
+//     // The difference is the render target: here it's an offscreen texture
+//     // we then upload to Avalonia via SetSoftwareFrame.
+//     // ==================================================================
+//
+//     private void RenderGpuShaderMode(PixelSize pixelSize)
+//     {
+//         lock (_d3dLock)
+//         {
+//             if (_device is null) return;
+//
+//             // (Re)create the offscreen target when the size changes.
+//             if (_shaderTarget is null || _shaderTargetSize != pixelSize)
+//             {
+//                 Utilities.Dispose(ref _shaderTargetSrv);
+//                 Utilities.Dispose(ref _shaderTarget);
+//
+//                 try
+//                 {
+//                     _shaderTarget = new Texture2D(_device, new Texture2DDescription
+//                     {
+//                         Width             = pixelSize.Width,
+//                         Height            = pixelSize.Height,
+//                         ArraySize         = 1,
+//                         MipLevels         = 1,
+//                         Format            = Format.B8G8R8A8_UNorm,
+//                         SampleDescription = new SampleDescription(1, 0),
+//                         Usage             = ResourceUsage.Default,
+//                         BindFlags         = BindFlags.RenderTarget | BindFlags.ShaderResource,
+//                         CpuAccessFlags    = CpuAccessFlags.None,
+//                         OptionFlags       = ResourceOptionFlags.None
+//                     });
+//                     _shaderTargetSrv = new ShaderResourceView(_device, _shaderTarget);
+//                     _shaderTargetSize = pixelSize;
+//                     _forceRedraw = true;
+//                 }
+//                 catch (Exception ex)
+//                 {
+//                     Console.WriteLine($"[Interop/shader] Failed to create target: {ex.Message}");
+//                     Utilities.Dispose(ref _shaderTargetSrv);
+//                     Utilities.Dispose(ref _shaderTarget);
+//                     return;
+//                 }
+//             }
+//
+//             bool newFrame = _currentFrameSerial != _lastDrawnSerial;
+//             if (!newFrame && !_forceRedraw) return;
+//
+//             var context = _device.ImmediateContext;
+//
+//             try
+//             {
+//                 using var rtv = new RenderTargetView(_device, _shaderTarget);
+//                 context.OutputMerger.SetTargets(rtv);
+//                 context.ClearRenderTargetView(rtv, new RawColor4(0, 0, 0, 1));
+//
+//                 bool drawn = false;
+//
+//                 // Prefer the live video frame.
+//                 var frame = _currentVideoFrame;
+//                 if (frame is not null && frame.NativePointer != IntPtr.Zero)
+//                 {
+//                     try
+//                     {
+//                         Texture2DDescription fd = frame.Description;
+//                         using var srv = new ShaderResourceView(_device, frame);
+//                         DrawFullscreenQuad(context, srv, fd.Width, fd.Height, _shaderTargetSize);
+//                         drawn = true;
+//                     }
+//                     catch (Exception ex)
+//                     {
+//                         Console.WriteLine($"[Interop/shader] Draw live frame failed: {ex.Message}");
+//                     }
+//                 }
+//
+//                 // Fall back to the static image.
+//                 if (!drawn && _staticImageView is not null && _staticImageTexture is not null)
+//                 {
+//                     var sd = _staticImageTexture.Description;
+//                     DrawFullscreenQuad(context, _staticImageView, sd.Width, sd.Height, _shaderTargetSize);
+//                     drawn = true;
+//                 }
+//
+//                 context.PixelShader.SetShaderResource(0, null);
+//                 context.OutputMerger.ResetTargets();
+//                 context.Flush();
+//
+//                 if (drawn)
+//                 {
+//                     _lastDrawnSerial = _currentFrameSerial;
+//                     _forceRedraw     = false;
+//
+//                     ReadbackShaderTargetToSoftware();
+//                 }
+//             }
+//             catch (Exception ex)
+//             {
+//                 Console.WriteLine($"[Interop/shader] Render failed: {ex.Message}");
+//             }
+//         }
+//     }
+//
+//     /// <summary>
+//     /// Copies _shaderTarget to a staging texture, maps it, and feeds the
+//     /// bytes to SetSoftwareFrame so Avalonia can display the result.
+//     /// </summary>
+//     private void ReadbackShaderTargetToSoftware()
+//     {
+//         if (_device is null || _shaderTarget is null) return;
+//
+//         var desc = _shaderTarget.Description;
+//         if (desc.Width <= 0 || desc.Height <= 0) return;
+//
+//         int stride = desc.Width * 4;
+//         int len    = stride * desc.Height;
+//
+//         Texture2D? staging = null;
+//         try
+//         {
+//             staging = new Texture2D(_device, new Texture2DDescription
+//             {
+//                 Width             = desc.Width,
+//                 Height            = desc.Height,
+//                 ArraySize         = 1,
+//                 MipLevels         = 1,
+//                 Format            = Format.B8G8R8A8_UNorm,
+//                 SampleDescription = new SampleDescription(1, 0),
+//                 Usage             = ResourceUsage.Staging,
+//                 BindFlags         = BindFlags.None,
+//                 CpuAccessFlags    = CpuAccessFlags.Read,
+//                 OptionFlags       = ResourceOptionFlags.None
+//             });
+//
+//             var ctx = _device.ImmediateContext;
+//             ctx.CopyResource(_shaderTarget, staging);
+//
+//             var box = ctx.MapSubresource(staging, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+//             try
+//             {
+//                 byte[] managed = new byte[len];
+//                 Marshal.Copy(box.DataPointer, managed, 0, len);
+//                 SetSoftwareFrame(managed, desc.Width, desc.Height, stride);
+//             }
+//             finally
+//             {
+//                 ctx.UnmapSubresource(staging, 0);
+//             }
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"[Interop/shader] Readback failed: {ex.Message}");
+//         }
+//         finally
+//         {
+//             Utilities.Dispose(ref staging);
+//         }
+//     }
+//
+//     // ==================================================================
+//     // Swapchain mode (unchanged behavior)
+//     // ==================================================================
+//
+//     private void RenderSwapchainMode(PixelSize pixelSize)
+//     {
+//         if (_swapchain is null || _device is null) return;
+//
+//         bool sizeChanged = TryCommitSwapchainSize(pixelSize);
+//
+//         // Size still settling: keep showing the last presented image.
+//         if (pixelSize != _currentSwapchainSize) return;
+//
+//         lock (_d3dLock)
+//         {
+//             if (sizeChanged)
+//                 ClearOutputViewCache();
+//
+//             bool newFrame = _currentFrameSerial != _lastDrawnSerial;
+//             if (!newFrame && !sizeChanged && !_forceRedraw)
+//                 return;
+//
+//             var context = _device.ImmediateContext;
+//
+//             using (_swapchain.BeginDraw(_currentSwapchainSize, out var renderView))
+//             {
+//                 Texture2D? renderTexture = null;
+//                 Resource?  rtResource    = null;
+//                 try
+//                 {
+//                     rtResource    = renderView.Resource;
+//                     renderTexture = rtResource.QueryInterface<Texture2D>();
+//                 }
+//                 catch (Exception ex)
+//                 {
+//                     Console.WriteLine($"[Interop] RT query failed: {ex.Message}");
+//                 }
+//                 finally
+//                 {
+//                     rtResource?.Dispose();
+//                 }
+//
+//                 try
+//                 {
+//                     context.OutputMerger.SetTargets(renderView);
+//                     context.ClearRenderTargetView(renderView, new RawColor4(0f, 0f, 0f, 1f));
+//
+//                     bool didBlit = false;
+//                     Texture2D? frame = _currentVideoFrame;
+//
+//                     if (renderTexture is not null && frame is not null && frame.NativePointer != IntPtr.Zero)
+//                     {
+//                         Texture2DDescription frameDesc = default;
+//                         bool frameValid = true;
+//
+//                         try
+//                         {
+//                             frameDesc = frame.Description;
+//                         }
+//                         catch (Exception ex)
+//                         {
+//                             Console.WriteLine($"[Interop] Dropping invalid video frame: {ex.Message}");
+//                             _currentVideoFrame = null;
+//                             frameValid = false;
+//                         }
+//
+//                         if (frameValid &&
+//                             EnsureVideoProcessorFor(
+//                                 frameDesc.Width, frameDesc.Height,
+//                                 _currentSwapchainSize.Width, _currentSwapchainSize.Height))
+//                         {
+//                             didBlit = BlitVideoFrame(frame, _currentVideoFrameSlice,
+//                                 renderTexture, _currentSwapchainSize);
+//
+//                             if (!didBlit)
+//                             {
+//                                 ClearOutputViewCache();
+//                                 didBlit = BlitVideoFrame(frame, _currentVideoFrameSlice,
+//                                     renderTexture, _currentSwapchainSize);
+//                             }
+//
+//                             if (didBlit)
+//                                 CaptureLastGoodFrame(context, renderTexture);
+//                         }
+//                     }
+//
+//                     if (!didBlit)
+//                     {
+//                         bool drawn = false;
+//
+//                         if (_currentVideoFrame is not null && renderTexture is not null)
+//                             drawn = TryRestoreLastGoodFrame(context, renderTexture, renderView);
+//
+//                         if (!drawn && _staticImageView is not null && _staticImageTexture is not null)
+//                         {
+//                             DrawFullscreenQuad(context, _staticImageView,
+//                                 _staticImageTexture.Description.Width,
+//                                 _staticImageTexture.Description.Height,
+//                                 _currentSwapchainSize);
+//                         }
+//                     }
+//
+//                     context.PixelShader.SetShaderResource(0, null);
+//                     context.OutputMerger.ResetTargets();
+//
+//                     _lastDrawnSerial = _currentFrameSerial;
+//                     _forceRedraw     = false;
+//                 }
+//                 finally
+//                 {
+//                     renderTexture?.Dispose();
+//                 }
+//             }
+//
+//             if (sizeChanged)
+//             {
+//                 try
+//                 {
+//                     context.ClearState();
+//                     context.Flush();
+//                 }
+//                 catch (Exception ex)
+//                 {
+//                     Console.WriteLine($"[Interop] Post-resize flush failed: {ex.Message}");
+//                 }
+//             }
+//         }
+//     }
+//
+//     // ------------------------------------------------------------------
+//     // Letterbox
+//     // ------------------------------------------------------------------
+//     private static void ComputeLetterboxRect(int srcW, int srcH, PixelSize bb,
+//         out int outX, out int outY, out int outW, out int outH)
+//     {
+//         int bbW = bb.Width;
+//         int bbH = bb.Height;
+//
+//         if (srcW <= 0 || srcH <= 0 || bbW <= 0 || bbH <= 0)
+//         {
+//             outX = outY = 0;
+//             outW = bbW;
+//             outH = bbH;
+//             return;
+//         }
+//
+//         float srcAspect = (float)srcW / srcH;
+//
+//         if ((float)bbW / bbH > srcAspect)
+//         {
+//             outH = bbH;
+//             outW = (int)Math.Round(bbH * srcAspect);
+//         }
+//         else
+//         {
+//             outW = bbW;
+//             outH = (int)Math.Round(bbW / srcAspect);
+//         }
+//
+//         outW = Math.Clamp(outW, 1, bbW);
+//         outH = Math.Clamp(outH, 1, bbH);
+//         outX = (bbW - outW) / 2;
+//         outY = (bbH - outH) / 2;
+//     }
+//
+//     // ------------------------------------------------------------------
+//     // Fullscreen quad
+//     // ------------------------------------------------------------------
+//     private void DrawFullscreenQuad(DeviceContext context, ShaderResourceView view,
+//                                     int srcW, int srcH, PixelSize target)
+//     {
+//         ComputeLetterboxRect(srcW, srcH, target,
+//             out int outX, out int outY, out int outW, out int outH);
+//
+//         context.Rasterizer.SetViewport(outX, outY, outW, outH, 0f, 1f);
+//
+//         context.InputAssembler.InputLayout = _inputLayout;
+//         context.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+//         context.InputAssembler.SetVertexBuffers(
+//             0, new VertexBufferBinding(_vertexBuffer!, sizeof(float) * 5, 0));
+//
+//         context.VertexShader.Set(_vertexShader);
+//         context.PixelShader.Set(_pixelShader);
+//         context.PixelShader.SetShaderResource(0, view);
+//         context.PixelShader.SetSampler(0, _sampler);
+//
+//         context.Draw(6, 0);
+//     }
+//
+//     // ------------------------------------------------------------------
+//     // Video blit (swapchain mode)
+//     // ------------------------------------------------------------------
+//     private bool BlitVideoFrame(Texture2D inputTexture, int arraySlice,
+//                                 Texture2D outputTexture, PixelSize destSize)
+//     {
+//         if (_videoDevice1 is null || _videoContext1 is null ||
+//             _videoProcessor is null || _vpe is null)
+//             return false;
+//
+//         VideoProcessorInputView? vpiv = null;
+//         try
+//         {
+//             var inDesc = inputTexture.Description;
+//
+//             ComputeLetterboxRect(inDesc.Width, inDesc.Height, destSize,
+//                 out int outX, out int outY, out int outW, out int outH);
+//
+//             var vpivd = _vpivd;
+//             vpivd.Texture2D = new Texture2DVpiv
+//             {
+//                 MipSlice   = 0,
+//                 ArraySlice = inDesc.ArraySize > 1 ? arraySlice : 0
+//             };
+//
+//             _videoDevice1.CreateVideoProcessorInputView(inputTexture, _vpe, vpivd, out vpiv);
+//
+//             IntPtr outId = outputTexture.NativePointer;
+//             if (!_vpovCache.TryGetValue(outId, out var vpov))
+//             {
+//                 if (_vpovCache.Count >= MaxOutputViewCacheSize)
+//                     ClearOutputViewCache();
+//
+//                 _videoDevice1.CreateVideoProcessorOutputView(outputTexture, _vpe, _vpovd, out vpov);
+//                 _vpovCache[outId] = vpov;
+//             }
+//
+//             _videoContext1.VideoProcessorSetStreamMirror(
+//                 _videoProcessor, 0, true, false, true); // flip vertical
+//
+//             _videoContext1.VideoProcessorSetStreamSourceRect(
+//                 _videoProcessor, 0, true,
+//                 new RawRectangle(0, 0, inDesc.Width, inDesc.Height));
+//
+//             _videoContext1.VideoProcessorSetStreamDestRect(
+//                 _videoProcessor, 0, true,
+//                 new RawRectangle(outX, outY, outX + outW, outY + outH));
+//
+//             _videoContext1.VideoProcessorSetOutputTargetRect(
+//                 _videoProcessor, true,
+//                 new RawRectangle(0, 0, destSize.Width, destSize.Height));
+//
+//             var streams = new[]
+//             {
+//                 new VideoProcessorStream { PInputSurface = vpiv, Enable = new RawBool(true) }
+//             };
+//
+//             _videoContext1.VideoProcessorBlt(_videoProcessor, vpov, 0, 1, streams);
+//             return true;
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"[Interop] VideoProcessorBlt failed: {ex.Message}");
+//             return false;
+//         }
+//         finally
+//         {
+//             Utilities.Dispose(ref vpiv);
+//         }
+//     }
+//
+//     // ------------------------------------------------------------------
+//     // Last good frame (swapchain mode)
+//     // ------------------------------------------------------------------
+//     private void CaptureLastGoodFrame(DeviceContext context, Texture2D backBuffer)
+//     {
+//         if (_device is null) return;
+//
+//         Texture2DDescription src;
+//         try { src = backBuffer.Description; }
+//         catch { return; }
+//
+//         var size = new PixelSize(src.Width, src.Height);
+//
+//         if (_lastGoodFrameTexture is null ||
+//             _lastGoodFrameSize   != size ||
+//             _lastGoodFrameFormat != src.Format)
+//         {
+//             Utilities.Dispose(ref _lastGoodFrameTexture);
+//
+//             try
+//             {
+//                 _lastGoodFrameTexture = new Texture2D(_device, new Texture2DDescription
+//                 {
+//                     Width             = src.Width,
+//                     Height            = src.Height,
+//                     ArraySize         = 1,
+//                     MipLevels         = 1,
+//                     Format            = src.Format,
+//                     Usage             = ResourceUsage.Default,
+//                     BindFlags         = BindFlags.None,
+//                     CpuAccessFlags    = CpuAccessFlags.None,
+//                     OptionFlags       = ResourceOptionFlags.None,
+//                     SampleDescription = new SampleDescription(1, 0)
+//                 });
+//                 _lastGoodFrameSize   = size;
+//                 _lastGoodFrameFormat = src.Format;
+//             }
+//             catch (Exception ex)
+//             {
+//                 Console.WriteLine($"[Interop] Failed to allocate last-good-frame: {ex.Message}");
+//                 Utilities.Dispose(ref _lastGoodFrameTexture);
+//                 return;
+//             }
+//         }
+//
+//         try { context.CopyResource(backBuffer, _lastGoodFrameTexture); }
+//         catch (Exception ex) { Console.WriteLine($"[Interop] Capture last-good-frame failed: {ex.Message}"); }
+//     }
+//
+//     private bool TryRestoreLastGoodFrame(DeviceContext context, Texture2D backBuffer, RenderTargetView renderView)
+//     {
+//         if (_lastGoodFrameTexture is null) return false;
+//
+//         try
+//         {
+//             var dst = backBuffer.Description;
+//             if (dst.Width  != _lastGoodFrameSize.Width  ||
+//                 dst.Height != _lastGoodFrameSize.Height ||
+//                 dst.Format != _lastGoodFrameFormat)
+//                 return false;
+//
+//             context.OutputMerger.ResetTargets();
+//             context.CopyResource(_lastGoodFrameTexture, backBuffer);
+//             context.OutputMerger.SetTargets(renderView);
+//             return true;
+//         }
+//         catch (Exception ex)
+//         {
+//             Console.WriteLine($"[Interop] Restore last-good-frame failed: {ex.Message}");
+//             try { context.OutputMerger.SetTargets(renderView); } catch { }
+//             return false;
+//         }
+//     }
+//
+//     // ==================================================================
+//     // Shaders, quad, sampler
+//     // ==================================================================
+//
+//     private void CreateShaders()
+//     {
+//         const string vertexShaderCode = @"
+// struct VSInput
+// {
+//     float3 Position : POSITION;
+//     float2 TexCoord : TEXCOORD0;
+// };
+//
+// struct VSOutput
+// {
+//     float4 Position : SV_POSITION;
+//     float2 TexCoord : TEXCOORD0;
+// };
+//
+// VSOutput main(VSInput input)
+// {
+//     VSOutput output;
+//     output.Position = float4(input.Position, 1.0);
+//     output.TexCoord = input.TexCoord;
+//     return output;
+// }";
+//
+//         const string pixelShaderCode = @"
+// Texture2D Image : register(t0);
+// SamplerState Sampler : register(s0);
+//
+// struct PSInput
+// {
+//     float4 Position : SV_POSITION;
+//     float2 TexCoord : TEXCOORD0;
+// };
+//
+// float4 main(PSInput input) : SV_TARGET
+// {
+//     return Image.Sample(Sampler, input.TexCoord);
+// }";
+//
+//         using var vsByteCode = ShaderBytecode.Compile(vertexShaderCode, "main", "vs_5_0");
+//         using var psByteCode = ShaderBytecode.Compile(pixelShaderCode,   "main", "ps_5_0");
+//
+//         _vertexShader = new VertexShader(_device!, vsByteCode);
+//         _pixelShader  = new PixelShader(_device!, psByteCode);
+//
+//         _inputLayout = new InputLayout(
+//             _device!,
+//             ShaderSignature.GetInputSignature(vsByteCode),
+//             new[]
+//             {
+//                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0, 0),
+//                 new InputElement("TEXCOORD", 0, Format.R32G32_Float,   12, 0)
+//             });
+//     }
+//
+//     private void CreateQuad()
+//     {
+//         var vertices = new[]
+//         {
+//             -1.0f,  1.0f, 0.0f,   0.0f, 0.0f,
+//              1.0f,  1.0f, 0.0f,   1.0f, 0.0f,
+//              1.0f, -1.0f, 0.0f,   1.0f, 1.0f,
+//
+//             -1.0f,  1.0f, 0.0f,   0.0f, 0.0f,
+//              1.0f, -1.0f, 0.0f,   1.0f, 1.0f,
+//             -1.0f, -1.0f, 0.0f,   0.0f, 1.0f
+//         };
+//
+//         Utilities.Dispose(ref _vertexBuffer);
+//
+//         _vertexBuffer = Buffer.Create(
+//             _device!,
+//             BindFlags.VertexBuffer,
+//             vertices);
+//     }
+//
+//     private void CreateSampler()
+//     {
+//         _sampler = new SamplerState(_device!, new SamplerStateDescription
+//         {
+//             Filter             = Filter.MinMagMipLinear,
+//             AddressU           = TextureAddressMode.Clamp,
+//             AddressV           = TextureAddressMode.Clamp,
+//             AddressW           = TextureAddressMode.Clamp,
+//             ComparisonFunction = Comparison.Never,
+//             MinimumLod         = 0,
+//             MaximumLod         = float.MaxValue
+//         });
+//     }
+//
+//     // ==================================================================
+//     // Cleanup
+//     // ==================================================================
+//
+//     public void DisposeAll()
+//     {
+//         if (_disposed) return;
+//         _disposed = true;
+//
+//         is_running = false;
+//
+//         ReleaseGpuAsync();
+//         ReleaseSoftwareResources();
+//     }
+//
+//     /// <summary>
+//     /// Disposes the swapchain first (async), then every other D3D object.
+//     /// Safe to call when nothing was created.
+//     /// </summary>
+//     private void ReleaseGpuAsync()
+//     {
+//         var swapchain = _swapchain;
+//         _swapchain = null;
+//
+//         if (swapchain is null)
+//             ReleaseD3DResources();
+//         else
+//             _ = swapchain.DisposeAsync().AsTask()
+//                 .ContinueWith(_ => ReleaseD3DResources(), TaskScheduler.Default);
+//     }
+//
+//     private void ReleaseSoftwareResources()
+//     {
+//         lock (_swLock)
+//         {
+//             _swBitmap?.Dispose();      _swBitmap = null;
+//             _swStaticImage?.Dispose(); _swStaticImage = null;
+//             _swBuffer = null;
+//         }
+//     }
+//
+//     private void ReleaseD3DResources()
+//     {
+//         lock (_d3dLock)
+//         {
+//             if (_currentVideoFrameOwned)
+//                 Utilities.Dispose(ref _currentVideoFrame);
+//             else
+//                 _currentVideoFrame = null;
+//
+//             ClearOutputViewCache();
+//             Utilities.Dispose(ref _videoProcessor);
+//             Utilities.Dispose(ref _vpe);
+//             Utilities.Dispose(ref _videoContext1);
+//             Utilities.Dispose(ref _videoDevice1);
+//
+//             Utilities.Dispose(ref _sampler);
+//             Utilities.Dispose(ref _vertexBuffer);
+//             Utilities.Dispose(ref _inputLayout);
+//             Utilities.Dispose(ref _vertexShader);
+//             Utilities.Dispose(ref _pixelShader);
+//             Utilities.Dispose(ref _staticImageView);
+//             Utilities.Dispose(ref _staticImageTexture);
+//
+//             Utilities.Dispose(ref _shaderTargetSrv);
+//             Utilities.Dispose(ref _shaderTarget);
+//
+//             Utilities.Dispose(ref _lastGoodFrameTexture);
+//             Utilities.Dispose(ref _device);
+//         }
+//     }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6,13 +2826,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Androidplayer.Store;
+
 using Avalonia;
+using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Rendering.Composition;
-
+using Avalonia.VisualTree;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -30,20 +2852,57 @@ namespace Androidplayer.Rendering.win;
 
 public class D11InteropRenderer : DrawingSurfaceDemoBase
 {
+    // ==================================================================
+    // Modes
+    //
+    //   Swapchain  : full Avalonia GPU interop, VideoProcessor blits into
+    //                the composition surface's swapchain image.
+    //   GpuShader  : D3D11 device works, but Avalonia interop doesn't.
+    //                We draw with a pixel shader into an offscreen
+    //                texture, read it back, and feed it through the
+    //                software upload path.
+    //   Software   : no D3D11 device at all. Pure CPU path via
+    //                SetSoftwareFrame. This is the only mode that
+    //                does not touch the GPU.
+    // ==================================================================
+
+    private volatile bool _gpuShaderMode;
+    private volatile bool _softwareMode;
+    public  bool IsSoftwareMode  => _softwareMode;
+    public  bool IsGpuShaderMode => _gpuShaderMode;
+
+    // GPU mode: RenderFrame fires every composition tick.
+    // Software mode: drawing happens in Render(), no need to spin.
+    protected override bool RunContinuously => !_softwareMode;
+
     // ------------------------------------------------------------------
     // Core GPU objects
     // ------------------------------------------------------------------
     private D3DDevice?      _device;
     private D3D11Swapchain? _swapchain;
 
-    // Guards every access to _device.ImmediateContext and the frame fields.
     public readonly object _d3dLock = new();
 
-    // RenderFrame fires every composition tick; it early-outs when nothing changed.
-    protected override bool RunContinuously => true;
+    // ------------------------------------------------------------------
+    // Software (CPU) rendering path
+    // ------------------------------------------------------------------
+    private readonly object _swLock = new();
+    private byte[]? _swBuffer;
+    private int _swW, _swH, _swStride;
+    private long _swSerial, _swShownSerial = -1;
+    private Avalonia.Media.Imaging.WriteableBitmap? _swBitmap;
+    private Avalonia.Media.Imaging.Bitmap? _swStaticImage;
+    private int _swInvalidatePending;
 
     // ------------------------------------------------------------------
-    // Static image (shown when there is no video frame)
+    // GPU-shader-mode offscreen target
+    // ------------------------------------------------------------------
+    private Texture2D?         _shaderTarget;
+    private ShaderResourceView? _shaderTargetSrv;
+    private PixelSize          _shaderTargetSize;
+
+    // ------------------------------------------------------------------
+    // Static image (GPU modes)
     // ------------------------------------------------------------------
     private Texture2D?          _staticImageTexture;
     private ShaderResourceView? _staticImageView;
@@ -55,9 +2914,7 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     private SamplerState? _sampler;
 
     // ------------------------------------------------------------------
-    // Resize debounce
-    // A swapchain rebuild on every tick of a drag-resize races the
-    // compositor, so a new size must be stable for ResizeStableTicks ticks.
+    // Resize debounce (swapchain mode)
     // ------------------------------------------------------------------
     private PixelSize _currentSwapchainSize;
     private PixelSize _pendingSwapchainSize;
@@ -65,7 +2922,7 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     private const int ResizeStableTicks = 2;
 
     // ------------------------------------------------------------------
-    // Video processor (decoder texture -> back buffer, scale + colour convert)
+    // Video processor
     // ------------------------------------------------------------------
     private VideoDevice1?             _videoDevice1;
     private VideoContext1?            _videoContext1;
@@ -77,12 +2934,9 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     private VideoProcessorContentDescription    _vpcd;
     private bool _videoProcessorReady;
 
-    // Output views cached per back-buffer texture pointer.
     private readonly Dictionary<IntPtr, VideoProcessorOutputView> _vpovCache = new();
     private const int MaxOutputViewCacheSize = 8;
 
-    // Declared output size is rounded up to this, so small resizes don't
-    // force a rebuild. It also shrinks when it is more than 2x too big.
     private const int VideoProcessorOutputAlignment = 256;
     private const int VideoProcessorShrinkThreshold = VideoProcessorOutputAlignment * 4;
 
@@ -90,15 +2944,14 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     // Current frame (all access under _d3dLock)
     // ------------------------------------------------------------------
     private Texture2D? _currentVideoFrame;
-    private bool       _currentVideoFrameOwned = true; // false => never Dispose, FFmpeg owns it
-    private int        _currentVideoFrameSlice;        // array slice inside the texture
-    private long       _currentFrameSerial;            // bumped on every new frame
+    private bool       _currentVideoFrameOwned = true;
+    private int        _currentVideoFrameSlice;
+    private long       _currentFrameSerial;
     private long       _lastDrawnSerial = -1;
     private bool       _forceRedraw = true;
 
     // ------------------------------------------------------------------
-    // Last-good-frame copy of the back buffer. If a blit fails, this is
-    // copied back instead of presenting a black frame.
+    // Last-good-frame copy of the back buffer (swapchain mode only)
     // ------------------------------------------------------------------
     private Texture2D? _lastGoodFrameTexture;
     private PixelSize  _lastGoodFrameSize;
@@ -110,7 +2963,25 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     private readonly Stopwatch _globalClock = Stopwatch.StartNew();
     public long NowTicks => _globalClock.ElapsedTicks;
 
-    private string fileToPlay = @"M:\movie\Kung.Fu.Panda.3.2016.720p.WEBRip.x264.AAC-ETRG.mp4";
+    // ------------------------------------------------------------------
+    // Decode -> draw latency measurement
+    // ------------------------------------------------------------------
+    private const int StatsWindowSize = 120; 
+    private const bool EnableLatencyLogging = true;
+    
+    
+    private readonly object _latencyLock = new();
+    private readonly Queue<double> _decodeToDrawHistory = new();
+    private Texture2D? _lastLatencyTimedFrame;
+    private long _currentFrameDecodeTimestamp;
+    private long _swFrameDecodeTimestamp;
+    private long _swLatencyTimedSerial = -1;
+    private int _redrawStreak;
+
+    /// <summary>Path of the video to play. Set this before calling Play_video().</summary>
+    public string FileToPlay { get; set; } =
+        @"M:\movie\Kung.Fu.Panda.3.2016.720p.WEBRip.x264.AAC-ETRG.mp4";
+
     private Src.FFmpeg? ffmpeg;
     private Thread? threadPlay;
     private volatile bool is_running = true;
@@ -123,12 +2994,17 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     public D3DDevice? my_Device => _device;
 
     public string BackendName =>
-        _device is null
-            ? "Direct3D 11 (Avalonia interop, uninitialized)"
-            : $"Direct3D 11 ({_device.FeatureLevel}) (Avalonia interop)";
+        _softwareMode
+            ? "Software renderer (no GPU)"
+            : _device is null
+                ? "Direct3D 11 (Avalonia interop, uninitialized)"
+                : _gpuShaderMode
+                    ? $"Direct3D 11 ({_device.FeatureLevel}) [Avalonia interop: shader mode]"
+                    : $"Direct3D 11 ({_device.FeatureLevel}) [Avalonia interop]";
 
     public event EventHandler? Initialized;
-    public bool IsInitialized => _device is not null && _swapchain is not null;
+    public bool IsInitialized =>
+        _softwareMode || (_device is not null && (_swapchain is not null || _gpuShaderMode));
 
     public static D11InteropRenderer? Instance { get; private set; }
 
@@ -139,23 +3015,61 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     public void HandleResize() { }
     public void ResizeToClient(IntPtr hwnd) { }
 
-    public void PresentFrame(Texture2D textureHW, long decodeTimestamp, int d_width = 0, int d_height = 0)
-        => SetSourceTexture(textureHW, decodeTimestamp);
+    // ------------------------------------------------------------------
+    // PresentFrame overloads
+    //
+    //   Swapchain mode : stores the texture; RenderFrame blits it.
+    //   GPU-shader mode: stores the texture; RenderFrame draws it with
+    //                    the pixel shader into _shaderTarget, then we
+    //                    upload that to Avalonia through SetSoftwareFrame.
+    //   Software mode  : no D3D device, so a Texture2D can't be drawn.
+    //                    Call SetSoftwareFrame directly instead.
+    // ------------------------------------------------------------------
+    public void PresentFrame(Texture2D textureHW, long decodeTimestamp,
+                             int d_width = 0, int d_height = 0)
+        => PresentFrameInternal(textureHW, decodeTimestamp, arraySlice: 0, ownsTexture: true);
 
     public void PresentFrame(Texture2D textureHW, int d_width = 0, int d_height = 0)
-        => SetSourceTexture(textureHW, _globalClock.ElapsedTicks);
+        => PresentFrameInternal(textureHW, _globalClock.ElapsedTicks, arraySlice: 0, ownsTexture: true);
+
+    private void PresentFrameInternal(Texture2D? texture, long decodeTimestamp,
+                                      int arraySlice, bool ownsTexture)
+    {
+        if (texture == null) return;
+
+        if (_softwareMode)
+        {
+            // No device — nothing we can do with a texture here.
+            if (ownsTexture) { try { texture.Dispose(); } catch { } }
+            return;
+        }
+
+        SetSourceTexture(texture, decodeTimestamp, arraySlice, ownsTexture);
+        
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            if (this.GetVisualRoot() is Avalonia.Rendering.IRenderRoot root)
+            {
+                // This is the snippet you quoted. It's a UI-thread-only call.
+                root.Renderer.Paint(new Rect(root.ClientSize));
+            }
+        }, Avalonia.Threading.DispatcherPriority.Render);
+    }
 
     /// <summary>
-    /// Replaces the frame RenderFrame draws.
-    ///
-    /// ownsTexture = true : this renderer disposes the texture when it is replaced.
-    /// ownsTexture = false: the texture belongs to FFmpeg (pooled D3D11VA surface);
-    ///                      pass the frame's array slice and never dispose it here.
+    /// GPU modes only. Replaces the frame RenderFrame draws.
+    /// ownsTexture = true : this renderer disposes the texture when replaced.
+    /// ownsTexture = false: the texture belongs to FFmpeg; never dispose it here.
     /// </summary>
     public void SetSourceTexture(Texture2D? texture, long decodeTimestamp = 0,
                                  int arraySlice = 0, bool ownsTexture = true)
     {
         if (texture == null) return;
+        if (_softwareMode)
+        {
+            if (ownsTexture) { try { texture.Dispose(); } catch { } }
+            return;
+        }
 
         lock (_d3dLock)
         {
@@ -168,14 +3082,35 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
             _currentVideoFrame      = texture;
             _currentVideoFrameOwned = ownsTexture;
             _currentVideoFrameSlice = arraySlice;
+            _currentFrameDecodeTimestamp = decodeTimestamp != 0
+                ? decodeTimestamp
+                : _globalClock.ElapsedTicks;
             _currentFrameSerial++;
+            _forceRedraw = true;
         }
     }
 
     public void ResizeSwapChain(int width, int height)
     {
         if (width <= 0 || height <= 0) return;
-        _currentSwapchainSize = new PixelSize(width, height);
+        if (_softwareMode) return;
+
+        lock (_d3dLock)
+        {
+            if (_gpuShaderMode)
+            {
+                // Force the shader target to be recreated next tick.
+                _shaderTargetSize = default;
+                _forceRedraw = true;
+                return;
+            }
+
+            _currentSwapchainSize  = new PixelSize(width, height);
+            _pendingSwapchainSize  = default;
+            _pendingSwapchainTicks = 0;
+            ClearOutputViewCache();
+            _forceRedraw = true;
+        }
     }
 
     public void RunOnContext(Action<DeviceContext> action)
@@ -187,23 +3122,289 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     public new void Dispose() => DisposeAll();
 
     // ==================================================================
+    // Software (CPU) rendering path
+    // ==================================================================
+
+    protected override (bool success, string info) InitializeSoftwareFallback(string reason)
+{
+    Instance = this;
+
+    // Keep / create a D3D11 device so my_Device is never null.
+    // Try WARP — that's the same fallback DirectX uses.
+    if (_device is null)
+    {
+        try
+        {
+            _device = new D3DDevice(
+                SharpDX.Direct3D.DriverType.Warp,
+                DeviceCreationFlags.BgraSupport,
+                new[]
+                {
+                    FeatureLevel.Level_11_1,
+                    FeatureLevel.Level_11_0,
+                    FeatureLevel.Level_10_0,
+                    FeatureLevel.Level_9_3,
+                    FeatureLevel.Level_9_2,
+                    FeatureLevel.Level_9_1
+                });
+            Console.WriteLine("[Interop] Created WARP device for software fallback");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Interop] WARP device creation failed: {ex.Message}");
+        }
+    }
+
+    // Make sure the shared rendering resources exist so the shader path
+    // and my_AV_win both have what they need.
+    if (_device is not null)
+    {
+        try
+        {
+            if (_vertexShader is null)   CreateShaders();
+            if (_vertexBuffer is null)   CreateQuad();
+            if (_sampler is null)        CreateSampler();
+
+            _gpuShaderMode = true;   // we have a device, draw with the pixel shader
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Interop] Shader setup failed in fallback: {ex.Message}");
+            _gpuShaderMode = false;
+        }
+    }
+
+    _softwareMode = _device is null;   // only true if even WARP failed
+
+    Console.WriteLine(
+        $"[Interop] Fallback mode: " +
+        $"{(_softwareMode ? "CPU only" : "D3D11 shader (WARP/hardware)")} ({reason})");
+
+    Initialized?.Invoke(this, EventArgs.Empty);
+
+    return (true,
+        _softwareMode
+            ? $"Software renderer ({reason})"
+            : $"D3D11 shader renderer ({reason})");
+}
+    
+    
+    
+    
+    
+    /// <summary>
+    /// Feed a BGRA frame (stride in bytes). Works in all modes:
+    /// - Software mode: Render() paints this buffer.
+    /// - GPU-shader mode: same — we render on the GPU, then upload the
+    ///   result through this method so Avalonia can display it.
+    /// </summary>
+    public void SetSoftwareFrame(byte[] bgra, int width, int height, int stride, long decodeTimestamp = 0)
+    {
+        if (width <= 0 || height <= 0 || stride < width * 4) return;
+
+        int len = stride * height;
+        if (bgra.Length < len) return;
+
+        lock (_swLock)
+        {
+            if (_swBuffer == null || _swBuffer.Length < len)
+                _swBuffer = new byte[len];
+
+            Buffer_BlockCopy(bgra, _swBuffer, len);
+            _swW = width; _swH = height; _swStride = stride;
+            _swFrameDecodeTimestamp = decodeTimestamp != 0
+                ? decodeTimestamp
+                : _globalClock.ElapsedTicks;
+            _swSerial++;
+        }
+
+        // Coalesce: at most one pending invalidate.
+        if (Interlocked.Exchange(ref _swInvalidatePending, 1) == 0)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                Interlocked.Exchange(ref _swInvalidatePending, 0);
+                InvalidateVisual();
+            }, Avalonia.Threading.DispatcherPriority.Render);
+        }
+    }
+
+    // "Buffer" is aliased to the SharpDX type, so use System.Buffer explicitly.
+    private static void Buffer_BlockCopy(byte[] src, byte[] dst, int len)
+        => System.Buffer.BlockCopy(src, 0, dst, 0, len);
+
+    public override void Render(DrawingContext ctx)
+    {
+        // Only the pure CPU path paints here.
+        if (!_softwareMode && !_gpuShaderMode)
+        {
+            base.Render(ctx);
+            return;
+        }
+
+        var bounds = new Rect(Bounds.Size);
+        ctx.FillRectangle(Brushes.Black, bounds);
+
+        lock (_swLock)
+        {
+            if (_swBuffer != null && _swW > 0 && _swH > 0)
+            {
+                if (_swBitmap == null ||
+                    _swBitmap.PixelSize.Width != _swW ||
+                    _swBitmap.PixelSize.Height != _swH)
+                {
+                    _swBitmap?.Dispose();
+                    _swBitmap = new Avalonia.Media.Imaging.WriteableBitmap(
+                        new PixelSize(_swW, _swH),
+                        new Vector(96, 96),
+                        Avalonia.Platform.PixelFormat.Bgra8888,
+                        Avalonia.Platform.AlphaFormat.Opaque);
+                    _swShownSerial = -1;
+                }
+
+                if (_swShownSerial != _swSerial)
+                {
+                    using var fb = _swBitmap.Lock();
+                    int rowBytes = Math.Min(_swW * 4, fb.RowBytes);
+                    for (int y = 0; y < _swH; y++)
+                        Marshal.Copy(_swBuffer, y * _swStride, fb.Address + y * fb.RowBytes, rowBytes);
+                    _swShownSerial = _swSerial;
+                }
+
+                DrawLetterboxed(ctx, _swBitmap, _swW, _swH, bounds);
+
+                if (_swShownSerial != _swLatencyTimedSerial && _swFrameDecodeTimestamp != 0)
+                {
+                    double latencyMs = (_globalClock.ElapsedTicks - _swFrameDecodeTimestamp)
+                        * 1000.0 / Stopwatch.Frequency;
+                    RecordDecodeToDrawLatency(latencyMs);
+                    _swLatencyTimedSerial = _swShownSerial;
+                }
+
+                return;
+            }
+        }
+
+        if (_swStaticImage != null)
+        {
+            DrawLetterboxed(ctx, _swStaticImage,
+                (int)_swStaticImage.Size.Width, (int)_swStaticImage.Size.Height, bounds);
+        }
+    }
+
+    private void RecordDecodeToDrawLatency(double latencyMs)
+    {
+        if (latencyMs < 0 || double.IsNaN(latencyMs) || double.IsInfinity(latencyMs))
+            return;
+
+        lock (_latencyLock)
+        {
+            _decodeToDrawHistory.Enqueue(latencyMs);
+            while (_decodeToDrawHistory.Count > StatsWindowSize)
+                _decodeToDrawHistory.Dequeue();
+        }
+
+        if (EnableLatencyLogging)
+            PrintDecodeToDrawStats();
+    }
+
+    private void PrintDecodeToDrawStats()
+    {
+        double[] samples;
+        int redrawStreak;
+
+        lock (_latencyLock)
+        {
+            samples = _decodeToDrawHistory.ToArray();
+            redrawStreak = _redrawStreak;
+        }
+
+        if (samples.Length == 0) return;
+
+        double sum = 0;
+        double min = double.MaxValue;
+        double max = double.MinValue;
+
+        foreach (double value in samples)
+        {
+            sum += value;
+            if (value < min) min = value;
+            if (value > max) max = value;
+        }
+
+        double avg = sum / samples.Length;
+        double variance = 0;
+        foreach (double value in samples)
+        {
+            double delta = value - avg;
+            variance += delta * delta;
+        }
+
+        double stddev = Math.Sqrt(variance / samples.Length);
+
+        string message =
+            $"[DecodeToDrawLatency][Interop] avg={avg:F3}ms min={min:F3}ms " +
+            $"max={max:F3}ms stddev={stddev:F3}ms window={samples.Length} " +
+            $"redrawStreak={redrawStreak}";
+
+        Debug.WriteLine(message);
+        Console.WriteLine(message);
+    }
+
+    private static void DrawLetterboxed(DrawingContext ctx, Avalonia.Media.IImage image,
+                                        int srcW, int srcH, Rect bounds)
+    {
+        if (srcW <= 0 || srcH <= 0 || bounds.Width <= 0 || bounds.Height <= 0) return;
+
+        double scale = Math.Min(bounds.Width / srcW, bounds.Height / srcH);
+        double w = srcW * scale, h = srcH * scale;
+        var dest = new Rect((bounds.Width - w) / 2, (bounds.Height - h) / 2, w, h);
+        ctx.DrawImage(image, new Rect(0, 0, srcW, srcH), dest);
+    }
+
+    // ==================================================================
     // Static image
     // ==================================================================
 
     public void DisplayImage(string fileName)
     {
+        string imagePath = Path.IsPathRooted(fileName)
+            ? fileName
+            : Path.Combine(Directory.GetCurrentDirectory(), fileName);
+
+        if (_softwareMode)
+        {
+            try
+            {
+                if (!File.Exists(imagePath))
+                {
+                    Console.WriteLine($"Image file not found: {imagePath}");
+                    return;
+                }
+
+                var bmp = new Avalonia.Media.Imaging.Bitmap(imagePath);
+                lock (_swLock)
+                {
+                    _swStaticImage?.Dispose();
+                    _swStaticImage = bmp;
+                }
+                Avalonia.Threading.Dispatcher.UIThread.Post(InvalidateVisual);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error displaying image {fileName}: {ex.Message}");
+            }
+            return;
+        }
+
         if (_device == null)
         {
-            Console.WriteLine("[AvaloniaInteropRenderer] DisplayImage before init.");
+            Console.WriteLine("[Interop] DisplayImage before init.");
             return;
         }
 
         try
         {
-            string imagePath = Path.IsPathRooted(fileName)
-                ? fileName
-                : Path.Combine(Directory.GetCurrentDirectory(), fileName);
-
             if (!File.Exists(imagePath))
             {
                 Console.WriteLine($"Image file not found: {imagePath}");
@@ -251,16 +3452,6 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
             var width  = formatConverter.Size.Width;
             var height = formatConverter.Size.Height;
 
-            if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoHeight == 0)
-            {
-                My_Store.Instance.SetVideoResolution((int)width, (int)height);
-            }
-
-            if (My_Store.Instance?.DeviceHeight == 0 || My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
-            {
-                My_Store.Instance.SetDeviceResolution((int)width, (int)height);
-            }
-
             var stride = width * 4;
             using var dataStream = new DataStream(height * stride, true, true);
             formatConverter.CopyPixels(stride, dataStream);
@@ -300,66 +3491,117 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
         CompositionDrawingSurface surface,
         ICompositionGpuInterop interop)
     {
-        Instance = this;
-
-        if (interop.SupportedImageHandleTypes.Contains(
-                KnownPlatformGraphicsExternalImageHandleTypes
-                    .D3D11TextureGlobalSharedHandle) != true)
-        {
-            return (false,
-                "DXGI shared handle import is not supported by the current graphics backend");
-        }
-
-        using var factory = new DxgiFactory();
-        using var adapter = factory.GetAdapter1(0);
-
-        _device = new D3DDevice(
-            adapter,
-            DeviceCreationFlags.BgraSupport,
-            new[]
-            {
-                FeatureLevel.Level_12_1,
-                FeatureLevel.Level_12_0,
-                FeatureLevel.Level_11_1,
-                FeatureLevel.Level_11_0,
-                FeatureLevel.Level_10_0,
-                FeatureLevel.Level_9_3,
-                FeatureLevel.Level_9_2,
-                FeatureLevel.Level_9_1
-            });
-
-        _swapchain = new D3D11Swapchain(_device, interop, surface);
-
         try
         {
-            _videoDevice1  = _device.QueryInterface<VideoDevice1>();
-            _videoContext1 = _device.ImmediateContext.QueryInterface<VideoContext1>();
+            Instance = this;
+
+            bool interopOk =
+                interop.SupportedImageHandleTypes.Contains(
+                    KnownPlatformGraphicsExternalImageHandleTypes
+                        .D3D11TextureGlobalSharedHandle) == true;
+
+            using var factory = new DxgiFactory();
+
+            // Pick the first REAL hardware adapter. Skip WARP / Basic Render Driver.
+            Adapter1? adapter = null;
+            int count = factory.GetAdapterCount1();
+            for (int i = 0; i < count; i++)
+            {
+                var candidate = factory.GetAdapter1(i);
+                var d = candidate.Description1;
+                bool isSoftware = (d.Flags & AdapterFlags.Software) != 0 || d.VendorId == 0x1414;
+                if (!isSoftware)
+                {
+                    adapter = candidate;
+                    break;
+                }
+                candidate.Dispose();
+            }
+
+            if (adapter == null)
+                return (false, "No hardware GPU found");
+
+            using (adapter)
+            {
+                _device = new D3DDevice(
+                    adapter,
+                    DeviceCreationFlags.BgraSupport,
+                    new[]
+                    {
+                        FeatureLevel.Level_12_1,
+                        FeatureLevel.Level_12_0,
+                        FeatureLevel.Level_11_1,
+                        FeatureLevel.Level_11_0,
+                        FeatureLevel.Level_10_0,
+                        FeatureLevel.Level_9_3,
+                        FeatureLevel.Level_9_2,
+                        FeatureLevel.Level_9_1
+                    });
+
+                // ---- Swapchain only if interop is usable. ----
+                if (interopOk)
+                {
+                    try
+                    {
+                        _swapchain = new D3D11Swapchain(_device, interop, surface);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"[Interop] Swapchain creation failed: {ex.Message} — falling back to shader mode");
+                        _swapchain = null;
+                        interopOk = false;
+                    }
+                }
+
+                if (!interopOk)
+                {
+                    _gpuShaderMode = true;
+                    Console.WriteLine(
+                        "[Interop] Avalonia GPU interop unavailable — using D3D11 shader mode");
+                }
+
+                // Video processor (only useful in swapchain mode).
+                if (interopOk)
+                {
+                    try
+                    {
+                        _videoDevice1  = _device.QueryInterface<VideoDevice1>();
+                        _videoContext1 = _device.ImmediateContext.QueryInterface<VideoContext1>();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Interop] Video processor not available: {ex.Message}");
+                        _videoProcessorReady = false;
+                    }
+                }
+
+                CreateShaders();
+                CreateQuad();
+                CreateSampler();
+
+                _currentSwapchainSize  = default;
+                _pendingSwapchainSize  = default;
+                _pendingSwapchainTicks = 0;
+                _lastDrawnSerial       = -1;
+                _forceRedraw           = true;
+
+                Initialized?.Invoke(this, EventArgs.Empty);
+
+                Console.WriteLine("initialized gpuinterop class");
+
+                string adapterName = adapter.Description1.Description;
+                return (true,
+                    _gpuShaderMode
+                        ? $"D3D11 ({_device.FeatureLevel}) {adapterName} [Avalonia interop: shader mode]"
+                        : $"D3D11 ({_device.FeatureLevel}) {adapterName} [Avalonia interop]");
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Interop] Video processor not available: {ex.Message}");
-            _videoProcessorReady = false;
+            // Base class will clean up and switch to software mode.
+            return (false, $"GPU init failed: {ex.Message}");
         }
-
-        CreateShaders();
-        CreateQuad();
-        CreateSampler();
-
-        _currentSwapchainSize  = default;
-        _pendingSwapchainSize  = default;
-        _pendingSwapchainTicks = 0;
-        _lastDrawnSerial       = -1;
-        _forceRedraw           = true;
-
-        Initialized?.Invoke(this, EventArgs.Empty);
-
-        // Static image test path:
-        // DisplayImage("dev_img1.jpg");
-        // Video test path:
-        // Play_video();
-
-        return (true,
-            $"D3D11 ({_device.FeatureLevel}) {adapter.Description1.Description} [Avalonia interop]");
     }
 
     protected override void FreeGraphicsResources() => DisposeAll();
@@ -403,7 +3645,6 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
             return true;
         }
 
-        // Output views are tied to the enumerator, so they must go too.
         ClearOutputViewCache();
         Utilities.Dispose(ref _videoProcessor);
         Utilities.Dispose(ref _vpe);
@@ -428,7 +3669,6 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
             _videoDevice1.CreateVideoProcessorEnumerator(ref _vpcd, out _vpe);
             _videoDevice1.CreateVideoProcessor(_vpe, 0, out _videoProcessor);
 
-            // Scale + colour convert only; no driver enhancement.
             try { _videoContext1.VideoProcessorSetStreamAutoProcessingMode(_videoProcessor, 0, false); }
             catch { /* not implemented on some drivers; not fatal */ }
 
@@ -460,14 +3700,9 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     }
 
     // ==================================================================
-    // Render
+    // Render dispatch
     // ==================================================================
 
-    /// <summary>
-    /// Commits pixelSize once it has been stable for ResizeStableTicks ticks.
-    /// The very first size commits immediately. Returns true when the
-    /// committed size just changed.
-    /// </summary>
     private bool TryCommitSwapchainSize(PixelSize pixelSize)
     {
         if (_currentSwapchainSize == default)
@@ -503,8 +3738,192 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
 
     protected override void RenderFrame(PixelSize pixelSize)
     {
+        if (_softwareMode) return;
         if (pixelSize == default) return;
         if (pixelSize.Width <= 1 || pixelSize.Height <= 1) return;
+        if (_device is null) return;
+
+        if (_gpuShaderMode)
+        {
+            RenderGpuShaderMode(pixelSize);
+            return;
+        }
+
+        RenderSwapchainMode(pixelSize);
+    }
+
+    // ==================================================================
+    // GPU shader mode
+    //
+    // Mirrors the DirectX class's "software" fallback:
+    //   - clear a render target to black
+    //   - set the aspect-correct viewport
+    //   - draw a fullscreen quad with a pixel shader
+    //   - present
+    //
+    // The difference is the render target: here it's an offscreen texture
+    // we then upload to Avalonia via SetSoftwareFrame.
+    // ==================================================================
+
+    private void RenderGpuShaderMode(PixelSize pixelSize)
+    {
+        lock (_d3dLock)
+        {
+            if (_device is null) return;
+
+            // (Re)create the offscreen target when the size changes.
+            if (_shaderTarget is null || _shaderTargetSize != pixelSize)
+            {
+                Utilities.Dispose(ref _shaderTargetSrv);
+                Utilities.Dispose(ref _shaderTarget);
+
+                try
+                {
+                    _shaderTarget = new Texture2D(_device, new Texture2DDescription
+                    {
+                        Width             = pixelSize.Width,
+                        Height            = pixelSize.Height,
+                        ArraySize         = 1,
+                        MipLevels         = 1,
+                        Format            = Format.B8G8R8A8_UNorm,
+                        SampleDescription = new SampleDescription(1, 0),
+                        Usage             = ResourceUsage.Default,
+                        BindFlags         = BindFlags.RenderTarget | BindFlags.ShaderResource,
+                        CpuAccessFlags    = CpuAccessFlags.None,
+                        OptionFlags       = ResourceOptionFlags.None
+                    });
+                    _shaderTargetSrv = new ShaderResourceView(_device, _shaderTarget);
+                    _shaderTargetSize = pixelSize;
+                    _forceRedraw = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Interop/shader] Failed to create target: {ex.Message}");
+                    Utilities.Dispose(ref _shaderTargetSrv);
+                    Utilities.Dispose(ref _shaderTarget);
+                    return;
+                }
+            }
+
+            bool newFrame = _currentFrameSerial != _lastDrawnSerial;
+            if (!newFrame && !_forceRedraw) return;
+
+            var context = _device.ImmediateContext;
+
+            try
+            {
+                using var rtv = new RenderTargetView(_device, _shaderTarget);
+                context.OutputMerger.SetTargets(rtv);
+                context.ClearRenderTargetView(rtv, new RawColor4(0, 0, 0, 1));
+
+                bool drawn = false;
+
+                // Prefer the live video frame.
+                var frame = _currentVideoFrame;
+                if (frame is not null && frame.NativePointer != IntPtr.Zero)
+                {
+                    try
+                    {
+                        Texture2DDescription fd = frame.Description;
+                        using var srv = new ShaderResourceView(_device, frame);
+                        DrawFullscreenQuad(context, srv, fd.Width, fd.Height, _shaderTargetSize);
+                        drawn = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Interop/shader] Draw live frame failed: {ex.Message}");
+                    }
+                }
+
+                // Fall back to the static image.
+                if (!drawn && _staticImageView is not null && _staticImageTexture is not null)
+                {
+                    var sd = _staticImageTexture.Description;
+                    DrawFullscreenQuad(context, _staticImageView, sd.Width, sd.Height, _shaderTargetSize);
+                    drawn = true;
+                }
+
+                context.PixelShader.SetShaderResource(0, null);
+                context.OutputMerger.ResetTargets();
+                context.Flush();
+
+                if (drawn)
+                {
+                    _lastDrawnSerial = _currentFrameSerial;
+                    _forceRedraw     = false;
+
+                    ReadbackShaderTargetToSoftware(_currentFrameDecodeTimestamp);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Interop/shader] Render failed: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Copies _shaderTarget to a staging texture, maps it, and feeds the
+    /// bytes to SetSoftwareFrame so Avalonia can display the result.
+    /// </summary>
+    private void ReadbackShaderTargetToSoftware(long decodeTimestamp)
+    {
+        if (_device is null || _shaderTarget is null) return;
+
+        var desc = _shaderTarget.Description;
+        if (desc.Width <= 0 || desc.Height <= 0) return;
+
+        int stride = desc.Width * 4;
+        int len    = stride * desc.Height;
+
+        Texture2D? staging = null;
+        try
+        {
+            staging = new Texture2D(_device, new Texture2DDescription
+            {
+                Width             = desc.Width,
+                Height            = desc.Height,
+                ArraySize         = 1,
+                MipLevels         = 1,
+                Format            = Format.B8G8R8A8_UNorm,
+                SampleDescription = new SampleDescription(1, 0),
+                Usage             = ResourceUsage.Staging,
+                BindFlags         = BindFlags.None,
+                CpuAccessFlags    = CpuAccessFlags.Read,
+                OptionFlags       = ResourceOptionFlags.None
+            });
+
+            var ctx = _device.ImmediateContext;
+            ctx.CopyResource(_shaderTarget, staging);
+
+            var box = ctx.MapSubresource(staging, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+            try
+            {
+                byte[] managed = new byte[len];
+                Marshal.Copy(box.DataPointer, managed, 0, len);
+                SetSoftwareFrame(managed, desc.Width, desc.Height, stride, decodeTimestamp);
+            }
+            finally
+            {
+                ctx.UnmapSubresource(staging, 0);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Interop/shader] Readback failed: {ex.Message}");
+        }
+        finally
+        {
+            Utilities.Dispose(ref staging);
+        }
+    }
+
+    // ==================================================================
+    // Swapchain mode (unchanged behavior)
+    // ==================================================================
+
+    private void RenderSwapchainMode(PixelSize pixelSize)
+    {
         if (_swapchain is null || _device is null) return;
 
         bool sizeChanged = TryCommitSwapchainSize(pixelSize);
@@ -514,20 +3933,20 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
 
         lock (_d3dLock)
         {
-            // Cached output views reference the OLD back buffers.
             if (sizeChanged)
                 ClearOutputViewCache();
 
             bool newFrame = _currentFrameSerial != _lastDrawnSerial;
             if (!newFrame && !sizeChanged && !_forceRedraw)
+            {
+                _redrawStreak++;
                 return;
+            }
 
             var context = _device.ImmediateContext;
 
             using (_swapchain.BeginDraw(_currentSwapchainSize, out var renderView))
             {
-                // renderView.Resource returns a NEW COM reference each call,
-                // so resolve once and dispose the wrapper.
                 Texture2D? renderTexture = null;
                 Resource?  rtResource    = null;
                 try
@@ -573,19 +3992,29 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
                                 frameDesc.Width, frameDesc.Height,
                                 _currentSwapchainSize.Width, _currentSwapchainSize.Height))
                         {
-                            didBlit = BlitVideoFrame(frame, _currentVideoFrameSlice, renderTexture, _currentSwapchainSize);
+                            didBlit = BlitVideoFrame(frame, _currentVideoFrameSlice,
+                                renderTexture, _currentSwapchainSize);
 
-                            // One retry with fresh output views: a stale view
-                            // keyed by a recycled back-buffer pointer is a
-                            // classic cause of a single black frame.
                             if (!didBlit)
                             {
                                 ClearOutputViewCache();
-                                didBlit = BlitVideoFrame(frame, _currentVideoFrameSlice, renderTexture, _currentSwapchainSize);
+                                didBlit = BlitVideoFrame(frame, _currentVideoFrameSlice,
+                                    renderTexture, _currentSwapchainSize);
                             }
 
                             if (didBlit)
+                            {
                                 CaptureLastGoodFrame(context, renderTexture);
+
+                                if (frame != _lastLatencyTimedFrame && _currentFrameDecodeTimestamp != 0)
+                                {
+                                    double latencyMs = (_globalClock.ElapsedTicks - _currentFrameDecodeTimestamp)
+                                        * 1000.0 / Stopwatch.Frequency;
+                                    RecordDecodeToDrawLatency(latencyMs);
+                                    _lastLatencyTimedFrame = frame;
+                                    _redrawStreak = 0;
+                                }
+                            }
                         }
                     }
 
@@ -593,21 +4022,18 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
                     {
                         bool drawn = false;
 
-                        // A video frame exists but the blit failed:
-                        // show the previous picture instead of black.
                         if (_currentVideoFrame is not null && renderTexture is not null)
                             drawn = TryRestoreLastGoodFrame(context, renderTexture, renderView);
 
-                        // No video (or nothing to restore): show the static image.
                         if (!drawn && _staticImageView is not null && _staticImageTexture is not null)
                         {
                             DrawFullscreenQuad(context, _staticImageView,
                                 _staticImageTexture.Description.Width,
-                                _staticImageTexture.Description.Height);
+                                _staticImageTexture.Description.Height,
+                                _currentSwapchainSize);
                         }
                     }
 
-                    // Unbind so D3D11 can free old back buffers.
                     context.PixelShader.SetShaderResource(0, null);
                     context.OutputMerger.ResetTargets();
 
@@ -620,7 +4046,6 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
                 }
             }
 
-            // D3D11 frees resources lazily; flush only on size change.
             if (sizeChanged)
             {
                 try
@@ -639,11 +4064,11 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     // ------------------------------------------------------------------
     // Letterbox
     // ------------------------------------------------------------------
-    private void ComputeLetterboxRect(int srcW, int srcH,
+    private static void ComputeLetterboxRect(int srcW, int srcH, PixelSize bb,
         out int outX, out int outY, out int outW, out int outH)
     {
-        int bbW = _currentSwapchainSize.Width;
-        int bbH = _currentSwapchainSize.Height;
+        int bbW = bb.Width;
+        int bbH = bb.Height;
 
         if (srcW <= 0 || srcH <= 0 || bbW <= 0 || bbH <= 0)
         {
@@ -673,11 +4098,12 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     }
 
     // ------------------------------------------------------------------
-    // Static image quad
+    // Fullscreen quad
     // ------------------------------------------------------------------
-    private void DrawFullscreenQuad(DeviceContext context, ShaderResourceView view, int srcW, int srcH)
+    private void DrawFullscreenQuad(DeviceContext context, ShaderResourceView view,
+                                    int srcW, int srcH, PixelSize target)
     {
-        ComputeLetterboxRect(srcW, srcH,
+        ComputeLetterboxRect(srcW, srcH, target,
             out int outX, out int outY, out int outW, out int outH);
 
         context.Rasterizer.SetViewport(outX, outY, outW, outH, 0f, 1f);
@@ -696,7 +4122,7 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     }
 
     // ------------------------------------------------------------------
-    // Video blit
+    // Video blit (swapchain mode)
     // ------------------------------------------------------------------
     private bool BlitVideoFrame(Texture2D inputTexture, int arraySlice,
                                 Texture2D outputTexture, PixelSize destSize)
@@ -710,10 +4136,9 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
         {
             var inDesc = inputTexture.Description;
 
-            ComputeLetterboxRect(inDesc.Width, inDesc.Height,
+            ComputeLetterboxRect(inDesc.Width, inDesc.Height, destSize,
                 out int outX, out int outY, out int outW, out int outH);
 
-            // D3D11VA pool textures are texture arrays: use the frame's slice.
             var vpivd = _vpivd;
             vpivd.Texture2D = new Texture2DVpiv
             {
@@ -768,7 +4193,7 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     }
 
     // ------------------------------------------------------------------
-    // Last good frame (same size + format as the back buffer => CopyResource)
+    // Last good frame (swapchain mode)
     // ------------------------------------------------------------------
     private void CaptureLastGoodFrame(DeviceContext context, Texture2D backBuffer)
     {
@@ -794,7 +4219,7 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
                     Height            = src.Height,
                     ArraySize         = 1,
                     MipLevels         = 1,
-                    Format            = src.Format, // must match the back buffer
+                    Format            = src.Format,
                     Usage             = ResourceUsage.Default,
                     BindFlags         = BindFlags.None,
                     CpuAccessFlags    = CpuAccessFlags.None,
@@ -828,7 +4253,6 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
                 dst.Format != _lastGoodFrameFormat)
                 return false;
 
-            // Don't copy into a texture that is bound as the current target.
             context.OutputMerger.ResetTargets();
             context.CopyResource(_lastGoodFrameTexture, backBuffer);
             context.OutputMerger.SetTargets(renderView);
@@ -839,75 +4263,6 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
             Console.WriteLine($"[Interop] Restore last-good-frame failed: {ex.Message}");
             try { context.OutputMerger.SetTargets(renderView); } catch { }
             return false;
-        }
-    }
-
-    // ==================================================================
-    // Video playback
-    // ==================================================================
-
-    public void Play_video()
-    {
-        try
-        {
-            ffmpeg = new Src.FFmpeg();
-
-            if (!ffmpeg.InitHWAccel(_device!))
-            {
-                Console.WriteLine("Failed to Initialize FFmpeg's HW Acceleration");
-                return;
-            }
-
-            if (!ffmpeg.Open(fileToPlay))
-            {
-                Console.WriteLine("FFmpeg failed to open input");
-                return;
-            }
-
-            threadPlay = new Thread(() =>
-            {
-                try
-                {
-                    var sw = new Stopwatch();
-
-                    while (is_running)
-                    {
-                        sw.Restart();
-
-                        // Decode with NO lock held, so a slow decode never
-                        // blocks the render tick.
-                        Texture2D? texture = ffmpeg.GetFrame();
-
-                        if (texture == null)
-                        {
-                            Thread.Sleep(1);
-                            continue;
-                        }
-
-                        // Brief lock inside: swap + dispose the old frame.
-                        // If GetFrame() returns FFmpeg's pooled surface use:
-                        //   SetSourceTexture(texture, stamp, sliceIndex, ownsTexture: false)
-                        SetSourceTexture(texture, _globalClock.ElapsedTicks);
-
-                        double remaining = 16.67 - sw.Elapsed.TotalMilliseconds;
-                        if (remaining > 1)
-                            Thread.Sleep((int)remaining);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Thread error: {ex.Message}");
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                }
-            });
-
-            threadPlay.SetApartmentState(ApartmentState.STA);
-            threadPlay.Start();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Initialization error: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -1015,6 +4370,16 @@ float4 main(PSInput input) : SV_TARGET
 
         is_running = false;
 
+        ReleaseGpuAsync();
+        ReleaseSoftwareResources();
+    }
+
+    /// <summary>
+    /// Disposes the swapchain first (async), then every other D3D object.
+    /// Safe to call when nothing was created.
+    /// </summary>
+    private void ReleaseGpuAsync()
+    {
         var swapchain = _swapchain;
         _swapchain = null;
 
@@ -1023,6 +4388,16 @@ float4 main(PSInput input) : SV_TARGET
         else
             _ = swapchain.DisposeAsync().AsTask()
                 .ContinueWith(_ => ReleaseD3DResources(), TaskScheduler.Default);
+    }
+
+    private void ReleaseSoftwareResources()
+    {
+        lock (_swLock)
+        {
+            _swBitmap?.Dispose();      _swBitmap = null;
+            _swStaticImage?.Dispose(); _swStaticImage = null;
+            _swBuffer = null;
+        }
     }
 
     private void ReleaseD3DResources()
@@ -1047,6 +4422,10 @@ float4 main(PSInput input) : SV_TARGET
             Utilities.Dispose(ref _pixelShader);
             Utilities.Dispose(ref _staticImageView);
             Utilities.Dispose(ref _staticImageTexture);
+
+            Utilities.Dispose(ref _shaderTargetSrv);
+            Utilities.Dispose(ref _shaderTarget);
+
             Utilities.Dispose(ref _lastGoodFrameTexture);
             Utilities.Dispose(ref _device);
         }

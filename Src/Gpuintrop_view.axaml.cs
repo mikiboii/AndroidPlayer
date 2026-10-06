@@ -102,6 +102,8 @@ public partial class Gpuintrop_view : UserControl
              Loaded += OnLoaded;
              
              // MainImage.HandleCreated += testOnHandleCreated;
+
+             Console.WriteLine("Gpuintrop view constructed $$$");
              
              my_render.Initialized += My_renderOnInitialized;
              
@@ -215,6 +217,9 @@ public partial class Gpuintrop_view : UserControl
     private void InitAppManager()
     {
         if (my_app_manager != null) return; // avoid double-init
+
+        Console.WriteLine("appmanager initialized $$$$$$");
+        
     
         my_app_manager = new App_manager();
     

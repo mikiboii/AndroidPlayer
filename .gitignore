@@ -10,4 +10,5 @@ bin/linux/
 bin/
 publish-test/
 publish/
+notes/
 run_linux.ps1
