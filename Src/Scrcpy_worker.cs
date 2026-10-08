@@ -1057,6 +1057,8 @@ private void SaveScreenshot(Texture2D frame)
                         
 
                         sw.Stop();
+                        
+                        // Console.WriteLine($"[decode] sw = {sw.Elapsed.TotalMilliseconds:F3} ms ({sw.ElapsedTicks} ticks)");
 
                         continue;
                     }

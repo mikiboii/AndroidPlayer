@@ -5,6 +5,8 @@
         Title="Sidebar"
         Height="400"
         Width="35"
+        MaxWidth="35"
+        MaxHeight="400"
         SystemDecorations="None"
         TransparencyLevelHint="Transparent"
         Background="Transparent"

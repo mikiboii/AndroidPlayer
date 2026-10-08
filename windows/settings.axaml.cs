@@ -107,6 +107,45 @@ public partial class settings : Window
             }
         }
         
+        
+        
+        
+        
+        if (OperatingSystem.IsWindows() && !OperatingSystem.IsWindowsVersionAtLeast(6, 2))
+        {
+
+            // Background = "#FF00FF";
+                
+            Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0xFF, 0x00, 0xFF));
+                
+                
+            var handle = this.TryGetPlatformHandle()?.Handle;
+            if (handle != null && handle != IntPtr.Zero)
+            {
+                // Get current extended style and add WS_EX_LAYERED
+                int exStyle = GetWindowLong(handle.Value, GWL_EXSTYLE);
+                SetWindowLong(handle.Value, GWL_EXSTYLE, exStyle | WS_EX_LAYERED);
+
+                // 3. Choose a color to be the "transparent key"
+                // This color should NOT be used anywhere else in your visible UI.
+                // A color like Magenta (255, 0, 255) is a good choice.
+                // The crKey parameter expects a COLORREF (0x00BBGGRR).
+                uint colorKey = 0x00FF00FF; // Magenta in BGR
+
+                // Apply the transparency key
+                SetLayeredWindowAttributes(handle.Value, colorKey, 0, LWA_COLORKEY);
+
+                // 4. Update your XAML to use this color as the window background
+                // In your SidebarWindow.axaml:
+                // <Window ... Background="#FF00FF">  <-- This will become transparent
+                //     <Border Background="#f0f0f0" ...>
+            }
+        }
+
+        
+        
+        
+        
         #endif
 
 

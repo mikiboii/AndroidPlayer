@@ -13,7 +13,7 @@ namespace Androidplayer.Store
 
 #if DEBUG
         
-        private bool _developerMode = false;
+        private bool _developerMode = true;
 #else
 
         

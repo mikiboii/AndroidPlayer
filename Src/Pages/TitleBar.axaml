@@ -50,11 +50,13 @@
         <!-- Default: controller icon -->
         <Style Selector="Image.typingModeIcon">
             <Setter Property="Source" Value="avares://Androidplayer/Icons/Controller.png"/>
+            <Setter Property="ToolTip.Tip" Value="Enable Gaming mode."/>
         </Style>
 
         <!-- When Typing_mode is true: keyboard icon -->
         <Style Selector="Image.typingModeIcon.typing">
             <Setter Property="Source" Value="avares://Androidplayer/Icons/Keyboard.png"/>
+            <Setter Property="ToolTip.Tip" Value="Enable Typing mode."/>
         </Style>
         
         

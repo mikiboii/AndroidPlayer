@@ -542,7 +542,7 @@ namespace Androidplayer.Src
 
             
             // Remove any existing network stuff.
-            // adbClient.RemoveAllForwards(device);
+            adbClient.RemoveAllForwards(device);
             
             // adbClient.RemoveAllReverseForwards(device);
         }
