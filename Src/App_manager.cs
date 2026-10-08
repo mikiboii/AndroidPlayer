@@ -247,10 +247,10 @@ public class App_manager : IDisposable
 
                     Dispatcher.UIThread.Post(() =>
                     {
-                        Console.WriteLine($" Display view {my_image.Bounds.Width}, {my_image.Bounds.Height}");
 
                         if (my_image != null)
                         {
+                            Console.WriteLine($" Display view {my_image?.Bounds.Width}, {my_image?.Bounds.Height}");
                             // k_info.Instance.directx?.ResizeSwapChain(
                             //     (int)my_image.Bounds.Width,
                             //     (int)my_image.Bounds.Height);

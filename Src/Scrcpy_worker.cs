@@ -979,54 +979,112 @@ private void SaveScreenshot(Texture2D frame)
                             // my_directx = D11InteropRenderer.Instance;
 
                             // D11InteropRenderer.Instance?.RunOnContext(new Action<object>(_ =>
-                                D11InteropRenderer.Instance?.RunOnContext(new Action<DeviceContext>(_ =>
-                            {
-                                
-                            frame = _decoder.DecodePacket(
-                                packet.Data,
-                                packet.Pts,
-                                packet.IsConfig);
-
-                            if (frame == null)
-                            {
-                                return;
-                                // continue;
-                            }
-
-                            // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
-                            // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
-                            if (k_info.Instance.ImageContainer is { } container)
-                            {
-                                double cw = container.Bounds.Width;
-                                double ch = container.Bounds.Height;
-
-                                if (My_Store.Instance.DisplayHeight == 0 ||
-                                    My_Store.Instance.DisplayHeight != (int)cw)
-                                {
-                                    My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
-                                }
-                            }
-
-                            if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
-                            {
-                                My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
-                            }
-
-                            if (My_Store.Instance?.DeviceHeight == 0 ||
-                                My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
-                            {
-                                My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
-                            }
-
-                            if (_previousFrame != null && !_previousFrame.IsDisposed)
-                            {
-                                _previousFrame.Dispose();
-                            }
-
-                            _previousFrame = frame;
-                                
-                            }));
                             
+                            
+                            
+                            
+                            //
+                            //     D11InteropRenderer.Instance?.RunOnContext(new Action<DeviceContext>(_ =>
+                            // {
+                            //     
+                            // frame = _decoder.DecodePacket(
+                            //     packet.Data,
+                            //     packet.Pts,
+                            //     packet.IsConfig);
+                            //
+                            // if (frame == null)
+                            // {
+                            //     return;
+                            //     // continue;
+                            // }
+                            //
+                            // // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
+                            // // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
+                            // if (k_info.Instance.ImageContainer is { } container)
+                            // {
+                            //     double cw = container.Bounds.Width;
+                            //     double ch = container.Bounds.Height;
+                            //
+                            //     if (My_Store.Instance.DisplayHeight == 0 ||
+                            //         My_Store.Instance.DisplayHeight != (int)cw)
+                            //     {
+                            //         My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
+                            //     }
+                            // }
+                            //
+                            // if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
+                            // {
+                            //     My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
+                            // }
+                            //
+                            // if (My_Store.Instance?.DeviceHeight == 0 ||
+                            //     My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
+                            // {
+                            //     My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
+                            // }
+                            //
+                            // if (_previousFrame != null && !_previousFrame.IsDisposed)
+                            // {
+                            //     _previousFrame.Dispose();
+                            // }
+                            //
+                            // _previousFrame = frame;
+                            //     
+                            // }));
+                            //
+                            //     
+                                
+                                
+                            
+                            
+                            
+                            
+                            frame = _decoder.DecodePacket(
+                                                            packet.Data,
+                                                            packet.Pts,
+                                                            packet.IsConfig);
+                            
+                                                        if (frame == null)
+                                                        {
+                                                            // return;
+                                                            continue;
+                                                        }
+                            
+                                                        // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
+                                                        // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
+                                                        if (k_info.Instance.ImageContainer is { } container)
+                                                        {
+                                                            double cw = container.Bounds.Width;
+                                                            double ch = container.Bounds.Height;
+                            
+                                                            if (My_Store.Instance.DisplayHeight == 0 ||
+                                                                My_Store.Instance.DisplayHeight != (int)cw)
+                                                            {
+                                                                My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
+                                                            }
+                                                        }
+                            
+                                                        if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
+                                                        {
+                                                            My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
+                                                        }
+                            
+                                                        if (My_Store.Instance?.DeviceHeight == 0 ||
+                                                            My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
+                                                        {
+                                                            My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
+                                                        }
+                            
+                                                        if (_previousFrame != null && !_previousFrame.IsDisposed)
+                                                        {
+                                                            _previousFrame.Dispose();
+                                                        }
+                            
+                                                        _previousFrame = frame;
+                                
+                                
+                                
+                                
                         }
 
 

@@ -162,7 +162,18 @@ namespace Androidplayer.windows
             }
         }
 
+        
+        
+#if DEBUG
+        
         private bool _audioEnabled = false;
+#else
+
+        
+        private bool _audioEnabled = true;
+#endif
+        
+        
         public bool AudioEnabled
         {
             get => _audioEnabled;

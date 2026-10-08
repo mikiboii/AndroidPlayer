@@ -1857,7 +1857,7 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     // Decode -> draw latency measurement
     // ------------------------------------------------------------------
     private const int StatsWindowSize = 120;
-    private const bool EnableLatencyLogging = false;
+    private const bool EnableLatencyLogging = true;
 
     private readonly object _latencyLock = new();
     private readonly Queue<double> _decodeToDrawHistory = new();
@@ -2262,15 +2262,26 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
                 },
                 Avalonia.Threading.DispatcherPriority.Send);
         }
+
         
         
-        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        
+        if (!my_info.Instance.Window_resizing)
         {
-            if (this.GetVisualRoot() is Avalonia.Rendering.IRenderRoot root)
+            
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
             {
-                root.Renderer.Paint(new Rect(root.ClientSize));
-            }
-        }, Avalonia.Threading.DispatcherPriority.Render);
+                if (this.GetVisualRoot() is Avalonia.Rendering.IRenderRoot root)
+                {
+                    root.Renderer.Paint(new Rect(root.ClientSize));
+                }
+            }, Avalonia.Threading.DispatcherPriority.Render);
+            
+        }
+        
+        
+        
+        
         
     }
 

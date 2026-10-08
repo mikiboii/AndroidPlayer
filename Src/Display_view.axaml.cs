@@ -441,7 +441,7 @@ public partial class Display_view : UserControl
         resetTimer.Tick += (s, args) =>
         {
             resetTimer.Stop();
-            // my_info.Instance.Window_resizing = false;
+            my_info.Instance.Window_resizing = false;
             
             //
             // k_info.Instance.directx?.ResizeSwapChain(

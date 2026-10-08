@@ -268,7 +268,7 @@ public partial class Gpuintrop_view : UserControl
         resetTimer.Tick += (s, args) =>
         {
             resetTimer.Stop();
-            // my_info.Instance.Window_resizing = false;
+            my_info.Instance.Window_resizing = false;
             
             //
             // k_info.Instance.directx?.ResizeSwapChain(
@@ -339,7 +339,7 @@ public partial class Gpuintrop_view : UserControl
         int v_width = My_Store.Instance.VideoWidth;
         int v_height = My_Store.Instance.VideoHeight;
 
-            Console.WriteLine("resize called from gpuintrop");
+            // Console.WriteLine("resize called from gpuintrop");
         if (v_height > 0 && v_width > 0)
         {
             ScaleFormToFit(v_width, v_height);
