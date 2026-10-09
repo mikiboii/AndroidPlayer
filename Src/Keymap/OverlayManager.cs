@@ -804,6 +804,8 @@ public async void AnimateModeOverlay(string mode)
             Canvas.SetTop(toastBorder, top);
 
             // Panel.SetZIndex(toastBorder, 9999);
+            
+            
            
             
         
@@ -813,6 +815,17 @@ public async void AnimateModeOverlay(string mode)
             //       For now just make it visible and set opacity.
             toastBorder.Opacity = 1;
             toastBorder.IsVisible = true;
+            
+            
+            Dispatcher.UIThread.Post(() =>
+            {
+                double cw = _canvas.Bounds.Width;
+                double left = (cw - toastBorder.Bounds.Width) / 2;
+                if (left < 0) left = 0;
+
+                Canvas.SetLeft(toastBorder, left);
+                Canvas.SetTop(toastBorder, 20);
+            }, DispatcherPriority.Loaded);
 
             // Optional: hide after a delay using DispatcherTimer
             DispatcherTimer.RunOnce(() =>

@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-
+using Androidplayer.notes;
 using Androidplayer.windows;
 using Avalonia;
 using Avalonia.Controls;
@@ -36,7 +36,15 @@ public partial class App : Application
             
             // desktop.MainWindow.Hide();
             
+            // var demo = new del_Window();
+            //
+            // demo.Show();
+            
+            
             _ = StartAsync(desktop);
+            
+            
+            
 
             // var settings = new settings();
             //

@@ -1105,7 +1105,7 @@ private DeviceData GetWirelessDevice()
     
         
         
-    if (stored_ip != null)
+    if (!string.IsNullOrWhiteSpace(stored_ip))
     {
         try
         {

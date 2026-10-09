@@ -180,22 +180,62 @@ namespace Androidplayer.Src
                     
                     
                     #if WINDOWS
-                            if (k_info.Instance.my_renderer is DirectX dx)
+
+                    if ( my_info.Instance.Nativeview_mode_local)
+                    {
+
+                        if (k_info.Instance.my_renderer is DirectX dx)
+                        {
+                            // SaveScreenshot runs entirely under _renderLock,
+                            // so the decoder can't dispose _previousFrame mid-copy.
+                            dx.RunOnContext(_ =>
                             {
-                                // SaveScreenshot runs entirely under _renderLock,
-                                // so the decoder can't dispose _previousFrame mid-copy.
-                                dx.RunOnContext(_ =>
+                                if (_previousFrame != null && !_previousFrame.IsDisposed)
                                 {
-                                    if (_previousFrame != null && !_previousFrame.IsDisposed)
-                                    {
-                                        SaveScreenshot(_previousFrame);
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("[Screenshot] no frame available yet");
-                                    }
-                                });
-                            }
+                                    SaveScreenshot(_previousFrame);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("[Screenshot] no frame available yet");
+                                }
+                            });
+                        }
+
+
+                        
+                    }
+                    else
+                    {
+                        // my_directx = D11InteropRenderer.Instance;
+                    
+                        // long decodeTimestamp = D11InteropRenderer.Instance.NowTicks;
+                        //
+                        // if (_pendingFrame != null)
+                        //     D11InteropRenderer.Instance?.PresentFrame(_pendingFrame, decodeTimestamp);
+
+                        
+                        
+                            D11InteropRenderer.Instance?.RunOnContext(new Action<DeviceContext>(_ =>
+                            {
+                                
+                                if (_previousFrame != null && !_previousFrame.IsDisposed)
+                                {
+                                    SaveScreenshot(_previousFrame);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("[Screenshot] no frame available yet");
+                                }
+                            
+                                
+                            }));
+                        
+                        
+                    }
+
+                           
+                            
+                            
                     #endif
                     
                     
@@ -367,119 +407,136 @@ namespace Androidplayer.Src
             const long PACKET_FLAG_CONFIG = 1L << 62;
             const long PACKET_FLAG_KEY_FRAME = 1L << 61;
 
-            while (isrunning)
+
+            try
             {
-                audioReadyEvent.Wait();
-
-                if (audioClient == null)
+                
+                
+                
+                    
+                while (isrunning)
                 {
-                    audioClient = new TcpClient();
+                    audioReadyEvent.Wait();
 
-                    if (!audioClient.ConnectAsync(host, 1012).Wait(1000))
+                    if (audioClient == null)
                     {
-                        ErrorOccurred?.Invoke("Control connection timeout");
-                        audioClient = null;
-                        continue;
-                    }
+                        audioClient = new TcpClient();
 
-                    Console.WriteLine("audio socket connected");
-                    continue;
-                }
-
-                try
-                {
-                    Console.WriteLine("started reciving audio....");
-
-                    NetworkStream audioStream = audioClient.GetStream();
-                    audioStream.ReadTimeout = Timeout.Infinite;
-
-                    byte[] codecBuffer = new byte[4];
-                    if (!ReadExact(audioStream, codecBuffer, 4))
-                        throw new IOException("codec header read failed");
-
-                    uint codecId = BinaryPrimitives.ReadUInt32BigEndian(codecBuffer);
-                    Console.WriteLine($"Audio codec ID: {codecId}");
-
-                    byte[] frameMeta = new byte[12];
-
-                    while (isrunning && audioClient.Connected)
-                    {
-                        if (!ReadExact(audioStream, frameMeta, 12))
+                        if (!audioClient.ConnectAsync(host, 1012).Wait(1000))
                         {
-                            Console.WriteLine("audio stream closed (frame meta)");
-                            break;
-                        }
-
-                        long ptsAndFlags =
-                            BinaryPrimitives.ReadInt64BigEndian(
-                                frameMeta.AsSpan(0, 8));
-
-                        int packetSize =
-                            (int)BinaryPrimitives.ReadUInt32BigEndian(
-                                frameMeta.AsSpan(8, 4));
-
-                        bool isConfig =
-                            (ptsAndFlags & PACKET_FLAG_CONFIG) != 0;
-
-                        if (packetSize <= 0 || packetSize > 1_000_000)
-                        {
-                            Console.WriteLine($"Invalid audio packet size: {packetSize}");
-                            break;
-                        }
-
-                        byte[] payload = new byte[packetSize];
-                        if (!ReadExact(audioStream, payload, packetSize))
-                        {
-                            Console.WriteLine("audio stream closed (payload)");
-                            break;
-                        }
-
-                        if (isConfig)
-                        {
-                            Console.WriteLine(
-                                $"Audio config packet: {payload.Length} bytes");
-                            _audio_decoder?.SetExtradata(payload);
-                            _recorder?.SetAudioExtradata(payload);
+                            ErrorOccurred?.Invoke("Control connection timeout");
+                            audioClient = null;
                             continue;
                         }
 
-                        long ptsUs = ptsAndFlags & ((1L << 62) - 1);
-                        _recorder?.WriteAudioPacket(payload, ptsUs);
-                        
-                        
-                        byte[]? pcm = _audio_decoder?.Decode(payload);
-                        
+                        Console.WriteLine("audio socket connected");
+                        continue;
+                    }
 
-           
-                        if (pcm != null && pcm.Length > 0)
+                    try
+                    {
+                        Console.WriteLine("started reciving audio....");
+
+                        NetworkStream audioStream = audioClient.GetStream();
+                        audioStream.ReadTimeout = Timeout.Infinite;
+
+                        byte[] codecBuffer = new byte[4];
+                        if (!ReadExact(audioStream, codecBuffer, 4))
+                            throw new IOException("codec header read failed");
+
+                        uint codecId = BinaryPrimitives.ReadUInt32BigEndian(codecBuffer);
+                        Console.WriteLine($"Audio codec ID: {codecId}");
+
+                        byte[] frameMeta = new byte[12];
+
+                        while (isrunning && audioClient.Connected)
                         {
-                            _audioPlayer?.Play(pcm);
+                            if (!ReadExact(audioStream, frameMeta, 12))
+                            {
+                                Console.WriteLine("audio stream closed (frame meta)");
+                                break;
+                            }
+
+                            long ptsAndFlags =
+                                BinaryPrimitives.ReadInt64BigEndian(
+                                    frameMeta.AsSpan(0, 8));
+
+                            int packetSize =
+                                (int)BinaryPrimitives.ReadUInt32BigEndian(
+                                    frameMeta.AsSpan(8, 4));
+
+                            bool isConfig =
+                                (ptsAndFlags & PACKET_FLAG_CONFIG) != 0;
+
+                            if (packetSize <= 0 || packetSize > 1_000_000)
+                            {
+                                Console.WriteLine($"Invalid audio packet size: {packetSize}");
+                                break;
+                            }
+
+                            byte[] payload = new byte[packetSize];
+                            if (!ReadExact(audioStream, payload, packetSize))
+                            {
+                                Console.WriteLine("audio stream closed (payload)");
+                                break;
+                            }
+
+                            if (isConfig)
+                            {
+                                Console.WriteLine(
+                                    $"Audio config packet: {payload.Length} bytes");
+                                _audio_decoder?.SetExtradata(payload);
+                                _recorder?.SetAudioExtradata(payload);
+                                continue;
+                            }
+
+                            long ptsUs = ptsAndFlags & ((1L << 62) - 1);
+                            _recorder?.WriteAudioPacket(payload, ptsUs);
+                            
+                            
+                            byte[]? pcm = _audio_decoder?.Decode(payload);
+                            
+
+               
+                            if (pcm != null && pcm.Length > 0)
+                            {
+                                _audioPlayer?.Play(pcm);
+                            }
+
                         }
+                    }
+                    catch (IOException ioEx) when (ioEx.InnerException is SocketException sockEx)
+                    {
+                        Console.WriteLine($"Audio socket error: {sockEx.SocketErrorCode}");
+                        ErrorOccurred?.Invoke(sockEx.Message);
+                        audioReadyEvent.Reset();
 
                     }
-                }
-                catch (IOException ioEx) when (ioEx.InnerException is SocketException sockEx)
-                {
-                    Console.WriteLine($"Audio socket error: {sockEx.SocketErrorCode}");
-                    ErrorOccurred?.Invoke(sockEx.Message);
-                    audioReadyEvent.Reset();
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Audio receive error: {ex.Message}");
+                        ErrorOccurred?.Invoke(ex.Message);
+                        audioReadyEvent.Reset();
 
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Audio receive error: {ex.Message}");
-                    ErrorOccurred?.Invoke(ex.Message);
-                    audioReadyEvent.Reset();
+                    }
+                    finally
+                    {
+                        try { audioClient?.Close(); } catch { }
+                        audioClient = null;
+                    }
 
-                }
-                finally
-                {
-                    try { audioClient?.Close(); } catch { }
-                    audioClient = null;
+                    Thread.Sleep(16);
                 }
 
-                Thread.Sleep(16);
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                ErrorOccurred?.Invoke($"{e.ToString()}");
+                
+            }
+            
+            
         }
 
         private static bool ReadExact(NetworkStream stream, byte[] buffer, int count)
@@ -984,103 +1041,103 @@ private void SaveScreenshot(Texture2D frame)
                             
                             
                             //
-                            //     D11InteropRenderer.Instance?.RunOnContext(new Action<DeviceContext>(_ =>
-                            // {
-                            //     
-                            // frame = _decoder.DecodePacket(
-                            //     packet.Data,
-                            //     packet.Pts,
-                            //     packet.IsConfig);
-                            //
-                            // if (frame == null)
-                            // {
-                            //     return;
-                            //     // continue;
-                            // }
-                            //
-                            // // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
-                            // // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
-                            // if (k_info.Instance.ImageContainer is { } container)
-                            // {
-                            //     double cw = container.Bounds.Width;
-                            //     double ch = container.Bounds.Height;
-                            //
-                            //     if (My_Store.Instance.DisplayHeight == 0 ||
-                            //         My_Store.Instance.DisplayHeight != (int)cw)
-                            //     {
-                            //         My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
-                            //     }
-                            // }
-                            //
-                            // if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
-                            // {
-                            //     My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
-                            // }
-                            //
-                            // if (My_Store.Instance?.DeviceHeight == 0 ||
-                            //     My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
-                            // {
-                            //     My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
-                            // }
-                            //
-                            // if (_previousFrame != null && !_previousFrame.IsDisposed)
-                            // {
-                            //     _previousFrame.Dispose();
-                            // }
-                            //
-                            // _previousFrame = frame;
-                            //     
-                            // }));
-                            //
-                            //     
+                                D11InteropRenderer.Instance?.RunOnContext(new Action<DeviceContext>(_ =>
+                            {
                                 
-                                
-                            
-                            
-                            
-                            
                             frame = _decoder.DecodePacket(
-                                                            packet.Data,
-                                                            packet.Pts,
-                                                            packet.IsConfig);
+                                packet.Data,
+                                packet.Pts,
+                                packet.IsConfig);
                             
-                                                        if (frame == null)
-                                                        {
-                                                            // return;
-                                                            continue;
-                                                        }
+                            if (frame == null)
+                            {
+                                return;
+                                // continue;
+                            }
                             
-                                                        // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
-                                                        // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
-                                                        if (k_info.Instance.ImageContainer is { } container)
-                                                        {
-                                                            double cw = container.Bounds.Width;
-                                                            double ch = container.Bounds.Height;
+                            // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
+                            // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
+                            if (k_info.Instance.ImageContainer is { } container)
+                            {
+                                double cw = container.Bounds.Width;
+                                double ch = container.Bounds.Height;
                             
-                                                            if (My_Store.Instance.DisplayHeight == 0 ||
-                                                                My_Store.Instance.DisplayHeight != (int)cw)
-                                                            {
-                                                                My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
-                                                            }
-                                                        }
+                                if (My_Store.Instance.DisplayHeight == 0 ||
+                                    My_Store.Instance.DisplayHeight != (int)cw)
+                                {
+                                    My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
+                                }
+                            }
                             
-                                                        if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
-                                                        {
-                                                            My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
-                                                        }
+                            if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
+                            {
+                                My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
+                            }
                             
-                                                        if (My_Store.Instance?.DeviceHeight == 0 ||
-                                                            My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
-                                                        {
-                                                            My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
-                                                        }
+                            if (My_Store.Instance?.DeviceHeight == 0 ||
+                                My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
+                            {
+                                My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
+                            }
                             
-                                                        if (_previousFrame != null && !_previousFrame.IsDisposed)
-                                                        {
-                                                            _previousFrame.Dispose();
-                                                        }
+                            if (_previousFrame != null && !_previousFrame.IsDisposed)
+                            {
+                                _previousFrame.Dispose();
+                            }
                             
-                                                        _previousFrame = frame;
+                            _previousFrame = frame;
+                                
+                            }));
+                            //
+                            //     
+                                
+                                
+                            
+                            
+                            
+                            //
+                            // frame = _decoder.DecodePacket(
+                            //                                 packet.Data,
+                            //                                 packet.Pts,
+                            //                                 packet.IsConfig);
+                            //
+                            //                             if (frame == null)
+                            //                             {
+                            //                                 // return;
+                            //                                 continue;
+                            //                             }
+                            //
+                            //                             // ---- Avalonia: ImageContainer is an Avalonia.Controls.Canvas.
+                            //                             // Use Bounds instead of ActualWidth/ActualHeight, and null-guard.
+                            //                             if (k_info.Instance.ImageContainer is { } container)
+                            //                             {
+                            //                                 double cw = container.Bounds.Width;
+                            //                                 double ch = container.Bounds.Height;
+                            //
+                            //                                 if (My_Store.Instance.DisplayHeight == 0 ||
+                            //                                     My_Store.Instance.DisplayHeight != (int)cw)
+                            //                                 {
+                            //                                     My_Store.Instance.SetDisplayResolution((int)cw, (int)ch);
+                            //                                 }
+                            //                             }
+                            //
+                            //                             if (My_Store.Instance.VideoHeight == 0 || My_Store.Instance.VideoWidth == 0)
+                            //                             {
+                            //                                 My_Store.Instance.SetVideoResolution(frame.Description.Width, frame.Description.Height);
+                            //                             }
+                            //
+                            //                             if (My_Store.Instance?.DeviceHeight == 0 ||
+                            //                                 My_Store.Instance?.DeviceWidth == 0 && my_info.Instance.DeveloperMode)
+                            //                             {
+                            //                                 My_Store.Instance.SetDeviceResolution(frame.Description.Width, frame.Description.Height);
+                            //                             }
+                            //
+                            //                             if (_previousFrame != null && !_previousFrame.IsDisposed)
+                            //                             {
+                            //                                 _previousFrame.Dispose();
+                            //                             }
+                            //
+                            //                             _previousFrame = frame;
                                 
                                 
                                 

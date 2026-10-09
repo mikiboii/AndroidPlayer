@@ -1857,7 +1857,7 @@ public class D11InteropRenderer : DrawingSurfaceDemoBase
     // Decode -> draw latency measurement
     // ------------------------------------------------------------------
     private const int StatsWindowSize = 120;
-    private const bool EnableLatencyLogging = true;
+    private const bool EnableLatencyLogging = false;
 
     private readonly object _latencyLock = new();
     private readonly Queue<double> _decodeToDrawHistory = new();

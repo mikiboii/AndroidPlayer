@@ -95,19 +95,37 @@
               </StackPanel>
             </ListBoxItem>
 
+            <!-- <ListBoxItem Padding="10" CornerRadius="4" Background="#F2F6FF" FontWeight="SemiBold"> -->
+            <!--   <StackPanel Orientation="Horizontal" VerticalAlignment="Center"> -->
+            <!--     <TextBlock Text="🖱️" Margin="0,0,10,0"/> -->
+            <!--     <TextBlock Text="Mouse Setting"/> -->
+            <!--   </StackPanel> -->
+            <!-- </ListBoxItem> -->
+            
             <ListBoxItem Padding="10" CornerRadius="4" Background="#F2F6FF" FontWeight="SemiBold">
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="🖱️" Margin="0,0,10,0"/>
+                <Viewbox Width="16" Height="16" Margin="-3,0,10,0">
+                  <Path Fill="#2D2D2D"
+                        Data="M12 2C8.13 2 5 5.13 5 9v6c0 3.87 3.13 7 7 7s7-3.13 7-7V9c0-3.87-3.13-7-7-7zm0 2c2.76 0 5 2.24 5 5v1h-5V4zm-5 5c0-2.76 2.24-5 5-5v6H7V9zm0 5v-3h5v8c-2.76 0-5-2.24-5-5zm7 5v-8h5v3c0 2.76-2.24 5-5 5z"/>
+                </Viewbox>
                 <TextBlock Text="Mouse Setting"/>
               </StackPanel>
             </ListBoxItem>
 
-            <ListBoxItem Padding="10"  CornerRadius="4">
+            <!-- <ListBoxItem Padding="10"  CornerRadius="4"> -->
+            <!--   <StackPanel Orientation="Horizontal" VerticalAlignment="Center"> -->
+            <!--     <TextBlock Text="⌨️" Margin="0,0,10,0"/> -->
+            <!--     <TextBlock Text="Shortcut key"/> -->
+            <!--   </StackPanel> -->
+            <!-- </ListBoxItem> -->
+            
+            <ListBoxItem Padding="10" CornerRadius="4">
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="⌨️" Margin="0,0,10,0"/>
-                <TextBlock Text="Shortcut key"/>
+                <TextBlock Text="ℹ️" Margin="0,0,10,0"/>
+                <TextBlock Text="About"/>
               </StackPanel>
             </ListBoxItem>
+            
           </ListBox>
         </StackPanel>
       </Border>

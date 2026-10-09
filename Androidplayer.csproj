@@ -2,9 +2,11 @@
 
     <!-- 1. Main properties -->
     <PropertyGroup>
-<!--        <OutputType>Exe</OutputType>-->
-        <OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>
-        <OutputType Condition="'$(Configuration)' != 'Debug'">WinExe</OutputType>
+        <OutputType>Exe</OutputType>
+<!--        <OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>-->
+<!--        <OutputType Condition="'$(Configuration)' != 'Debug'">WinExe</OutputType>-->
+        
+        
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -56,6 +58,7 @@
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
         <PackageReference Include="LiteDB" Version="6.0.0-prerelease.65" />
+        
         <PackageReference Include="SharpAdbClient" Version="2.3.23" />
         
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
@@ -116,6 +119,20 @@
         <TrimmerRootAssembly Include="FFmpeg.AutoGen" />
     </ItemGroup>
 
+    <ItemGroup Condition="'$(DepsPlatform)' == 'windows'">
+        <PackageReference Include="Microsoft.XAudio2.Redist" Version="1.2.13" />
+
+        <!-- Ship the redist build under the name SharpDX probes for (2.8) -->
+        <None Include="$(NuGetPackageRoot)microsoft.xaudio2.redist\1.2.13\build\native\release\bin\x64\xaudio2_9redist.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <TargetPath>xaudio2_8.dll</TargetPath>
+            <Link>xaudio2_8.dll</Link>
+        </None>
+    </ItemGroup>
+    
+    
+    
     <!-- 7. Native deps copy -->
     <ItemGroup>
         <Content Remove="deps\**\*" />

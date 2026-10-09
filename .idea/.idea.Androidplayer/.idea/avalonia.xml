@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="App.axaml" value="Androidplayer.csproj" />
+        <entry key="SidebarWindow.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Gpuintrop_view.axaml" value="Androidplayer.csproj" />
+        <entry key="Src/Pages/TitleBar.axaml" value="Androidplayer.csproj" />
+        <entry key="notes/del_Window.axaml" value="Androidplayer.csproj" />
+        <entry key="windows/settings.axaml" value="Androidplayer.csproj" />
+        <entry key="windows/settings_view/AboutSettings.axaml" value="Androidplayer.csproj" />
+        <entry key="windows/settings_view/ScreenSettings.axaml" value="Androidplayer.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

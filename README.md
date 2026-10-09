@@ -104,17 +104,41 @@ Please keep code style consistent and test changes before submitting.
 - ADB
 - .NET
 
+[//]: # (---)
+
+[//]: # ()
+[//]: # ()
+[//]: # (💝 Support the Project)
+
+[//]: # (If you find AndroidPlayer useful and would like to support its development, consider making a donation:)
+
+[//]: # ()
+[//]: # (https://img.shields.io/badge/Donate-PayPal-blue.svg)
+
+[//]: # ()
+[//]: # (Your support helps keep the project alive and encourages continued development! Every contribution, no matter how small, is greatly appreciated. ❤️)
+
+[//]: # ()
+[//]: # (---)
+
+
+
 ---
 
+## 💝 Support the Project
 
-💝 Support the Project
 If you find AndroidPlayer useful and would like to support its development, consider making a donation:
 
-https://img.shields.io/badge/Donate-PayPal-blue.svg
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/mikiyasweldetinsay21)
+
+👉 **Donate here:** [https://paypal.me/mikiyasweldetinsay21](https://paypal.me/mikiyasweldetinsay21)
 
 Your support helps keep the project alive and encourages continued development! Every contribution, no matter how small, is greatly appreciated. ❤️
 
 ---
+
+
+
 
 ## License
 

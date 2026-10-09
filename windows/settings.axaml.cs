@@ -216,6 +216,7 @@ public partial class settings : Window
             case 2: // Mouse Settings
                 SettingsContent.Content = new MouseSettings();
                 break;
+            case 3: SettingsContent.Content = new AboutSettings();   break;
             default:
                 SettingsContent.Content = new ScreenSettings();
                 break;

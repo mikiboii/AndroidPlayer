@@ -11,5 +11,9 @@
         
         <StyleInclude Source="avares://Androidplayer/Styles/Resources.axaml"/>
         <StyleInclude Source="avares://Androidplayer/Styles/Scroll.axaml"/>
+        
+        <Style Selector=":is(Control)">
+            <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
+        </Style>
     </Application.Styles>
 </Application>

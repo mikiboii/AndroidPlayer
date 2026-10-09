@@ -26,9 +26,12 @@ public class App_manager : IDisposable
 {
     private Adb_worker my_adb_worker;
     private app_worker my_app_worker;
-    private Scrcpy_worker scrcpy_worker;
+    public Scrcpy_worker scrcpy_worker;
 
     private Native_view my_image;
+    
+    
+    public static  App_manager Instance { get; private set; }
 
     private bool first_frame_displayed = false;
 
@@ -51,6 +54,8 @@ public class App_manager : IDisposable
 
     public App_manager(Native_view image = null)
     {
+        Instance = this;
+        
         my_image = image;
 
         my_info.Instance.PropertyChanged += my_info_propertychanged;
