@@ -1,6 +1,6 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Androidplayer.notes;
+
 using Androidplayer.windows;
 using Avalonia;
 using Avalonia.Controls;
