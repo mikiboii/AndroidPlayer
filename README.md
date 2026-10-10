@@ -1,6 +1,8 @@
 # AndroidPlayer
 
-AndroidPlayer is a high-performance Android screen mirroring application for Windows built with WPF and DirectX. It provides low-latency video and audio streaming, keyboard and mouse control, and customizable key mapping for games and productivity.
+AndroidPlayer is a high-performance Android screen mirroring application for Windows built with Avalonia and DirectX. It provides low-latency video and audio streaming, keyboard and mouse control, and customizable key mapping for games and productivity.
+
+> **Support for macOS and Linux is coming soon.**
 
 ---
 
@@ -34,7 +36,7 @@ AndroidPlayer is a high-performance Android screen mirroring application for Win
 ### Requirements
 
 - Windows 7 or later
-- .NET SDK 
+- .NET SDK 8.0
 - JetBrains Rider (recommended) or Visual Studio
 - Android device with USB debugging enabled
 
@@ -98,29 +100,11 @@ Please keep code style consistent and test changes before submitting.
 ## Technologies
 
 - C#
-- WPF
+- Avalonia UI
 - DirectX 11
 - FFmpeg.AutoGen
 - ADB
 - .NET
-
-[//]: # (---)
-
-[//]: # ()
-[//]: # ()
-[//]: # (💝 Support the Project)
-
-[//]: # (If you find AndroidPlayer useful and would like to support its development, consider making a donation:)
-
-[//]: # ()
-[//]: # (https://img.shields.io/badge/Donate-PayPal-blue.svg)
-
-[//]: # ()
-[//]: # (Your support helps keep the project alive and encourages continued development! Every contribution, no matter how small, is greatly appreciated. ❤️)
-
-[//]: # ()
-[//]: # (---)
-
 
 
 ---
@@ -138,7 +122,19 @@ Your support helps keep the project alive and encourages continued development! 
 ---
 
 
+## Credits & Acknowledgements
 
+AndroidPlayer would not exist without the work of these projects:
+
+- **[scrcpy](https://github.com/Genymobile/scrcpy)** by Genymobile — the original Android screen mirroring and control tool. AndroidPlayer's streaming model, `scrcpy-server.jar` integration, and much of the ADB control flow are directly inspired by (and in places rely on) scrcpy. Huge thanks to the scrcpy team and contributors.
+- **[Flyleaf](https://github.com/SuRGeoNix/Flyleaf)** by SuRGeoNix — media playback framework whose architecture and media handling approach influenced parts of AndroidPlayer's FFmpeg integration.
+
+Special thanks to the **scrcpy** and **Flyleaf** projects and their maintainers — please consider starring and supporting them:
+
+- https://github.com/Genymobile/scrcpy
+- https://github.com/SuRGeoNix/Flyleaf
+
+---
 
 ## License
 
