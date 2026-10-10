@@ -2,9 +2,9 @@
 
     <!-- 1. Main properties -->
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
-<!--        <OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>-->
-<!--        <OutputType Condition="'$(Configuration)' != 'Debug'">WinExe</OutputType>-->
+<!--        <OutputType>Exe</OutputType>-->
+        <OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>
+        <OutputType Condition="'$(Configuration)' != 'Debug'">WinExe</OutputType>
         
         
         <TargetFramework>net8.0</TargetFramework>
